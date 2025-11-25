@@ -11,7 +11,7 @@ function Navbar() {
   const navigator = useNavigation();
   return (
     //
-    <View className="flex w-full flex-row justify-between bg-amber-800 py-5">
+    <View className="bg-dark flex w-full flex-row justify-between py-5">
       <Button variant="ghost" onPress={() => navigator.navigate('Calendar')} className="ml-10">
         Calendar
       </Button>
