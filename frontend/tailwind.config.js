@@ -1,6 +1,6 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
-  content: ['./App.{js,ts,tsx}', './components/**/*.{js,ts,tsx}'],
+  content: ['./src/App.{js,ts,tsx}', './src/components/**/*.{js,ts,tsx}'],
 
   presets: [require('nativewind/preset'), require('./nativecn-preset')],
   theme: {
@@ -15,7 +15,7 @@ module.exports = {
         'text-primary': '#200524',
         'text-secondary': '#754ABF',
 
-        // Dark mode colors (prefixed for clarity in code)
+        // Dark mode colors
         'dark-background': '#200524',
         'dark-surface': '#2D1B3D',
         'dark-primary': '#A77ED6',
