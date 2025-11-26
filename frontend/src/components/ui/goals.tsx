@@ -1,7 +1,20 @@
-import { View, Text } from 'react-native';
+import { View, Text, StyleSheet } from 'react-native';
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from './card';
 import Button from './button';
+import AnimatedCheckbox from 'react-native-checkbox-reanimated';
+import { Pressable } from 'react-native';
+import {
+  AlertDialog,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+  AlertDialogAction,
+} from 'components/ui';
 
 function Goals() {
   const [goals, setGoals] = useState([]);
@@ -27,6 +40,14 @@ function Goals() {
     showGoals();
   }, []);
 
+  const [checked, setChecked] = useState<boolean>(false);
+
+  const handleCheckboxPress = () => {
+    setChecked((prev) => {
+      return !prev;
+    });
+  };
+
   return (
     <View className="">
       <Card className="">
@@ -36,12 +57,45 @@ function Goals() {
         <CardContent>
           {goals.map((goal) => (
             //
-            <Card className="mb-5 flex-col">
+            <Card key={goal._id} className="mb-5 max-h-32 flex-col px-2">
               <CardHeader>
-                <CardTitle>{goal.title}</CardTitle>
+                <CardTitle className="text-center">{goal.title}</CardTitle>
               </CardHeader>
               <CardContent>
-                <Text>{goal.description}</Text>
+                <View className="h-32 w-full flex-row">
+                  <View className="w-[25%]">
+                    <Text>{goal.description}</Text>
+                  </View>
+                  <View className="  justify-center pl-44">
+                    <AlertDialog>
+                      <AlertDialogTrigger asChild>
+                        <Pressable className="mb-32 h-20 w-10">
+                          <AnimatedCheckbox
+                            checked={checked}
+                            checkmarkColor="#008000"
+                            highlightColor="#00FF0040"
+                            boxOutlineColor="#754ABF"></AnimatedCheckbox>
+                        </Pressable>
+                      </AlertDialogTrigger>
+                      <AlertDialogContent className="bg-primary">
+                        <AlertDialogHeader>
+                          <AlertDialogTitle>Mark Goal Complete?</AlertDialogTitle>
+                          <AlertDialogDescription>
+                            By pressing confirm, you are agreeing that you completed this goal
+                          </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter className="mb-5 mt-5 flex-row justify-center">
+                          <AlertDialogCancel variant="outline" className="mr-5">
+                            Cancel
+                          </AlertDialogCancel>
+                          <AlertDialogAction variant="outline" onPress={handleCheckboxPress}>
+                            Confirm
+                          </AlertDialogAction>
+                        </AlertDialogFooter>
+                      </AlertDialogContent>
+                    </AlertDialog>
+                  </View>
+                </View>
               </CardContent>
             </Card>
           ))}
