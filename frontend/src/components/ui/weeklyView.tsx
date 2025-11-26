@@ -2,6 +2,7 @@ import { View } from 'react-native';
 import { WeekCalendar } from 'react-native-calendars';
 import { useColorScheme } from 'react-native';
 import Goals from './goals';
+import AddGoal from '../addGoal';
 
 function WeeklyView() {
   const colorScheme = useColorScheme();
@@ -21,13 +22,16 @@ function WeeklyView() {
     textDayHeaderFontWeight: '600',
   };
   return (
-    <View className="">
+    <View className="flex flex-col">
       <WeekCalendar
         theme={calendarTheme}
         firstDay={1}
         current={new Date().toISOString()}></WeekCalendar>
       <View className="px-10 py-10">
         <Goals />
+      </View>
+      <View className="flex-row justify-center px-10 py-10">
+        <AddGoal />
       </View>
     </View>
   );

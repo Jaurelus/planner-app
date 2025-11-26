@@ -1,4 +1,4 @@
-import Goal from "./goalsModel";
+import Goal from "./goalsModel.js";
 
 //Create a goal (Put)
 export const createGoal = async (req, res) => {
@@ -19,7 +19,7 @@ export const createGoal = async (req, res) => {
       .status(201)
       .json({ message: "New goal added!", goal: savedGoal });
   } catch (error) {
-    return res.status(400).json({ message: "Error saving goal." });
+    return res.status(400).json({ message: `Error saving goal: ${error}` });
   }
 };
 

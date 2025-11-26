@@ -6,7 +6,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import HomePage from '@/screens/home';
 import Personal from '@/screens/personal';
 import Daily from '@/screens/today';
-import CalendarScreen from '@/components/ui/scrollview';
+import CalendarScreen from '@/screens/calendarScreen';
 
 export default function App() {
   const Stack = createNativeStackNavigator();

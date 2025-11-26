@@ -35,10 +35,9 @@ function CalendarScreen({ navigation }) {
   };
   return (
     <View className="flex flex-1">
-      <Button variant="ghost" onPress={handleView}>
+      <Button variant="ghost" onPress={handleView} className="absolute h-20">
         <Eye />
       </Button>
-      {/*}
       {scrollVisibility && (
         <View className="">
           <ScrollView />
@@ -53,10 +52,7 @@ function CalendarScreen({ navigation }) {
         <View className="">
           <MonthlyView></MonthlyView>
         </View>
-      )
-        }
-      */}
-      ;
+      )}
     </View>
   );
 }
