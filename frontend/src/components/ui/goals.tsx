@@ -18,10 +18,16 @@ import {
 
 function Goals() {
   const [goals, setGoals] = useState([]);
+  const [alertDT, setAlertDT] = useState('Mark Goal Complete?');
+  const [alertDD, setAlertDD] = useState(
+    'By pressing confirm, you are agreeing that you completed this goal'
+  );
 
+  //-------- API Calls ---------
+  const API_URL = 'http://localhost:3000/api/goals';
+
+  //Show Goals
   const showGoals = async () => {
-    const API_URL = 'http://localhost:3000/api/goals';
-
     try {
       const response = await fetch(API_URL, {
         headers: { 'Content-Type': 'application/json' },
@@ -40,10 +46,22 @@ function Goals() {
     showGoals();
   }, []);
 
+  //Edit goals
+  const editGoals = () => {};
+  //Delete goals
+  const deleteGoals = () => {};
+
   const [checked, setChecked] = useState<boolean>(false);
 
   const handleCheckboxPress = () => {
     setChecked((prev) => {
+      if (checked == false) {
+        setAlertDT('Unmark goal as complete');
+        setAlertDD('By pressing confirm, you are marking this goal as incomplete');
+      } else if (checked == true) {
+        setAlertDT('Mark Goal Complete?');
+        setAlertDD('By pressing confirm, you are agreeing that you completed this goal');
+      }
       return !prev;
     });
   };
@@ -71,7 +89,7 @@ function Goals() {
                       <AlertDialogTrigger asChild>
                         <Pressable className="mb-32 h-20 w-10">
                           <AnimatedCheckbox
-                            checked={checked}
+                            checked={goal.complete}
                             checkmarkColor="#008000"
                             highlightColor="#00FF0040"
                             boxOutlineColor="#754ABF"></AnimatedCheckbox>
@@ -79,10 +97,8 @@ function Goals() {
                       </AlertDialogTrigger>
                       <AlertDialogContent className="bg-primary">
                         <AlertDialogHeader>
-                          <AlertDialogTitle>Mark Goal Complete?</AlertDialogTitle>
-                          <AlertDialogDescription>
-                            By pressing confirm, you are agreeing that you completed this goal
-                          </AlertDialogDescription>
+                          <AlertDialogTitle>{alertDT}</AlertDialogTitle>
+                          <AlertDialogDescription>{alertDD}</AlertDialogDescription>
                         </AlertDialogHeader>
                         <AlertDialogFooter className="mb-5 mt-5 flex-row justify-center">
                           <AlertDialogCancel variant="outline" className="mr-5">
