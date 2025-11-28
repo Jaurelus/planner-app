@@ -15,6 +15,7 @@ import {
   AlertDialogTrigger,
   AlertDialogAction,
 } from 'components/ui';
+import { TextInput } from 'react-native';
 
 function Goals() {
   const [goals, setGoals] = useState([]);
@@ -23,8 +24,43 @@ function Goals() {
     'By pressing confirm, you are agreeing that you completed this goal'
   );
 
+  const [gTitle, setGTitle] = useState('');
+  const [gDesc, setGDesc] = useState('');
+
   //-------- API Calls ---------
+
   const API_URL = 'http://localhost:3000/api/goals';
+
+  //Add new goal
+  const saveNewGoal = async () => {
+    const API_URL = 'http://localhost:3000/api/goals';
+
+    try {
+      const payload = {
+        goalTitle: gTitle,
+        goalDescription: gDesc,
+      };
+      console.log(payload.goalTitle);
+      const response = await fetch(API_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+
+      const data = await response.json();
+
+      if (response.status == 201) {
+        setGTitle('');
+        setGDesc('');
+        console.log('Goal Saved');
+        showGoals;
+      } else {
+        console.log(data.message);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   //Show Goals
   const showGoals = async () => {
@@ -80,11 +116,11 @@ function Goals() {
                 <CardTitle className="text-center">{goal.title}</CardTitle>
               </CardHeader>
               <CardContent>
-                <View className="h-32 w-full flex-row">
-                  <View className="w-[25%]">
+                <View className="h-32 w-full flex-1 flex-row">
+                  <View className=" w-[95%]">
                     <Text>{goal.description}</Text>
                   </View>
-                  <View className="  justify-center pl-44">
+                  <View className="justify-center">
                     <AlertDialog>
                       <AlertDialogTrigger asChild>
                         <Pressable className="mb-32 h-20 w-10">
@@ -115,7 +151,41 @@ function Goals() {
               </CardContent>
             </Card>
           ))}
-          <Button>Create Goal</Button>
+          <AlertDialog>
+            <AlertDialogTrigger asChild>
+              <Button>Create Goal</Button>
+            </AlertDialogTrigger>
+            <View className="">
+              <AlertDialogContent className=" scale-10 !w-[90%] rounded-3xl bg-primary p-2">
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Add New Goal</AlertDialogTitle>
+                </AlertDialogHeader>
+                <TextInput
+                  className="mb-5 mt-5 rounded-xl border border-primary  bg-white p-1 text-center"
+                  value={gTitle}
+                  onChangeText={setGTitle}
+                  placeholder="Goal Title"></TextInput>
+                <TextInput
+                  value={gDesc}
+                  onChangeText={setGDesc}
+                  multiline
+                  scrollEnabled={false}
+                  className="w-100 mb-5 h-64 rounded-xl border border-primary bg-white p-2 text-center"
+                  placeholder="Goal Description"></TextInput>
+                <AlertDialogFooter className="mt-5 flex-row justify-center text-white">
+                  <AlertDialogCancel variant="outline" className="mr-5 border border-white">
+                    <Text className="text-white">Cancel</Text>
+                  </AlertDialogCancel>
+                  <AlertDialogAction
+                    variant="outline"
+                    className="border border-white"
+                    onPress={saveNewGoal}>
+                    <Text className="text-white">Confirm</Text>
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </View>
+          </AlertDialog>
         </CardContent>
       </Card>
     </View>

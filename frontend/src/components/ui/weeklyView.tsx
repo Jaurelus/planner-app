@@ -30,9 +30,6 @@ function WeeklyView() {
       <View className="px-10 py-10">
         <Goals />
       </View>
-      <View className="flex-row justify-center px-10 py-10">
-        <AddGoal />
-      </View>
     </View>
   );
 }
