@@ -7,7 +7,7 @@ function EditGoal() {
   const [gTitle, setGTitle] = useState('');
   const [gDesc, setGDesc] = useState('');
 
-  const saveNewGoal = async () => {
+  const editUserGoal = async () => {
     const API_URL = 'http://localhost:3000/api/goals';
     try {
     } catch (error) {}
@@ -29,7 +29,7 @@ function EditGoal() {
           multiline
           scrollEnabled={false}
           className="w-100 mb-5 h-64 rounded-xl border border-primary p-2 text-center"></TextInput>
-        <Button onPress={saveNewGoal}>Save</Button>
+        <Button onPress={editUserGoal}>Save</Button>
       </CardContent>
     </Card>
   );

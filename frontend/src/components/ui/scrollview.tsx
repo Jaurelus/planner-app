@@ -20,7 +20,6 @@ function ScrollView() {
     textMonthFontWeight: 'bold',
     textDayHeaderFontWeight: '600',
   };
-  console.log(new Date().toISOString().slice(0, 7));
 
   return (
     <View>

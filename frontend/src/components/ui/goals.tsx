@@ -2,7 +2,7 @@ import { View, Text, StyleSheet } from 'react-native';
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from './card';
 import Button from './button';
-import AnimatedCheckbox from 'react-native-checkbox-reanimated';
+import BouncyCheckbox from 'react-native-bouncy-checkbox';
 import { Pressable } from 'react-native';
 import {
   AlertDialog,
@@ -27,20 +27,28 @@ function Goals() {
   const [gTitle, setGTitle] = useState('');
   const [gDesc, setGDesc] = useState('');
 
+  const updateAlertText = () => {
+    if (alertDT == 'Mark Goal Complete?') {
+      setAlertDT('Mark Goal Incomplete');
+      setAlertDD(
+        'By pressing confirm, you are reopening the goal, meaning it has yet to be completed.'
+      );
+    } else {
+      setAlertDT('Mark Goal Complete?');
+      setAlertDD('By pressing confirm, you are agreeing that you completed this goal');
+    }
+  };
   //-------- API Calls ---------
 
   const API_URL = 'http://localhost:3000/api/goals';
 
   //Add new goal
   const saveNewGoal = async () => {
-    const API_URL = 'http://localhost:3000/api/goals';
-
     try {
       const payload = {
         goalTitle: gTitle,
         goalDescription: gDesc,
       };
-      console.log(payload.goalTitle);
       const response = await fetch(API_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -53,7 +61,7 @@ function Goals() {
         setGTitle('');
         setGDesc('');
         console.log('Goal Saved');
-        showGoals;
+        showGoals();
       } else {
         console.log(data.message);
       }
@@ -87,19 +95,24 @@ function Goals() {
   //Delete goals
   const deleteGoals = () => {};
 
-  const [checked, setChecked] = useState<boolean>(false);
+  const handleCheckboxPress = async (GID: any, currCompletion: any) => {
+    try {
+      const response = await fetch(API_URL + '/' + GID, {
+        headers: { 'Content-Type': 'application/json' },
+        method: 'PUT',
+        body: JSON.stringify({ goalCompletion: !currCompletion }),
+      });
 
-  const handleCheckboxPress = () => {
-    setChecked((prev) => {
-      if (checked == false) {
-        setAlertDT('Unmark goal as complete');
-        setAlertDD('By pressing confirm, you are marking this goal as incomplete');
-      } else if (checked == true) {
-        setAlertDT('Mark Goal Complete?');
-        setAlertDD('By pressing confirm, you are agreeing that you completed this goal');
+      if (response.status == 200) {
+        //
+        console.log('Goal completion status changed.');
+        showGoals();
+      } else if (response.status == 400) {
+        console.log('Error updating the goal');
       }
-      return !prev;
-    });
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   return (
@@ -111,42 +124,46 @@ function Goals() {
         <CardContent>
           {goals.map((goal) => (
             //
-            <Card key={goal._id} className="mb-5 max-h-32 flex-col px-2">
+            <Card key={goal._id} className="mb-5 min-h-32 flex-col px-2">
               <CardHeader>
                 <CardTitle className="text-center">{goal.title}</CardTitle>
               </CardHeader>
               <CardContent>
-                <View className="h-32 w-full flex-1 flex-row">
-                  <View className=" w-[95%]">
-                    <Text>{goal.description}</Text>
-                  </View>
-                  <View className="justify-center">
-                    <AlertDialog>
-                      <AlertDialogTrigger asChild>
-                        <Pressable className="mb-32 h-20 w-10">
-                          <AnimatedCheckbox
-                            checked={goal.complete}
-                            checkmarkColor="#008000"
-                            highlightColor="#00FF0040"
-                            boxOutlineColor="#754ABF"></AnimatedCheckbox>
-                        </Pressable>
-                      </AlertDialogTrigger>
-                      <AlertDialogContent className="bg-primary">
-                        <AlertDialogHeader>
-                          <AlertDialogTitle>{alertDT}</AlertDialogTitle>
-                          <AlertDialogDescription>{alertDD}</AlertDialogDescription>
-                        </AlertDialogHeader>
-                        <AlertDialogFooter className="mb-5 mt-5 flex-row justify-center">
-                          <AlertDialogCancel variant="outline" className="mr-5">
-                            Cancel
-                          </AlertDialogCancel>
-                          <AlertDialogAction variant="outline" onPress={handleCheckboxPress}>
-                            Confirm
-                          </AlertDialogAction>
-                        </AlertDialogFooter>
-                      </AlertDialogContent>
-                    </AlertDialog>
-                  </View>
+                <View className="w-full flex-row justify-between">
+                  <Text>{goal.description}</Text>
+                  <AlertDialog>
+                    <AlertDialogTrigger asChild>
+                      <BouncyCheckbox
+                        isChecked={goal.complete}
+                        disableText
+                        fillColor="green"
+                        size={25}
+                        useBuiltInState={false}
+                        iconStyle={{ borderColor: 'green' }}
+                      />
+                    </AlertDialogTrigger>
+                    <AlertDialogContent className="scale-10 !w-[90%] bg-primary">
+                      <AlertDialogHeader>
+                        <AlertDialogTitle className="pt-3">{alertDT}</AlertDialogTitle>
+                        <AlertDialogDescription className="px-5 py-1">
+                          {alertDD}
+                        </AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter className="mb-5 mt-5 flex-row justify-center">
+                        <AlertDialogCancel variant="outline" className="mr-5">
+                          Cancel
+                        </AlertDialogCancel>
+                        <AlertDialogAction
+                          variant="outline"
+                          onPress={() => {
+                            handleCheckboxPress(goal._id, goal.complete);
+                            updateAlertText();
+                          }}>
+                          Confirm
+                        </AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
                 </View>
               </CardContent>
             </Card>

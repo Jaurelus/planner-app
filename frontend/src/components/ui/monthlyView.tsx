@@ -21,7 +21,7 @@ function MonthlyView() {
   };
 
   return (
-    <View className="top-0">
+    <View className="">
       <Calendar theme={calendarTheme}></Calendar>
     </View>
   );

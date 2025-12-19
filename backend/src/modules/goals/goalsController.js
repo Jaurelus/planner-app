@@ -1,6 +1,6 @@
 import Goal from "./goalsModel.js";
 
-//Create a goal (Put)
+//Create a goal (Post)
 export const createGoal = async (req, res) => {
   try {
     const { goalTitle, goalDescription } = req.body;
@@ -23,7 +23,7 @@ export const createGoal = async (req, res) => {
   }
 };
 
-// Edit a goal (Post)
+// Edit a goal (Put)
 export const editGoal = async (req, res) => {
   try {
     //Destructure request

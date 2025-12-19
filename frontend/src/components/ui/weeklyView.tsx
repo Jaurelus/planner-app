@@ -15,7 +15,7 @@ function WeeklyView() {
     selectedDayBackgroundColor: isDark ? '#A77ED6' : '#F6DBFA',
     selectedDayTextColor: '#F6DBFA',
     todayTextColor: isDark ? '#E89B6E' : '#D48354',
-    dayTextColor: isDark ? '#F6DBFA' : '#200524',
+    dayTextColor: isDark ? '#FFFFFF' : '#200524',
     textDisabledColor: isDark ? '#6B4A7A' : '#C4A8D4',
     monthTextColor: isDark ? '#F6DBFA' : '#200524',
     textMonthFontWeight: 'bold',
