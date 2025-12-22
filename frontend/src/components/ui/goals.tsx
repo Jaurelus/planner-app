@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from './card';
 import Button from './button';
 import BouncyCheckbox from 'react-native-bouncy-checkbox';
-import { Pressable } from 'react-native';
+import { CircleX, LucideCircleX, SquarePen } from 'lucide-react-native';
 import {
   AlertDialog,
   AlertDialogCancel,
@@ -91,9 +91,9 @@ function Goals() {
   }, []);
 
   //Edit goals
-  const editGoals = () => {};
+  const editGoals = async (GID) => {};
   //Delete goals
-  const deleteGoals = () => {};
+  const deleteGoals = async (GID) => {};
 
   const handleCheckboxPress = async (GID: any, currCompletion: any) => {
     try {
@@ -115,8 +115,12 @@ function Goals() {
     }
   };
 
+  // ---------- App Content Build ------------
+
   return (
     <View className="">
+      {/* Goal display (cards) */}
+
       <Card className="">
         <CardHeader>
           <CardTitle className="text-center">Goals</CardTitle>
@@ -130,14 +134,27 @@ function Goals() {
               </CardHeader>
               <CardContent>
                 <View className="w-full flex-row justify-between">
-                  <Text>{goal.description}</Text>
+                  <Text className="p-1">{goal.description}</Text>
+
+                  {/* Edit/Delete */}
+                  <View className="absolute bottom-11 left-52 flex-row gap-2">
+                    <Button variant="ghost" className="ml-0 p-0">
+                      <SquarePen color="#D48354" size={18} />
+                    </Button>
+                    <Button variant="ghost" className="mr-0 p-0">
+                      <CircleX color="red" size={18} />
+                    </Button>
+                  </View>
+
+                  {/* Marking a goal as complete */}
+
                   <AlertDialog>
                     <AlertDialogTrigger asChild>
                       <BouncyCheckbox
                         isChecked={goal.complete}
                         disableText
                         fillColor="green"
-                        size={25}
+                        size={20}
                         useBuiltInState={false}
                         iconStyle={{ borderColor: 'green' }}
                       />
@@ -145,7 +162,7 @@ function Goals() {
                     <AlertDialogContent className="scale-10 !w-[90%] bg-primary">
                       <AlertDialogHeader>
                         <AlertDialogTitle className="pt-3">{alertDT}</AlertDialogTitle>
-                        <AlertDialogDescription className="px-5 py-1">
+                        <AlertDialogDescription className="px-5 py-1 text-white">
                           {alertDD}
                         </AlertDialogDescription>
                       </AlertDialogHeader>
@@ -168,6 +185,9 @@ function Goals() {
               </CardContent>
             </Card>
           ))}
+
+          {/* Adding a new goal */}
+
           <AlertDialog>
             <AlertDialogTrigger asChild>
               <Button>Create Goal</Button>

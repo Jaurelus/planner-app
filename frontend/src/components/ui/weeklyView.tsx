@@ -13,7 +13,7 @@ function WeeklyView() {
     calendarBackground: isDark ? '#200524' : '#FFFFFF',
     textSectionTitleColor: isDark ? '#F6DBFA' : '#754ABF',
     selectedDayBackgroundColor: isDark ? '#A77ED6' : '#F6DBFA',
-    selectedDayTextColor: '#F6DBFA',
+    selectedDayTextColor: '#000000',
     todayTextColor: isDark ? '#E89B6E' : '#D48354',
     dayTextColor: isDark ? '#FFFFFF' : '#200524',
     textDisabledColor: isDark ? '#6B4A7A' : '#C4A8D4',
