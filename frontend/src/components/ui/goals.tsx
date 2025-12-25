@@ -26,7 +26,8 @@ function Goals() {
 
   const [gTitle, setGTitle] = useState('');
   const [gDesc, setGDesc] = useState('');
-
+  const [gTitleEdit, setGTitleEdit] = useState('');
+  const [gDescEdit, setGDescEdit] = useState('');
   const updateAlertText = () => {
     if (alertDT == 'Mark Goal Complete?') {
       setAlertDT('Mark Goal Incomplete');
@@ -91,9 +92,50 @@ function Goals() {
   }, []);
 
   //Edit goals
-  const editGoals = async (GID) => {};
+  const editGoals = async (GID) => {
+    const payload: any = {};
+
+    //Either description or title
+    if (!gTitleEdit.trim() && !gDescEdit.trim()) {
+      console.log('Nothing to change');
+    }
+    //Title change
+    if (gTitleEdit.trim()) {
+      payload.goalTitle = gTitleEdit;
+    }
+    //Description change
+    if (gDescEdit.trim()) {
+      payload.goalDescription = gDescEdit;
+    }
+
+    try {
+      const response = await fetch(API_URL + '/' + GID, {
+        headers: { 'Content-Type': 'application/json' },
+        method: 'PUT',
+        body: JSON.stringify(payload),
+      });
+
+      if (response.status == 200) {
+        console.log('Goal info sucuessfully updated');
+        showGoals();
+      }
+    } catch (error) {
+      console.log('Error: ', error);
+    }
+  };
   //Delete goals
-  const deleteGoals = async (GID) => {};
+  const deleteGoals = async (GID) => {
+    try {
+      const response = await fetch(API_URL + '/' + GID, {
+        method: 'DELETE',
+      });
+      if (response.status == 200) {
+        showGoals();
+      }
+    } catch (error) {
+      console.log('error:', error);
+    }
+  };
 
   const handleCheckboxPress = async (GID: any, currCompletion: any) => {
     try {
@@ -136,14 +178,70 @@ function Goals() {
                 <View className="w-full flex-row justify-between">
                   <Text className="p-1">{goal.description}</Text>
 
-                  {/* Edit/Delete */}
+                  {/* Edit */}
+
                   <View className="absolute bottom-11 left-52 flex-row gap-2">
-                    <Button variant="ghost" className="ml-0 p-0">
-                      <SquarePen color="#D48354" size={18} />
-                    </Button>
-                    <Button variant="ghost" className="mr-0 p-0">
-                      <CircleX color="red" size={18} />
-                    </Button>
+                    <AlertDialog>
+                      <AlertDialogTrigger asChild>
+                        <Button
+                          variant="ghost"
+                          className="ml-0 p-0"
+                          onPress={() => {
+                            setGTitleEdit(goal.title);
+                            setGDescEdit(goal.description);
+                          }}>
+                          <SquarePen color="#D48354" size={18} />
+                        </Button>
+                      </AlertDialogTrigger>
+                      <AlertDialogContent className="flex-row items-center justify-center">
+                        <AlertDialogHeader className="flex-col">
+                          <AlertDialogTitle>Edit Goal?</AlertDialogTitle>
+                          <TextInput
+                            className="mb-5 mt-5 !w-[90%] rounded-xl border border-primary bg-white p-1 text-center"
+                            placeholder={goal.title}
+                            placeholderTextColor={'black'}
+                            value={gTitleEdit}
+                            onChangeText={setGTitleEdit}></TextInput>
+                          <TextInput
+                            className="mb-5 min-h-20 !w-[90%] rounded-xl border border-primary  bg-white p-1 text-center"
+                            placeholder={goal.description}
+                            placeholderTextColor={'black'}
+                            value={gDescEdit}
+                            onChangeText={setGDescEdit}></TextInput>
+                          <AlertDialogDescription>
+                            Are you sure you would like to edit the contents of this goal to the
+                            text entered?
+                          </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter className="flex-row justify-center gap-2">
+                          <AlertDialogCancel>Cancel</AlertDialogCancel>
+                          <AlertDialogAction onPress={() => editGoals(goal._id)}>
+                            Confirm Edit
+                          </AlertDialogAction>
+                        </AlertDialogFooter>
+                      </AlertDialogContent>
+                    </AlertDialog>
+
+                    {/*Delete */}
+                    <AlertDialog>
+                      <AlertDialogTrigger asChild>
+                        <Button variant="ghost" className="mr-0 p-0">
+                          <CircleX color="red" size={18} />
+                        </Button>
+                      </AlertDialogTrigger>
+                      <AlertDialogContent>
+                        <AlertDialogHeader>
+                          <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                          <AlertDialogDescription>
+                            Are you sure that you want to delete and remove this goal?
+                          </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                          <AlertDialogCancel>Cancel</AlertDialogCancel>
+                          <AlertDialogAction>Delete</AlertDialogAction>
+                        </AlertDialogFooter>
+                      </AlertDialogContent>
+                    </AlertDialog>
                   </View>
 
                   {/* Marking a goal as complete */}
