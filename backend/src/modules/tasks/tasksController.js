@@ -1,7 +1,7 @@
 import Task from "./tasksModel";
 //Function to add a task
 
-const addGoal = async (res, req) => {
+export const addTask = async (res, req) => {
   try {
     //Destructure req
     const { uTaskName, uTaskDesc, uTaskStart, uTaskEnd, uTaskCat } = req.body;
@@ -20,10 +20,10 @@ const addGoal = async (res, req) => {
         taskCategory: uTaskCat || "",
       });
 
-      const savedGoal = await NewTask.save();
+      const savedTask = await NewTask.save();
       return res
         .status(201)
-        .json({ savedGoal, message: "Task successfully added" });
+        .json({ savedTask, message: "Task successfully added" });
     }
   } catch (error) {
     return res.status(400).json({ message: "Error : ", error });
@@ -31,9 +31,9 @@ const addGoal = async (res, req) => {
 };
 
 //Function to edit a task
-const editTask = async (req, res) => {};
+export const editTask = async (req, res) => {};
 //Function to delete a task
-const deleteTask = async (req, res) => {
+export const deleteTask = async (req, res) => {
   try {
     const { id } = req.params;
     Task.findByIdAndDelete(id);
@@ -44,7 +44,7 @@ const deleteTask = async (req, res) => {
 };
 //Function to view all tasks
 
-const viewAllTasks = async (res) => {
+export const viewAllTasks = async (res) => {
   try {
     const tasks = await Task.find();
     return res
