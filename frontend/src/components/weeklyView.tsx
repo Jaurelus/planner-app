@@ -1,8 +1,7 @@
 import { View } from 'react-native';
 import { WeekCalendar } from 'react-native-calendars';
 import { useColorScheme } from 'react-native';
-import Goals from './goals';
-import AddGoal from '../addGoal';
+import Goals from './ui/goals';
 
 function WeeklyView() {
   const colorScheme = useColorScheme();

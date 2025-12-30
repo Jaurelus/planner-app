@@ -1,5 +1,5 @@
-import WeeklyView from '@/components/ui/weeklyView';
-import MonthlyView from '@/components/ui/monthlyView';
+import WeeklyView from '@/components/weeklyView';
+import MonthlyView from '@/components/monthlyView';
 import { View, Text } from 'react-native';
 import ScrollView from '@/components/ui/scrollview';
 import { useState } from 'react';

@@ -1,5 +1,6 @@
 import { View, Text } from 'react-native';
 import Navbar from '../components/ui/Navbar';
+
 function HomePage({ navigation }) {
   return (
     <View className="flex flex-1 justify-between">
