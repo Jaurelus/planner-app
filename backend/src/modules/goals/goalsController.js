@@ -68,7 +68,7 @@ export const deleteGoal = async (req, res) => {
 };
 
 //Get all goals
-export const getGoals = async (res) => {
+export const getGoals = async (req, res) => {
   try {
     const goals = await Goal.find();
     return res.status(200).json({ message: "Goals retrieved", goals });

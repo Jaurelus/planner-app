@@ -5,6 +5,7 @@ import dotenv from "dotenv/config";
 import mongoose from "mongoose";
 
 import goalsRoutes from "./modules/goals/goalsRoutes.js";
+import tasksRoutes from "./modules/tasks/tasksRoutes.js";
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -15,6 +16,7 @@ app.use(express.json());
 
 //Routes
 app.use("/api/goals", goalsRoutes);
+app.use("/api/tasks", tasksRoutes);
 
 mongoose
   .connect(process.env.MONGO_URI)

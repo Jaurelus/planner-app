@@ -1,7 +1,7 @@
-import Task from "./tasksModel";
+import Task from "./tasksModel.js";
 //Function to add a task
 
-export const addTask = async (res, req) => {
+export const addTask = async (req, res) => {
   try {
     //Destructure req
     const { uTaskName, uTaskDesc, uTaskStart, uTaskEnd, uTaskCat } = req.body;
@@ -44,7 +44,7 @@ export const deleteTask = async (req, res) => {
 };
 //Function to view all tasks
 
-export const viewAllTasks = async (res) => {
+export const viewAllTasks = async (req, res) => {
   try {
     const tasks = await Task.find();
     return res

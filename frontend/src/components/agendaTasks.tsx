@@ -1,8 +1,8 @@
-import { View, Text, useColorScheme, TextInput } from 'react-native';
+import { View, Text, useColorScheme, TextInput, Pressable } from 'react-native';
 import { useState, useEffect } from 'react';
 import { Agenda } from 'react-native-calendars';
 import Button from './ui/button';
-import { CopyPlus } from 'lucide-react-native';
+import { CopyPlus, Square, Check, BicepsFlexed } from 'lucide-react-native';
 import { todayString } from 'react-native-calendars/src/expandableCalendar/commons';
 import DateTimePicker from '@react-native-community/datetimepicker';
 
@@ -17,16 +17,31 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from 'components/ui';
+import { Select } from 'components/Select';
 
 function AgendaTasks() {
   let today = new Date();
   let testDate = new Date('2025-12-28');
-  console.log(today.toISOString().slice(0, 10));
   const [agendaDates, setAgendaDates] = useState<string[]>([]);
   const [agendaData, setAgendaData] = useState([]);
   const [sunday, setSunday] = useState('');
+  const [checked, setChecked] = useState(false);
   const [startHour, setStartHour] = useState<Date>(new Date());
   const [endHour, setEndHour] = useState<Date>(new Date());
+  const [taskName, setTaskName] = useState('');
+  const [taskDesc, setTaskDesc] = useState('');
+  const [taskCat, setTaskCat] = useState('');
+  const catMap = {
+    1: { name: 'Physical' },
+    2: { name: 'Mental(School)' },
+    3: { name: 'Intellecutal(Personal)' },
+    4: { name: 'Creative' },
+    5: { name: 'Social' },
+    6: { name: 'Daily Living/Chore' },
+    7: { name: 'Recreation/Hobby' },
+    8: { name: 'Work/Occupation' },
+    9: { name: 'Misc' },
+  };
 
   //Get all the dates of this week
   const testLoad = [
@@ -69,9 +84,7 @@ function AgendaTasks() {
     },
     {} as Record<string, any>
   );
-  console.log(agendaItems);
   today.toISOString().slice(0, 10);
-  console.log(agendaItems.name);
 
   const colorScheme = useColorScheme();
   const isDark = colorScheme === 'dark';
@@ -92,12 +105,34 @@ function AgendaTasks() {
 
   //---------- API Calls -----------
 
-  const API_URL = 'http://localhost:3000/api/goals';
+  const API_URL = 'http://localhost:3000/api/tasks';
 
   // Function to get task data
 
   //Function to create a task
-  const createTask = () => {};
+  const createTask = async () => {
+    const tPayload = {
+      uTaskName: taskName,
+      uTaskDesc: taskDesc,
+      uTaskStart: startHour,
+      uTaskEnd: endHour,
+      uTaskCat: taskCat,
+    };
+    try {
+      const response = await fetch(API_URL, {
+        headers: { 'Content-Type': 'application/json' },
+        method: 'POST',
+        body: JSON.stringify(tPayload),
+      });
+
+      //Sucessful add
+      if (response.status == 201) {
+        console.log('Task sucessfully created');
+      }
+    } catch (error) {
+      console.log('Error', error);
+    }
+  };
 
   return (
     <View className="flex flex-1">
@@ -133,28 +168,63 @@ function AgendaTasks() {
           </AlertDialogHeader>
           <View className="items-center gap-2">
             <TextInput
+              value={taskName}
+              onChangeText={setTaskName}
               placeholder="Task Name"
               className="w-[90%] rounded-md bg-white placeholder:text-center"></TextInput>
             <TextInput
+              value={taskDesc}
+              onChangeText={setTaskDesc}
               placeholder="Task Description"
               className="w-[90%] rounded-md bg-white placeholder:text-center"></TextInput>
             {/* Times */}
-            <View className="flex w-[80%] flex-row justify-center gap-5">
-              <View className="flex justify-center">
-                <Text className="justify-center text-center text-white">Start Time</Text>
-                <DateTimePicker mode="time" value={startHour} />
+            <View className="flex w-[80%] flex-row items-center justify-center gap-5">
+              <View className="flex flex-col py-3">
+                <Text className="ml-3 text-center text-white">Start Time</Text>
+                <DateTimePicker
+                  mode="time"
+                  value={startHour}
+                  onChange={(event, date) => setStartHour(date)}
+                />
               </View>
               <View>
-                <Text className="justify-center text-center text-white">End Time</Text>
-                <DateTimePicker mode="time" value={endHour} />
+                <Text className="ml-3 justify-center text-center text-white">End Time</Text>
+                <DateTimePicker
+                  mode="time"
+                  value={endHour}
+                  onChange={(event, date) => setEndHour(date)}
+                />
               </View>
-              <Button size="sm">All day</Button>
+              <View>
+                <Text className=" text-center text-white">All Day?</Text>
+                <Pressable className="ml-3" onPress={() => setChecked((prev) => !prev)}>
+                  <Square>{checked && <Check color={'green'}></Check>}</Square>
+                </Pressable>
+              </View>
             </View>
+            <Select
+              placeholder="Choose a classification for this tasks"
+              options={[
+                { choiceNum: 1, option: 'Physical' },
+                { choiceNum: 2, option: 'Mental(School)' },
+                { choiceNum: 3, option: 'Intellecutal(Personal)' },
+                { choiceNum: 4, option: 'Creative' },
+                { choiceNum: 5, option: 'Social' },
+                { choiceNum: 6, option: 'Daily Living/Chore' },
+                { choiceNum: 7, option: 'Recreation/Hobby' },
+                { choiceNum: 8, option: 'Work/Occupation' },
+                { choiceNum: 9, option: 'Misc' },
+              ]}
+              onSelect={(value) => {
+                setTaskCat(catMap[value].name);
+              }}
+              labelKey="option"
+              valueKey="choiceNum"></Select>
           </View>
 
           <AlertDialogFooter className="mb-5 mt-5 flex flex-row items-center justify-center gap-3">
             <AlertDialogCancel variant="destructive">Cancel</AlertDialogCancel>
-            <AlertDialogAction>Confirm</AlertDialogAction>
+            <AlertDialogAction onPress={createTask}>Confirm</AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
