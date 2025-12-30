@@ -4,6 +4,8 @@ import { Agenda } from 'react-native-calendars';
 import Button from './ui/button';
 import { CopyPlus } from 'lucide-react-native';
 import { todayString } from 'react-native-calendars/src/expandableCalendar/commons';
+import DateTimePicker from '@react-native-community/datetimepicker';
+
 import {
   AlertDialog,
   AlertDialogAction,
@@ -15,7 +17,6 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from 'components/ui';
-import { Picker } from 'components/nativewindui/Picker';
 
 function AgendaTasks() {
   let today = new Date();
@@ -24,6 +25,8 @@ function AgendaTasks() {
   const [agendaDates, setAgendaDates] = useState<string[]>([]);
   const [agendaData, setAgendaData] = useState([]);
   const [sunday, setSunday] = useState('');
+  const [startHour, setStartHour] = useState<Date>(new Date());
+  const [endHour, setEndHour] = useState<Date>(new Date());
 
   //Get all the dates of this week
   const testLoad = [
@@ -136,8 +139,16 @@ function AgendaTasks() {
               placeholder="Task Description"
               className="w-[90%] rounded-md bg-white placeholder:text-center"></TextInput>
             {/* Times */}
-            <View>
-              <Picker></Picker>
+            <View className="flex w-[80%] flex-row justify-center gap-5">
+              <View className="flex justify-center">
+                <Text className="justify-center text-center text-white">Start Time</Text>
+                <DateTimePicker mode="time" value={startHour} />
+              </View>
+              <View>
+                <Text className="justify-center text-center text-white">End Time</Text>
+                <DateTimePicker mode="time" value={endHour} />
+              </View>
+              <Button size="sm">All day</Button>
             </View>
           </View>
 
