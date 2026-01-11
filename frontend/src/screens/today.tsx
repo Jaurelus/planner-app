@@ -1,14 +1,40 @@
 import AgendaTasks from '@/components/agendaTasks';
 import { View, Text } from 'react-native';
-import { Agenda } from 'react-native-calendars';
+import { Agenda, CalendarProvider, ExpandableCalendar } from 'react-native-calendars';
+import { useColorScheme } from 'react-native';
 
 function Daily({ navigation }) {
+  const colorScheme = useColorScheme();
+  const isDark = colorScheme === 'dark';
+
+  const calendarTheme = {
+    backgroundColor: isDark ? '#200524' : '#FFFFFF',
+    calendarBackground: isDark ? '#200524' : '#FFFFFF',
+    textSectionTitleColor: isDark ? '#F6DBFA' : '#754ABF',
+    selectedDayBackgroundColor: isDark ? '#A77ED6' : '#F6DBFA',
+    selectedDayTextColor: '#000000',
+    todayTextColor: isDark ? '#E89B6E' : '#D48354',
+    dayTextColor: isDark ? '#FFFFFF' : '#200524',
+    textDisabledColor: isDark ? '#6B4A7A' : '#C4A8D4',
+    monthTextColor: isDark ? '#F6DBFA' : '#200524',
+    textMonthFontWeight: 'bold',
+    textDayHeaderFontWeight: '600',
+  };
   return (
-    <View className="flex flex-1 flex-col">
-      <Text>Today</Text>
-      <Text>??</Text>
-      <AgendaTasks></AgendaTasks>
-    </View>
+    <CalendarProvider date={new Date().toISOString().slice(0, 10)}>
+      <ExpandableCalendar
+        theme={calendarTheme}
+        closeOnDayPress
+        firstDay={1}
+        markingType="custom"
+        markedDates={{}}
+        horizontal
+        pagingEnabled
+      />
+      <View className="flex flex-1 flex-col">
+        <AgendaTasks></AgendaTasks>
+      </View>
+    </CalendarProvider>
   );
 }
 

@@ -1,9 +1,8 @@
 import { View, Text, useColorScheme, TextInput, Pressable } from 'react-native';
 import { useState, useEffect } from 'react';
-import { Agenda } from 'react-native-calendars';
+import { Agenda, CalendarProvider, ExpandableCalendar, Timeline } from 'react-native-calendars';
 import Button from './ui/button';
 import { CopyPlus, Square, Check, BicepsFlexed } from 'lucide-react-native';
-import { todayString } from 'react-native-calendars/src/expandableCalendar/commons';
 import DateTimePicker from '@react-native-community/datetimepicker';
 
 import {
@@ -18,10 +17,11 @@ import {
   AlertDialogTrigger,
 } from 'components/ui';
 import { Select } from 'components/Select';
+import { Card } from './ui';
 
 function AgendaTasks() {
   let today = new Date();
-  let testDate = new Date('2025-12-28');
+  console.log();
   const [agendaDates, setAgendaDates] = useState<string[]>([]);
   const [agendaData, setAgendaData] = useState([]);
   const [sunday, setSunday] = useState('');
@@ -31,6 +31,7 @@ function AgendaTasks() {
   const [taskName, setTaskName] = useState('');
   const [taskDesc, setTaskDesc] = useState('');
   const [taskCat, setTaskCat] = useState('');
+  const [allTasks, setAllTasks] = useState([]);
   const catMap = {
     1: { name: 'Physical' },
     2: { name: 'Mental(School)' },
@@ -41,6 +42,10 @@ function AgendaTasks() {
     7: { name: 'Recreation/Hobby' },
     8: { name: 'Work/Occupation' },
     9: { name: 'Misc' },
+  };
+
+  const setCardHeight = (start: Date, end: Date) => {
+    return (new Date(end) - new Date(start)) / (1000 * 60);
   };
 
   //Get all the dates of this week
@@ -72,18 +77,6 @@ function AgendaTasks() {
     setAgendaDates([today.toISOString().slice(0, 10)]);
   }, []);
 
-  //Agenda strucyure mapping
-  const agendaItems = agendaDates.reduce(
-    (curr, header: string, index: number) => {
-      if (testLoad[index]) {
-        curr[header] = [testLoad[index]];
-      } else {
-        curr[header] = [];
-      }
-      return curr;
-    },
-    {} as Record<string, any>
-  );
   today.toISOString().slice(0, 10);
 
   const colorScheme = useColorScheme();
@@ -108,7 +101,22 @@ function AgendaTasks() {
   const API_URL = 'http://localhost:3000/api/tasks';
 
   // Function to get task data
+  const viewTasks = async () => {
+    try {
+      const response = await fetch(API_URL, { method: 'GET' });
+      if (response.status == 200) {
+        const data = await response.json();
+        setAllTasks(data.tasks);
+        console.log(allTasks);
+      }
+    } catch (error) {
+      console.log('Error', error);
+    }
+  };
 
+  useEffect(() => {
+    viewTasks();
+  }, []);
   //Function to create a task
   const createTask = async () => {
     const tPayload = {
@@ -128,6 +136,7 @@ function AgendaTasks() {
       //Sucessful add
       if (response.status == 201) {
         console.log('Task sucessfully created');
+        viewTasks();
       }
     } catch (error) {
       console.log('Error', error);
@@ -136,33 +145,25 @@ function AgendaTasks() {
 
   return (
     <View className="flex flex-1">
-      <View className="flex flex-1">
-        <Agenda
-          items={agendaItems}
-          renderItem={(item) => (
-            <View>
-              <Text>{item.name}</Text>
-            </View>
-          )}
-          scrollEnabled={false}
-          selected={today.toISOString().slice(0, 10)}
-          selectedDay={sunday}
-          theme={{
-            ...calendarTheme,
-            agendaTodayColor: '754ABF',
-            agendaDayTextColor: 'green',
-            agendaDayNumColor: 'green',
-            agendaKnobColor: '#754ABF',
-          }}></Agenda>
-      </View>
-
+      <Timeline
+        format24h={false}
+        events={[
+          {
+            id: '1',
+            summary: '',
+            start: `${today.toISOString().slice(0, 10)} 12:00:00`,
+            end: '{today.toISOString().slice(0,10)} 16:00:00',
+            title: 'Sleep',
+            color: 'red',
+          },
+        ]}></Timeline>
       <AlertDialog>
         <AlertDialogTrigger asChild>
           <Button className=" absolute bottom-10 right-10 rounded-full border p-2" size="lg">
             <CopyPlus color={'white'} />
           </Button>
         </AlertDialogTrigger>
-        <AlertDialogContent className="gap-3">
+        <AlertDialogContent className="gap-3 bg-white">
           <AlertDialogHeader>
             <AlertDialogTitle>Add New Task</AlertDialogTitle>
           </AlertDialogHeader>
