@@ -44,38 +44,15 @@ function AgendaTasks() {
     9: { name: 'Misc' },
   };
 
-  const setCardHeight = (start: Date, end: Date) => {
-    return (new Date(end) - new Date(start)) / (1000 * 60);
-  };
-
-  //Get all the dates of this week
-  const testLoad = [
-    {
-      name: 'Jay',
-      height: 21,
-      day: '2025-12-28',
-    },
-    {
-      name: 'Kay',
-      age: 13,
-    },
-  ];
-
-  const getWeekDates = () => {
-    let sundayDate = today.getDate() - today.getDay();
-    let array = [];
-    let Sunday = new Date(today.getFullYear(), today.getMonth(), sundayDate);
-    setSunday(Sunday.toISOString().slice(0, 10));
-    let tmpDay = Sunday;
-    for (let i = 0; i < 7; i++) {
-      array.push(tmpDay.toISOString().slice(0, 10));
-      tmpDay.setDate(tmpDay.getDate() + 1);
-    }
-    setAgendaDates(array);
-  };
-  useEffect(() => {
-    setAgendaDates([today.toISOString().slice(0, 10)]);
-  }, []);
+  //Prepare timeline events
+  const timelineEvents = allTasks.map((task) => ({
+    id: task._id,
+    summary: task.taskDescription,
+    start: TextTrackList.timeStart,
+    end: `${task.timeEnd.toISOString().slice(0, 10)} ${task.timeEnd.toISOString().slice(11)}`,
+    title: task.taskName,
+    color: 'red',
+  }));
 
   today.toISOString().slice(0, 10);
 
