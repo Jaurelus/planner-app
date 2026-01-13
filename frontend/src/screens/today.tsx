@@ -22,15 +22,6 @@ function Daily({ navigation }) {
   };
   return (
     <CalendarProvider date={new Date().toISOString().slice(0, 10)}>
-      <ExpandableCalendar
-        theme={calendarTheme}
-        closeOnDayPress
-        firstDay={1}
-        markingType="custom"
-        markedDates={{}}
-        horizontal
-        pagingEnabled
-      />
       <View className="flex flex-1 flex-col">
         <AgendaTasks></AgendaTasks>
       </View>

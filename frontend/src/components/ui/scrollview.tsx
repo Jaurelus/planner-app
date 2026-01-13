@@ -1,12 +1,13 @@
 import { View, Text } from 'react-native';
+import { useState } from 'react';
 import { CalendarList, Calendar } from 'react-native-calendars';
 import { useColorScheme } from 'react-native';
-import ViewsButton from 'components/ui/viewsButton';
 
 function ScrollView() {
   const colorScheme = useColorScheme();
   const isDark = colorScheme === 'dark';
 
+  const [markedCalDates, setMarkedCalDates] = useState([]);
   const calendarTheme = {
     backgroundColor: isDark ? '#200524' : '#FFFFFF',
     calendarBackground: isDark ? '#200524' : '#FFFFFF',
@@ -28,6 +29,7 @@ function ScrollView() {
         enableSwipeMonths={true}
         theme={calendarTheme}
         todayBottomMargin
+        onDayLongPress={() => {}}
         //current={new Date().toISOString().slice(0, 7)}
       ></CalendarList>
     </View>

@@ -20,12 +20,9 @@ import { Select } from 'components/Select';
 import { Card } from './ui';
 
 function AgendaTasks() {
-  let today = new Date();
-  console.log();
-  const [agendaDates, setAgendaDates] = useState<string[]>([]);
-  const [agendaData, setAgendaData] = useState([]);
-  const [sunday, setSunday] = useState('');
-  const [checked, setChecked] = useState(false);
+  let today = new Date().toISOString().slice(0, 10);
+  const [selectedDate, setSelectedDate] = useState<String>(new Date().toISOString().slice(0, 10));
+  const [selectPH, setSelectPH] = useState('Choose a classification for these tasks');
   const [startHour, setStartHour] = useState<Date>(new Date());
   const [endHour, setEndHour] = useState<Date>(new Date());
   const [taskName, setTaskName] = useState('');
@@ -44,17 +41,41 @@ function AgendaTasks() {
     9: { name: 'Misc' },
   };
 
-  //Prepare timeline events
-  const timelineEvents = allTasks.map((task) => ({
-    id: task._id,
-    summary: task.taskDescription,
-    start: TextTrackList.timeStart,
-    end: `${task.timeEnd.toISOString().slice(0, 10)} ${task.timeEnd.toISOString().slice(11)}`,
-    title: task.taskName,
-    color: 'red',
-  }));
+  //Convert to 12hr format
+  const convert12 = (time: string) => {
+    let hour = Number(time.slice(0, 2));
+    let minute = time.slice(3, 5).padEnd(2, '0');
+    let mFlag;
+    if (hour > 11) {
+      mFlag = 'PM';
+    } else {
+      mFlag = 'AM';
+    }
+    hour = hour % 12 || 12;
+    return `${hour}:${minute} ${mFlag}`;
+  };
 
-  today.toISOString().slice(0, 10);
+  //Function to filter out the events by the day
+
+  //Prepare timeline events
+  const [todayEvents, setTodayEvents] = useState();
+  const [timelineEvents, setTimelineEvents] = useState<any[]>([]);
+
+  const prepareEvents = async () => {
+    const todayEvents = await allTasks.filter(
+      (task) => task.timeStart.slice(0, 10) === selectedDate
+    );
+    const currEvents = todayEvents.map((task) => ({
+      id: task._id,
+      summary: task.taskDescription,
+      start: `${task.timeStart.slice(0, 10)} ${task.timeStart.slice(11, 19)}`,
+      end: `${task.timeEnd.slice(0, 10)} ${task.timeEnd.slice(11, 19)}`,
+      title: task.taskName,
+      color: '#FF0000',
+    }));
+    setTimelineEvents(currEvents);
+    await console.log(timelineEvents);
+  };
 
   const colorScheme = useColorScheme();
   const isDark = colorScheme === 'dark';
@@ -94,6 +115,10 @@ function AgendaTasks() {
   useEffect(() => {
     viewTasks();
   }, []);
+
+  useEffect(() => {
+    prepareEvents();
+  }, [allTasks]);
   //Function to create a task
   const createTask = async () => {
     const tPayload = {
@@ -121,92 +146,116 @@ function AgendaTasks() {
   };
 
   return (
-    <View className="flex flex-1">
-      <Timeline
-        format24h={false}
-        events={[
-          {
-            id: '1',
-            summary: '',
-            start: `${today.toISOString().slice(0, 10)} 12:00:00`,
-            end: '{today.toISOString().slice(0,10)} 16:00:00',
-            title: 'Sleep',
-            color: 'red',
-          },
-        ]}></Timeline>
-      <AlertDialog>
-        <AlertDialogTrigger asChild>
-          <Button className=" absolute bottom-10 right-10 rounded-full border p-2" size="lg">
-            <CopyPlus color={'white'} />
-          </Button>
-        </AlertDialogTrigger>
-        <AlertDialogContent className="gap-3 bg-white">
-          <AlertDialogHeader>
-            <AlertDialogTitle>Add New Task</AlertDialogTitle>
-          </AlertDialogHeader>
-          <View className="items-center gap-2">
-            <TextInput
-              value={taskName}
-              onChangeText={setTaskName}
-              placeholder="Task Name"
-              className="w-[90%] rounded-md bg-white placeholder:text-center"></TextInput>
-            <TextInput
-              value={taskDesc}
-              onChangeText={setTaskDesc}
-              placeholder="Task Description"
-              className="w-[90%] rounded-md bg-white placeholder:text-center"></TextInput>
-            {/* Times */}
-            <View className="flex w-[80%] flex-row items-center justify-center gap-5">
-              <View className="flex flex-col py-3">
-                <Text className="ml-3 text-center text-white">Start Time</Text>
-                <DateTimePicker
-                  mode="time"
-                  value={startHour}
-                  onChange={(event, date) => setStartHour(date)}
-                />
+    <CalendarProvider date={today}>
+      <View className="flex flex-1">
+        <ExpandableCalendar
+          date={today}
+          theme={calendarTheme}
+          closeOnDayPress
+          firstDay={1}
+          markingType="custom"
+          markedDates={{}}
+          horizontal
+          pagingEnabled
+          onDayPress={(day) => {
+            setSelectedDate(day.dateString);
+            prepareEvents();
+          }}
+          onDayLongPress={() => {
+            //Add the date to marked dates
+          }}
+        />
+        <Timeline
+          date={today}
+          timelineLeftInset={45}
+          rightEdgeSpacing={10}
+          format24h={false}
+          events={timelineEvents}
+          renderEvent={(event) => {
+            return (
+              <View
+                className="bg ml-auto mr-auto flex flex-1 flex-col items-center justify-center border-0 "
+                style={{}}>
+                <Text>{event.title}</Text>
+                <Text>{event.summary}</Text>
+                <Text>
+                  {convert12(event.start.slice(11, 16))} - {convert12(event.end.slice(11, -3))}
+                </Text>
               </View>
-              <View>
-                <Text className="ml-3 justify-center text-center text-white">End Time</Text>
-                <DateTimePicker
-                  mode="time"
-                  value={endHour}
-                  onChange={(event, date) => setEndHour(date)}
-                />
+            );
+          }}></Timeline>
+        <AlertDialog>
+          <AlertDialogTrigger asChild>
+            <Button className=" absolute bottom-10 right-10 rounded-full border p-2" size="lg">
+              <CopyPlus color={'white'} />
+            </Button>
+          </AlertDialogTrigger>
+          <AlertDialogContent className="!w-[90%] gap-3 bg-white">
+            <AlertDialogHeader>
+              <AlertDialogTitle className="mt-2">Add New Task</AlertDialogTitle>
+            </AlertDialogHeader>
+            <View className="items-center gap-2">
+              <View className="mt-5 items-center gap-5">
+                <TextInput
+                  value={taskName}
+                  onChangeText={setTaskName}
+                  placeholder="Task Name"
+                  className="w-80 rounded-xl border border-primary bg-white p-2  placeholder:text-center"></TextInput>
+                <TextInput
+                  multiline={true}
+                  value={taskDesc}
+                  onChangeText={setTaskDesc}
+                  placeholder="Task Description"
+                  className="w-80 rounded-xl border border-primary bg-white p-2 placeholder:text-center"></TextInput>
               </View>
-              <View>
-                <Text className=" text-center text-white">All Day?</Text>
-                <Pressable className="ml-3" onPress={() => setChecked((prev) => !prev)}>
-                  <Square>{checked && <Check color={'green'}></Check>}</Square>
-                </Pressable>
+              {/* Times */}
+              <View className="flex w-[80%] flex-row items-center justify-center gap-5">
+                <View className="flex flex-col py-3">
+                  <Text className="ml-3 text-center text-black">Start Time</Text>
+                  <DateTimePicker
+                    mode="time"
+                    value={startHour}
+                    onChange={(event, date) => setStartHour(date)}
+                  />
+                </View>
+                <View>
+                  <Text className="ml-3 justify-center text-center text-black">End Time</Text>
+                  <DateTimePicker
+                    mode="time"
+                    value={endHour}
+                    onChange={(event, date) => setEndHour(date)}
+                  />
+                </View>
               </View>
+              <Select
+                placeholder={selectPH}
+                options={[
+                  { choiceNum: 1, option: 'Physical' },
+                  { choiceNum: 2, option: 'Mental(School)' },
+                  { choiceNum: 3, option: 'Intellecutal(Personal)' },
+                  { choiceNum: 4, option: 'Creative' },
+                  { choiceNum: 5, option: 'Social' },
+                  { choiceNum: 6, option: 'Daily Living/Chore' },
+                  { choiceNum: 7, option: 'Recreation/Hobby' },
+                  { choiceNum: 8, option: 'Work/Occupation' },
+                  { choiceNum: 9, option: 'Misc' },
+                ]}
+                onSelect={(value) => {
+                  setTaskCat(catMap[value].name);
+                  setSelectPH(catMap[value].name);
+                }}
+                labelKey="option"
+                valueKey="choiceNum"></Select>
             </View>
-            <Select
-              placeholder="Choose a classification for this tasks"
-              options={[
-                { choiceNum: 1, option: 'Physical' },
-                { choiceNum: 2, option: 'Mental(School)' },
-                { choiceNum: 3, option: 'Intellecutal(Personal)' },
-                { choiceNum: 4, option: 'Creative' },
-                { choiceNum: 5, option: 'Social' },
-                { choiceNum: 6, option: 'Daily Living/Chore' },
-                { choiceNum: 7, option: 'Recreation/Hobby' },
-                { choiceNum: 8, option: 'Work/Occupation' },
-                { choiceNum: 9, option: 'Misc' },
-              ]}
-              onSelect={(value) => {
-                setTaskCat(catMap[value].name);
-              }}
-              labelKey="option"
-              valueKey="choiceNum"></Select>
-          </View>
 
-          <AlertDialogFooter className="mb-5 mt-5 flex flex-row items-center justify-center gap-3">
-            <AlertDialogCancel variant="destructive">Cancel</AlertDialogCancel>
-            <AlertDialogAction onPress={createTask}>Confirm</AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
-    </View>
+            <AlertDialogFooter className="mb-5 mt-5 flex flex-row items-center justify-center gap-3">
+              <AlertDialogCancel variant="destructive">Cancel</AlertDialogCancel>
+              <AlertDialogAction onPress={createTask}>Confirm</AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
+      </View>
+    </CalendarProvider>
   );
 }
 

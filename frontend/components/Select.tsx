@@ -1,12 +1,5 @@
 import React, { useRef, useState } from 'react';
-import {
-  FlatList,
-  LayoutRectangle,
-  Modal,
-  Text,
-  TouchableOpacity,
-  View,
-} from 'react-native';
+import { FlatList, LayoutRectangle, Modal, Text, TouchableOpacity, View } from 'react-native';
 
 import { cn } from '../lib/utils';
 
@@ -28,7 +21,7 @@ const convertToOptions = <T extends Record<string, any>>(
   valueKey?: keyof T
 ): ISelectedOption[] => {
   if (!data || !labelKey || !valueKey) return [];
-  return data.map(item => ({
+  return data.map((item) => ({
     label: String(item[labelKey]),
     value: item[valueKey],
   }));
@@ -68,8 +61,7 @@ export const Select = ({
   valueKey,
 }: SelectProps) => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const [dropdownPosition, setDropdownPosition] =
-    useState<LayoutRectangle | null>(null);
+  const [dropdownPosition, setDropdownPosition] = useState<LayoutRectangle | null>(null);
   const selectButtonRef = useRef<TouchableOpacity>(null);
 
   const new_options = convertToOptions(options, labelKey, valueKey);
@@ -84,7 +76,7 @@ export const Select = ({
       setDropdownPosition({
         x: px,
         y: py + _h,
-        width: _w,
+        width: 175,
         height: _h,
       });
       setIsDropdownOpen(true);
@@ -92,23 +84,20 @@ export const Select = ({
   };
 
   return (
-    <View className={cn('flex flex-col gap-1.5')}>
+    <View className={cn('flex flex-col items-center justify-center gap-1.5 text-center')}>
       {label && (
-        <Text className={cn('text-base text-primary', labelClasses)}>
-          {label}
-        </Text>
+        <Text className={cn('text-center text-base text-primary', labelClasses)}>{label}</Text>
       )}
       <TouchableOpacity
         ref={selectButtonRef}
         className={cn(
           selectClasses,
-          'border border-input py-2.5 px-4 rounded-lg bg-white dark:bg-black'
+          'rounded-lg border border-primary bg-white px-4 py-2.5 dark:bg-black'
         )}
-        onPress={openDropdown}
-      >
-        <Text className="text-primary">
+        onPress={openDropdown}>
+        <Text className="justify-center text-center text-black">
           {selectedValue
-            ? new_options.find(option => option.value === selectedValue)?.label
+            ? new_options.find((option) => option.value === selectedValue)?.label
             : placeholder}
         </Text>
       </TouchableOpacity>
@@ -116,31 +105,27 @@ export const Select = ({
       {/* Dropdown modal */}
       {isDropdownOpen && dropdownPosition && (
         <Modal visible={isDropdownOpen} transparent animationType="none">
-          <TouchableOpacity
-            style={{ flex: 1 }}
-            onPress={() => setIsDropdownOpen(false)}
-          >
+          <TouchableOpacity style={{ flex: 1 }} onPress={() => setIsDropdownOpen(false)}>
             <View
               style={{
                 top: dropdownPosition.y,
                 left: dropdownPosition.x,
                 width: dropdownPosition.width,
+                minWidth: dropdownPosition.width || 200,
                 shadowOpacity: 0.2,
                 shadowOffset: { width: 0, height: 2 },
                 shadowRadius: 8,
                 elevation: 5,
               }}
-              className="absolute bg-white shadow-sm dark:bg-black p-2 rounded-md shadow-black dark:shadow-white"
-            >
+              className="absolute rounded-md bg-white p-2 shadow-sm shadow-black dark:bg-black dark:shadow-white">
               <FlatList
                 data={new_options}
-                keyExtractor={item => item.value.toString()}
+                keyExtractor={(item) => item.value.toString()}
                 renderItem={({ item }) => (
                   <TouchableOpacity
                     onPress={() => handleSelect(item.value)}
-                    className="p-2 border-b border-input"
-                  >
-                    <Text className="text-primary">{item.label}</Text>
+                    className="border-b border-input p-2">
+                    <Text className="text-black">{item.label}</Text>
                   </TouchableOpacity>
                 )}
               />
