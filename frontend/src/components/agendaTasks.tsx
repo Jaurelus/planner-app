@@ -41,20 +41,17 @@ function AgendaTasks() {
     9: { name: 'Misc' },
   };
 
-  //Convert to 12hr format
-  const convert12 = (time: string) => {
-    let hour = Number(time.slice(0, 2));
-    let minute = time.slice(3, 5).padEnd(2, '0');
-    let mFlag;
-    if (hour > 11) {
-      mFlag = 'PM';
-    } else {
-      mFlag = 'AM';
+  //Format timestamps to display on timeline
+  const formatTime = (time: String) => {
+    let normalizedTime = time.padStart(11, '0');
+    if (normalizedTime.startsWith('0')) {
+      return `${normalizedTime.slice(1, 5)} ${normalizedTime.slice(9, 11)}`;
     }
-    hour = hour % 12 || 12;
-    return `${hour}:${minute} ${mFlag}`;
+    return `${normalizedTime.slice(0, 5)} ${normalizedTime.slice(9, 11)}`;
   };
-
+  useEffect(() => {
+    formatTime(new Date().toLocaleTimeString());
+  });
   //Function to filter out the events by the day
 
   //Prepare timeline events
@@ -68,13 +65,14 @@ function AgendaTasks() {
     const currEvents = todayEvents.map((task) => ({
       id: task._id,
       summary: task.taskDescription,
-      start: `${task.timeStart.slice(0, 10)} ${task.timeStart.slice(11, 19)}`,
-      end: `${task.timeEnd.slice(0, 10)} ${task.timeEnd.slice(11, 19)}`,
+      start: `${new Date(task.timeStart).toISOString()}`,
+      end: `${new Date(task.timeEnd).toISOString()}`,
       title: task.taskName,
       color: '#FF0000',
     }));
+
     setTimelineEvents(currEvents);
-    await console.log(timelineEvents);
+    console.log(currEvents);
   };
 
   const colorScheme = useColorScheme();
@@ -105,7 +103,12 @@ function AgendaTasks() {
       if (response.status == 200) {
         const data = await response.json();
         setAllTasks(data.tasks);
-        console.log(allTasks);
+        //console.log(allTasks);
+        if (data.tasks.length > 0) {
+          console.log('Type of timeStart:', typeof data.tasks[0].timeStart);
+          console.log('Value:', data.tasks[data.tasks.length - 1].timeStart);
+          console.log('Is it a Date object?', data.tasks[0].timeStart instanceof Date);
+        }
       }
     } catch (error) {
       console.log('Error', error);
@@ -179,7 +182,8 @@ function AgendaTasks() {
                 <Text>{event.title}</Text>
                 <Text>{event.summary}</Text>
                 <Text>
-                  {convert12(event.start.slice(11, 16))} - {convert12(event.end.slice(11, -3))}
+                  {formatTime(new Date(event.start).toLocaleTimeString())} -{' '}
+                  {formatTime(new Date(event.end).toLocaleTimeString())}
                 </Text>
               </View>
             );
