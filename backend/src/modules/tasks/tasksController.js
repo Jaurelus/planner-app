@@ -36,7 +36,7 @@ export const editTask = async (req, res) => {};
 export const deleteTask = async (req, res) => {
   try {
     const { id } = req.params;
-    Task.findByIdAndDelete(id);
+    await Task.findByIdAndDelete(id);
     return res.status(200).json({ message: "Task successfully deleted" });
   } catch (error) {
     return res.status(400).json({ message: "Error deleting task" });

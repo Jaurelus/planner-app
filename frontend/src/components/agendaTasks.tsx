@@ -2,6 +2,7 @@ import { View, Text, useColorScheme, TextInput, Pressable } from 'react-native';
 import { useState, useEffect } from 'react';
 import { Agenda, CalendarProvider, ExpandableCalendar, Timeline } from 'react-native-calendars';
 import Button from './ui/button';
+import { CircleX, SquarePen } from 'lucide-react-native';
 import { CopyPlus, Square, Check, BicepsFlexed } from 'lucide-react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 
@@ -20,7 +21,6 @@ import { Select } from 'components/Select';
 import { Card } from './ui';
 
 function AgendaTasks() {
-  let today = new Date().toISOString().slice(0, 10);
   const [selectedDate, setSelectedDate] = useState<string>(new Date().toISOString().slice(0, 10));
   const [selectPH, setSelectPH] = useState('Choose a classification for these tasks');
   const [startHour, setStartHour] = useState<Date>(new Date());
@@ -41,6 +41,20 @@ function AgendaTasks() {
     9: { name: 'Misc' },
   };
   const eventColors = ['#F6DBFA', '#E89B6E', '#754ABF', '#D7BE69'];
+
+  //Format for display
+  const convert12 = (time: string) => {
+    let hour = Number(time.slice(0, 2));
+    let minute = time.slice(3, 5).padEnd(2, '0');
+    let mFlag;
+    if (hour > 11) {
+      mFlag = 'PM';
+    } else {
+      mFlag = 'AM';
+    }
+    hour = hour % 12 || 12;
+    return `${hour}:${minute} ${mFlag}`;
+  };
 
   //Format timestamps to display on timeline
   const formatTime = (time: string) => {
@@ -145,7 +159,9 @@ function AgendaTasks() {
       prepareEvents();
     }
   }, [allTasks, selectedDate]);
+
   //Function to create a task
+
   const createTask = async () => {
     const tPayload = {
       uTaskName: taskName,
@@ -173,6 +189,29 @@ function AgendaTasks() {
     } catch (error) {
       console.log('Error', error);
     }
+  };
+
+  //Function to delete a task
+
+  const deleteTask = async (taskID: string) => {
+    try {
+      const response = await fetch(API_URL + '/' + taskID, { method: 'DELETE' });
+
+      if (response.status == 200) {
+        await viewTasks();
+        console.log('Task deleted');
+      } else console.log(response.status);
+    } catch (error) {
+      console.log('Error: ', error);
+    }
+  };
+
+  //Function to edit a task
+  const editTask = async (taskID: string) => {
+    const response = await fetch(API_URL + '/' + taskID, {
+      headers: { 'Content-Type': 'application/json' },
+      method: 'PATCH',
+    });
   };
 
   return (
@@ -206,9 +245,43 @@ function AgendaTasks() {
           console.log('Event end:', event.end, 'Type:', typeof event.end);
 
           return (
-            <View className="bg ml-auto mr-auto flex flex-1 flex-col items-center justify-center gap-5 border-0 ">
-              <Text>{event.title}</Text>
-              <Text className="max-w-64 text-center">{event.summary}</Text>
+            <View className="ml-auto mr-auto flex max-h-full flex-1 flex-row items-center justify-center gap-5 border-0">
+              <View className="ml-auto mr-auto flex flex-1 flex-col items-center justify-center ">
+                <Text>{event.title}</Text>
+                <Text className="max-w-64 text-center">{event.summary}</Text>
+                <Text>
+                  {convert12(event.start.slice(11, 19))} - {convert12(event.end.slice(11, 19))}
+                </Text>
+              </View>
+              <View
+                className="top-0 -mt-2 flex h-full flex-col border-l-2  pt-0"
+                style={{ borderColor: event.color }}>
+                <View
+                  className="top-0 mt-0 flex flex-1 border-b-2"
+                  style={{ borderColor: event.color }}>
+                  <Button
+                    className="flex flex-1 rounded-none"
+                    textClassName="color-black"
+                    style={{ backgroundColor: `${event.color}1A` }}>
+                    <SquarePen color="#3c0275" />
+                  </Button>
+                </View>
+                <View className="flex flex-1">
+                  <Button
+                    onPress={() => {
+                      if (!event.id) {
+                        console.log('No event id');
+                        return;
+                      }
+                      deleteTask(event.id);
+                    }}
+                    className="flex flex-1"
+                    textClassName="color-black"
+                    style={{ backgroundColor: `${event.color}1A` }}>
+                    <CircleX color="red" />
+                  </Button>
+                </View>
+              </View>
             </View>
           );
         }}></Timeline>

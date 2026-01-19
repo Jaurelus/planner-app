@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from './card';
 import Button from './button';
 import BouncyCheckbox from 'react-native-bouncy-checkbox';
-import { CircleX, LucideCircleX, SquarePen } from 'lucide-react-native';
+import { CircleX, SquarePen } from 'lucide-react-native';
 import {
   AlertDialog,
   AlertDialogCancel,
