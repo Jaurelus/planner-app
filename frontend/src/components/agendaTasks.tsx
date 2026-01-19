@@ -21,7 +21,7 @@ import { Card } from './ui';
 
 function AgendaTasks() {
   let today = new Date().toISOString().slice(0, 10);
-  const [selectedDate, setSelectedDate] = useState<String>(new Date().toISOString().slice(0, 10));
+  const [selectedDate, setSelectedDate] = useState<string>(new Date().toISOString().slice(0, 10));
   const [selectPH, setSelectPH] = useState('Choose a classification for these tasks');
   const [startHour, setStartHour] = useState<Date>(new Date());
   const [endHour, setEndHour] = useState<Date>(new Date());
@@ -40,35 +40,56 @@ function AgendaTasks() {
     8: { name: 'Work/Occupation' },
     9: { name: 'Misc' },
   };
+  const eventColors = ['#F6DBFA', '#E89B6E', '#754ABF', '#D7BE69'];
 
   //Format timestamps to display on timeline
-  const formatTime = (time: String) => {
+  const formatTime = (time: string) => {
     let normalizedTime = time.padStart(11, '0');
     if (normalizedTime.startsWith('0')) {
       return `${normalizedTime.slice(1, 5)} ${normalizedTime.slice(9, 11)}`;
     }
     return `${normalizedTime.slice(0, 5)} ${normalizedTime.slice(9, 11)}`;
   };
-  useEffect(() => {
-    formatTime(new Date().toLocaleTimeString());
-  });
+
+  //Format times so the timeline accepts it
+  const formatTimeLineTimes = (date: Date) => {
+    return (
+      date.getFullYear() +
+      '-' +
+      (date.getMonth() + 1).toString().padStart(2, '0') +
+      '-' +
+      date.getDate().toString().padStart(2, '0') +
+      ' ' +
+      date.toTimeString().slice(0, 8).padStart(8, '0')
+    );
+  };
+  const formatTimeLineDates = (date: Date) => {
+    return (
+      date.getFullYear() +
+      '-' +
+      (date.getMonth() + 1).toString().padStart(2, '0') +
+      '-' +
+      date.getDate().toString().padStart(2, '0')
+    );
+  };
   //Function to filter out the events by the day
 
   //Prepare timeline events
   const [todayEvents, setTodayEvents] = useState();
   const [timelineEvents, setTimelineEvents] = useState<any[]>([]);
 
-  const prepareEvents = async () => {
-    const todayEvents = await allTasks.filter(
-      (task) => task.timeStart.slice(0, 10) === selectedDate
+  const prepareEvents = () => {
+    const todayEvents = allTasks.filter(
+      (task) => formatTimeLineDates(new Date(task.timeStart)) === selectedDate
     );
-    const currEvents = todayEvents.map((task) => ({
+
+    const currEvents = todayEvents.map((task, i) => ({
       id: task._id,
       summary: task.taskDescription,
-      start: `${new Date(task.timeStart).toISOString()}`,
-      end: `${new Date(task.timeEnd).toISOString()}`,
       title: task.taskName,
-      color: '#FF0000',
+      color: eventColors[i % 4],
+      start: formatTimeLineTimes(new Date(task.timeStart)),
+      end: formatTimeLineTimes(new Date(task.timeEnd)),
     }));
 
     setTimelineEvents(currEvents);
@@ -120,8 +141,10 @@ function AgendaTasks() {
   }, []);
 
   useEffect(() => {
-    prepareEvents();
-  }, [allTasks]);
+    if (allTasks.length > 0 && selectedDate) {
+      prepareEvents();
+    }
+  }, [allTasks, selectedDate]);
   //Function to create a task
   const createTask = async () => {
     const tPayload = {
@@ -142,6 +165,10 @@ function AgendaTasks() {
       if (response.status == 201) {
         console.log('Task sucessfully created');
         viewTasks();
+
+        //Reset fields
+        setTaskName('');
+        setTaskDesc('');
       }
     } catch (error) {
       console.log('Error', error);
@@ -149,117 +176,113 @@ function AgendaTasks() {
   };
 
   return (
-    <CalendarProvider date={today}>
-      <View className="flex flex-1">
-        <ExpandableCalendar
-          date={today}
-          theme={calendarTheme}
-          closeOnDayPress
-          firstDay={1}
-          markingType="custom"
-          markedDates={{}}
-          horizontal
-          pagingEnabled
-          onDayPress={(day) => {
-            setSelectedDate(day.dateString);
-            prepareEvents();
-          }}
-          onDayLongPress={() => {
-            //Add the date to marked dates
-          }}
-        />
-        <Timeline
-          date={today}
-          timelineLeftInset={45}
-          rightEdgeSpacing={10}
-          format24h={false}
-          events={timelineEvents}
-          renderEvent={(event) => {
-            return (
-              <View
-                className="bg ml-auto mr-auto flex flex-1 flex-col items-center justify-center border-0 "
-                style={{}}>
-                <Text>{event.title}</Text>
-                <Text>{event.summary}</Text>
-                <Text>
-                  {formatTime(new Date(event.start).toLocaleTimeString())} -{' '}
-                  {formatTime(new Date(event.end).toLocaleTimeString())}
-                </Text>
-              </View>
-            );
-          }}></Timeline>
-        <AlertDialog>
-          <AlertDialogTrigger asChild>
-            <Button className=" absolute bottom-10 right-10 rounded-full border p-2" size="lg">
-              <CopyPlus color={'white'} />
-            </Button>
-          </AlertDialogTrigger>
-          <AlertDialogContent className="!w-[90%] gap-3 bg-white">
-            <AlertDialogHeader>
-              <AlertDialogTitle className="mt-2">Add New Task</AlertDialogTitle>
-            </AlertDialogHeader>
-            <View className="items-center gap-2">
-              <View className="mt-5 items-center gap-5">
-                <TextInput
-                  value={taskName}
-                  onChangeText={setTaskName}
-                  placeholder="Task Name"
-                  className="w-80 rounded-xl border border-primary bg-white p-2  placeholder:text-center"></TextInput>
-                <TextInput
-                  multiline={true}
-                  value={taskDesc}
-                  onChangeText={setTaskDesc}
-                  placeholder="Task Description"
-                  className="w-80 rounded-xl border border-primary bg-white p-2 placeholder:text-center"></TextInput>
-              </View>
-              {/* Times */}
-              <View className="flex w-[80%] flex-row items-center justify-center gap-5">
-                <View className="flex flex-col py-3">
-                  <Text className="ml-3 text-center text-black">Start Time</Text>
-                  <DateTimePicker
-                    mode="time"
-                    value={startHour}
-                    onChange={(event, date) => setStartHour(date)}
-                  />
-                </View>
-                <View>
-                  <Text className="ml-3 justify-center text-center text-black">End Time</Text>
-                  <DateTimePicker
-                    mode="time"
-                    value={endHour}
-                    onChange={(event, date) => setEndHour(date)}
-                  />
-                </View>
-              </View>
-              <Select
-                placeholder={selectPH}
-                options={[
-                  { choiceNum: 1, option: 'Physical' },
-                  { choiceNum: 2, option: 'Mental(School)' },
-                  { choiceNum: 3, option: 'Intellecutal(Personal)' },
-                  { choiceNum: 4, option: 'Creative' },
-                  { choiceNum: 5, option: 'Social' },
-                  { choiceNum: 6, option: 'Daily Living/Chore' },
-                  { choiceNum: 7, option: 'Recreation/Hobby' },
-                  { choiceNum: 8, option: 'Work/Occupation' },
-                  { choiceNum: 9, option: 'Misc' },
-                ]}
-                onSelect={(value) => {
-                  setTaskCat(catMap[value].name);
-                  setSelectPH(catMap[value].name);
-                }}
-                labelKey="option"
-                valueKey="choiceNum"></Select>
-            </View>
+    <View className="flex flex-1">
+      <ExpandableCalendar
+        className="block"
+        date={selectedDate}
+        theme={calendarTheme}
+        closeOnDayPress
+        firstDay={1}
+        markingType="custom"
+        markedDates={{}}
+        horizontal
+        pagingEnabled
+        onDayPress={(day) => {
+          setSelectedDate(day.dateString);
+        }}
+        onDayLongPress={(day) => {
+          //Add the date to marked dates
+        }}
+      />
+      <Timeline
+        date={selectedDate}
+        timelineLeftInset={45}
+        rightEdgeSpacing={10}
+        format24h={false}
+        events={timelineEvents}
+        renderEvent={(event) => {
+          console.log('=== RENDERING EVENT ===', event.title);
+          console.log('Event start:', event.start, 'Type:', typeof event.start);
+          console.log('Event end:', event.end, 'Type:', typeof event.end);
 
-            <AlertDialogFooter className="mb-5 mt-5 flex flex-row items-center justify-center gap-3">
-              <AlertDialogCancel variant="destructive">Cancel</AlertDialogCancel>
-              <AlertDialogAction onPress={createTask}>Confirm</AlertDialogAction>
-            </AlertDialogFooter>
-          </AlertDialogContent>
-        </AlertDialog>
-      </View>
-    </CalendarProvider>
+          return (
+            <View className="bg ml-auto mr-auto flex flex-1 flex-col items-center justify-center gap-5 border-0 ">
+              <Text>{event.title}</Text>
+              <Text className="max-w-64 text-center">{event.summary}</Text>
+            </View>
+          );
+        }}></Timeline>
+      <AlertDialog>
+        <AlertDialogTrigger asChild>
+          <Button className=" absolute bottom-10 right-10 rounded-full border p-2" size="lg">
+            <CopyPlus color={'white'} />
+          </Button>
+        </AlertDialogTrigger>
+        <AlertDialogContent className="!w-[90%] gap-3 bg-white">
+          <AlertDialogHeader>
+            <AlertDialogTitle className="mt-2">Add New Task</AlertDialogTitle>
+          </AlertDialogHeader>
+          <View className="items-center gap-2">
+            <View className="mt-5 items-center gap-5">
+              <TextInput
+                value={taskName}
+                onChangeText={setTaskName}
+                placeholder="Task Name"
+                className="w-80 rounded-xl border border-primary bg-white p-2  placeholder:text-center"></TextInput>
+              <TextInput
+                multiline={true}
+                value={taskDesc}
+                onChangeText={setTaskDesc}
+                placeholder="Task Description"
+                className="w-80 rounded-xl border border-primary bg-white p-2 placeholder:text-center"></TextInput>
+            </View>
+            {/* Times */}
+            <View className="flex w-[80%] flex-row items-center justify-center gap-5">
+              <View className="flex flex-col py-3">
+                <Text className="ml-3 text-center text-black">Start Time</Text>
+                <DateTimePicker
+                  mode="time"
+                  value={startHour}
+                  onChange={(event, date) => setStartHour(date)}
+                />
+              </View>
+              <View>
+                <Text className="ml-3 justify-center text-center text-black">End Time</Text>
+                <DateTimePicker
+                  mode="time"
+                  value={endHour}
+                  onChange={(event, date) => setEndHour(date)}
+                />
+              </View>
+            </View>
+            <Select
+              placeholder={selectPH}
+              options={[
+                { choiceNum: 1, option: 'Physical' },
+                { choiceNum: 2, option: 'Mental(School)' },
+                { choiceNum: 3, option: 'Intellecutal(Personal)' },
+                { choiceNum: 4, option: 'Creative' },
+                { choiceNum: 5, option: 'Social' },
+                { choiceNum: 6, option: 'Daily Living/Chore' },
+                { choiceNum: 7, option: 'Recreation/Hobby' },
+                { choiceNum: 8, option: 'Work/Occupation' },
+                { choiceNum: 9, option: 'Misc' },
+              ]}
+              onSelect={(value) => {
+                setTaskCat(catMap[value].name);
+                setSelectPH(catMap[value].name);
+              }}
+              labelKey="option"
+              valueKey="choiceNum"></Select>
+          </View>
+
+          <AlertDialogFooter className="mb-5 mt-5 flex flex-row items-center justify-center gap-3">
+            <AlertDialogCancel variant="destructive">Cancel</AlertDialogCancel>
+            <AlertDialogAction onPress={createTask}>Confirm</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </View>
   );
 }
 
