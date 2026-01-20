@@ -1,6 +1,6 @@
 import { View } from 'react-native';
 import { Calendar, CalendarList } from 'react-native-calendars';
-import { useColorScheme } from 'react-native';
+import { useColorScheme, Text } from 'react-native';
 
 function MonthlyView() {
   const colorScheme = useColorScheme();
@@ -21,8 +21,13 @@ function MonthlyView() {
   };
 
   return (
-    <View className="">
-      <Calendar theme={calendarTheme}></Calendar>
+    <View className="flex">
+      <View>
+        <Calendar theme={calendarTheme}></Calendar>
+      </View>
+      <View className="justify-center">
+        <Text className="mt-3 text-center"> Monthly Overview</Text>
+      </View>
     </View>
   );
 }

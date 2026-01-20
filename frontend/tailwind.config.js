@@ -9,7 +9,7 @@ module.exports = {
         // Light mode colors (default)
         background: '#F6DBFA',
         surface: '#FFFFFF',
-        primary: '#754ABF',
+        primary: '#754ABF', //royal purple
         secondary: '#D48354',
         dark: '#200524',
         'text-primary': '#200524',

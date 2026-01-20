@@ -341,10 +341,8 @@ function AgendaTasks() {
                             <Text className="ml-3 text-center text-black">Start Time</Text>
                             <DateTimePicker
                               mode="time"
-                              value={
-                                uTaskStart.getSeconds() === 0 ? new Date(event.start) : uTaskStart
-                              }
-                              onChange={(event, date) => setUTaskStart(date)}
+                              value={uTaskStart || new Date(event.start)}
+                              onChange={(event, date) => setUTaskStart(new Date(date))}
                             />
                           </View>
                           <View>
@@ -354,7 +352,7 @@ function AgendaTasks() {
 
                             <DateTimePicker
                               mode="time"
-                              value={uTaskEnd.getSeconds() === 0 ? new Date(event.end) : uTaskEnd}
+                              value={uTaskEnd || new Date(event.end)}
                               onChange={(event, date) => {
                                 setUTaskEnd(date);
                               }}
@@ -376,6 +374,7 @@ function AgendaTasks() {
                           ]}
                           onSelect={(value) => {
                             setUTaskCat(catMap[value].name);
+                            setPH(catMap[value].name);
                           }}
                           labelKey="option"
                           valueKey="choiceNum"></Select>

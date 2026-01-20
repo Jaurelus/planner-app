@@ -111,7 +111,7 @@ function Goals() {
       flag = -6;
     } else flag = 1;
 
-    let firstDay = date.getDate() - ((date.getDay() || 7) % 7) + 0;
+    let firstDay = date.getDate() - ((date.getDay() || 7) % 7) + flag;
     return new Date(
       date.getFullYear() + '-' + String(date.getMonth() + 1).padStart(2, '0') + '-' + firstDay
     );

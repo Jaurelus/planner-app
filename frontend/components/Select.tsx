@@ -84,15 +84,16 @@ export const Select = ({
   };
 
   return (
-    <View className={cn('flex flex-col items-center justify-center gap-1.5 text-center')}>
+    <View className={cn('flex w-full flex-col items-center justify-center gap-1.5 text-center')}>
       {label && (
         <Text className={cn('text-center text-base text-primary', labelClasses)}>{label}</Text>
       )}
       <TouchableOpacity
+        style={{ minWidth: '50%' }}
         ref={selectButtonRef}
         className={cn(
           selectClasses,
-          'rounded-lg border border-primary bg-white px-4 py-2.5 dark:bg-black'
+          ' rounded-lg border border-primary bg-white px-4 py-2.5 dark:bg-black'
         )}
         onPress={openDropdown}>
         <Text className="justify-center text-center text-black">
