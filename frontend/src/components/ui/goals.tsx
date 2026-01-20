@@ -1,9 +1,9 @@
-import { View, Text, StyleSheet } from 'react-native';
-import { useState, useEffect } from 'react';
+import { View, Text, StyleSheet, ScrollView } from 'react-native';
+import { useState, useEffect, useContext } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from './card';
 import Button from './button';
 import BouncyCheckbox from 'react-native-bouncy-checkbox';
-import { CircleX, SquarePen } from 'lucide-react-native';
+import { CircleX, LucideCircleX, SquarePen } from 'lucide-react-native';
 import {
   AlertDialog,
   AlertDialogCancel,
@@ -16,6 +16,8 @@ import {
   AlertDialogAction,
 } from 'components/ui';
 import { TextInput } from 'react-native';
+import { CalendarContext } from 'react-native-calendars';
+import { findFocusedRoute } from '@react-navigation/native';
 
 function Goals() {
   const [goals, setGoals] = useState([]);
@@ -23,6 +25,8 @@ function Goals() {
   const [alertDD, setAlertDD] = useState(
     'By pressing confirm, you are agreeing that you completed this goal'
   );
+
+  const context = useContext(CalendarContext);
 
   const [gTitle, setGTitle] = useState('');
   const [gDesc, setGDesc] = useState('');
@@ -49,6 +53,7 @@ function Goals() {
       const payload = {
         goalTitle: gTitle,
         goalDescription: gDesc,
+        goalDate: new Date(context.selectedDate),
       };
       const response = await fetch(API_URL, {
         method: 'POST',
@@ -91,6 +96,33 @@ function Goals() {
     showGoals();
   }, []);
 
+  const formatTimeLineDates = (date: Date) => {
+    return (
+      date.getFullYear() +
+      '-' +
+      (date.getMonth() + 1).toString().padStart(2, '0') +
+      '-' +
+      date.getDate().toString().padStart(2, '0')
+    );
+  };
+  const findFirstDay = (date: Date) => {
+    let flag;
+    if (date.getDay() == 0) {
+      flag = -6;
+    } else flag = 1;
+
+    let firstDay = date.getDate() - ((date.getDay() || 7) % 7) + 0;
+    return new Date(
+      date.getFullYear() + '-' + String(date.getMonth() + 1).padStart(2, '0') + '-' + firstDay
+    );
+  };
+
+  const currGoals = goals.filter(
+    (goals) =>
+      formatTimeLineDates(findFirstDay(new Date(goals.date))) ===
+      formatTimeLineDates(findFirstDay(new Date(context.date)))
+  );
+
   //Edit goals
   const editGoals = async (GID) => {
     const payload: any = {};
@@ -130,7 +162,7 @@ function Goals() {
         method: 'DELETE',
       });
       if (response.status == 200) {
-        showGoals();
+        await showGoals();
       }
     } catch (error) {
       console.log('error:', error);
@@ -168,7 +200,7 @@ function Goals() {
           <CardTitle className="text-center">Goals</CardTitle>
         </CardHeader>
         <CardContent>
-          {goals.map((goal) => (
+          {currGoals.map((goal) => (
             //
             <Card key={goal._id} className="mb-5 min-h-32 flex-col px-2">
               <CardHeader>
@@ -238,7 +270,12 @@ function Goals() {
                         </AlertDialogHeader>
                         <AlertDialogFooter>
                           <AlertDialogCancel>Cancel</AlertDialogCancel>
-                          <AlertDialogAction>Delete</AlertDialogAction>
+                          <AlertDialogAction
+                            onPress={() => {
+                              deleteGoals(goal._id);
+                            }}>
+                            Delete
+                          </AlertDialogAction>
                         </AlertDialogFooter>
                       </AlertDialogContent>
                     </AlertDialog>

@@ -1,12 +1,19 @@
-import { View } from 'react-native';
-import { WeekCalendar } from 'react-native-calendars';
+import { View, ScrollView } from 'react-native';
+import {
+  WeekCalendar,
+  CalendarContext,
+  DateData,
+  ExpandableCalendar,
+} from 'react-native-calendars';
 import { useColorScheme } from 'react-native';
 import Goals from './ui/goals';
+import { useContext, useState } from 'react';
 
 function WeeklyView() {
   const colorScheme = useColorScheme();
   const isDark = colorScheme === 'dark';
-
+  const context = useContext(CalendarContext);
+  const [date, setDate] = useState<string>();
   const calendarTheme = {
     backgroundColor: isDark ? '#200524' : '#FFFFFF',
     calendarBackground: isDark ? '#200524' : '#FFFFFF',
@@ -21,15 +28,18 @@ function WeeklyView() {
     textDayHeaderFontWeight: '600',
   };
   return (
-    <View className="flex flex-col">
-      <WeekCalendar
+    <ScrollView className="flex flex-col">
+      <ExpandableCalendar
         theme={calendarTheme}
+        date={date || context.date}
         firstDay={1}
-        current={new Date().toISOString()}></WeekCalendar>
+        onDayPress={(date) => {
+          setDate(date.dateString);
+        }}></ExpandableCalendar>
       <View className="px-10 py-10">
         <Goals />
       </View>
-    </View>
+    </ScrollView>
   );
 }
 export default WeeklyView;

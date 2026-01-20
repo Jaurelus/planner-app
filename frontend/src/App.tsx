@@ -15,7 +15,7 @@ export default function App() {
       <NavigationContainer>
         <Stack.Navigator>
           <Stack.Screen name="Home" component={HomePage} />
-          <Stack.Screen name="Calendar" component={CalendarScreen} />
+          <Stack.Screen name="Goals" component={CalendarScreen} />
           <Stack.Screen name="Personal" component={Personal} />
           <Stack.Screen name="Today" component={Daily} />
         </Stack.Navigator>

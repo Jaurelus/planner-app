@@ -3,7 +3,7 @@ import Goal from "./goalsModel.js";
 //Create a goal (Post)
 export const createGoal = async (req, res) => {
   try {
-    const { goalTitle, goalDescription } = req.body;
+    const { goalTitle, goalDescription, goalDate } = req.body;
 
     if (!goalTitle) {
       return res.status(400).json({ message: "Missing the goal title" });
@@ -12,9 +12,11 @@ export const createGoal = async (req, res) => {
     const newGoal = new Goal({
       title: goalTitle,
       description: goalDescription || "",
+      date: goalDate || new Date(),
     });
 
     const savedGoal = await newGoal.save();
+    console.log(savedGoal.date);
     return res
       .status(201)
       .json({ message: "New goal added!", goal: savedGoal });
@@ -48,7 +50,7 @@ export const editGoal = async (req, res) => {
         complete:
           goalCompletion !== undefined ? goalCompletion : currGoal.complete,
       },
-      { new: true }
+      { new: true },
     );
     return res.status(200).json({ message: "Goal updated", goal: updatedGoal });
   } catch (error) {

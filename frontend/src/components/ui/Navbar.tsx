@@ -8,7 +8,7 @@ function Navbar() {
   return (
     //
     <View className="flex w-full flex-row justify-between bg-secondary py-5">
-      <Button variant="ghost" onPress={() => navigator.navigate('Calendar')} className="ml-10">
+      <Button variant="ghost" onPress={() => navigator.navigate('Goals')} className="ml-10">
         Calendar
       </Button>
       <Button variant="ghost" onPress={() => navigator.navigate('Today')}>
