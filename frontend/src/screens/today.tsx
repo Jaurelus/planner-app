@@ -20,8 +20,17 @@ function Daily({ navigation }) {
     textMonthFontWeight: 'bold',
     textDayHeaderFontWeight: '600',
   };
+  const prepareDate = () => {
+    return (
+      new Date().getFullYear() +
+      '-' +
+      String(new Date().getMonth() + 1).padStart(2, '0') +
+      '-' +
+      String(new Date().getDate()).padStart(2, '0')
+    );
+  };
   return (
-    <CalendarProvider date={new Date().toISOString().slice(0, 10)}>
+    <CalendarProvider date={prepareDate()}>
       <View className="flex flex-1 flex-col">
         <AgendaTasks></AgendaTasks>
       </View>

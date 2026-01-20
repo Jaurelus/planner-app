@@ -31,7 +31,33 @@ export const addTask = async (req, res) => {
 };
 
 //Function to edit a task
-export const editTask = async (req, res) => {};
+export const editTask = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { uTaskName, uTaskDesc, uTaskStart, uTaskEnd, uTaskCat } = req.body;
+    //Backend verification checks
+    if (!uTaskName && !uTaskDesc && !uTaskStart && !uTaskEnd && !uTaskCat) {
+      return res.status(400).json({ message: "Nothing to change" });
+    }
+    const currTask = await Task.findById(id);
+    const updatedTask = await Task.findByIdAndUpdate(
+      id,
+      {
+        taskName: uTaskName || currTask.taskName,
+        taskDescription: uTaskDesc || currTask.taskDescription,
+        timeStart: uTaskStart || currTask.timeStart,
+        timeEnd: uTaskEnd || currTask.timeEnd,
+        taskCategory: uTaskCat || currTask.taskCategory,
+      },
+      { new: true },
+    );
+    return res
+      .status(200)
+      .json({ message: "Goal successfully updated", task: updatedTask });
+  } catch (error) {
+    console.log(error);
+  }
+};
 //Function to delete a task
 export const deleteTask = async (req, res) => {
   try {
