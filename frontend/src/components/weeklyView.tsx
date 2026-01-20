@@ -6,7 +6,7 @@ import {
   ExpandableCalendar,
 } from 'react-native-calendars';
 import { useColorScheme } from 'react-native';
-import Goals from './ui/goals';
+import Goals from './goals';
 import { useContext, useState } from 'react';
 
 function WeeklyView() {
@@ -28,15 +28,19 @@ function WeeklyView() {
     textDayHeaderFontWeight: '600',
   };
   return (
-    <ScrollView className="flex flex-col">
-      <ExpandableCalendar
-        theme={calendarTheme}
-        date={date || context.date}
-        firstDay={1}
-        onDayPress={(date) => {
-          setDate(date.dateString);
-        }}></ExpandableCalendar>
-      <View className="px-10 py-10">
+    <ScrollView className="flex-col">
+      <View className=" block">
+        <WeekCalendar
+          theme={calendarTheme}
+          date={date || context.date}
+          closeOnDayPress={true}
+          firstDay={1}
+          onDayPress={(date) => {
+            setDate(date.dateString);
+            context.setDate(date.dateString, 'weeklyView');
+          }}></WeekCalendar>
+      </View>
+      <View className="">
         <Goals />
       </View>
     </ScrollView>

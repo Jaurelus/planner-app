@@ -315,7 +315,9 @@ function AgendaTasks() {
                     </AlertDialogTrigger>
                     <AlertDialogContent className="!w-[90%] gap-3 bg-white">
                       <AlertDialogHeader>
-                        <AlertDialogTitle className="mt-2">Edit This Task?</AlertDialogTitle>
+                        <AlertDialogTitle className="mt-2 color-dark">
+                          Edit This Task?
+                        </AlertDialogTitle>
                       </AlertDialogHeader>
                       <View className="items-center gap-2">
                         <View className="mt-5 items-center gap-5">
@@ -427,7 +429,7 @@ function AgendaTasks() {
         </AlertDialogTrigger>
         <AlertDialogContent className="!w-[90%] gap-3 bg-white">
           <AlertDialogHeader>
-            <AlertDialogTitle className="mt-2">Add New Task</AlertDialogTitle>
+            <AlertDialogTitle className="mt-2 color-dark">Add New Task</AlertDialogTitle>
           </AlertDialogHeader>
           <View className="items-center gap-2">
             <View className="mt-5 items-center gap-5">
