@@ -9,7 +9,7 @@ import { useColorScheme } from 'react-native';
 import Goals from './goals';
 import { useContext, useState } from 'react';
 
-function WeeklyView() {
+function WeeklyView({ api }: { api: string }) {
   const colorScheme = useColorScheme();
   const isDark = colorScheme === 'dark';
   const context = useContext(CalendarContext);
@@ -41,7 +41,7 @@ function WeeklyView() {
           }}></WeekCalendar>
       </View>
       <View className="">
-        <Goals />
+        <Goals api={api} />
       </View>
     </ScrollView>
   );

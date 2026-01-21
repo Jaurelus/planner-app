@@ -7,7 +7,8 @@ import Button from '@/components/ui/button';
 import { Eye } from 'lucide-react-native';
 import { CalendarProvider } from 'react-native-calendars';
 
-function CalendarScreen({ navigation }) {
+function CalendarScreen({ route, navigation }) {
+  const { api } = route.params;
   const [scrollVisibility, setScrollVisiblity] = useState(true);
   const [weeklyVisibility, setWeeklyVisbility] = useState(false);
   const [monthlyVisibility, setMonthlyVisibility] = useState(false);
@@ -58,7 +59,7 @@ function CalendarScreen({ navigation }) {
         )}
         {weeklyVisibility && (
           <View className="top-0 mt-0">
-            <WeeklyView></WeeklyView>
+            <WeeklyView api={api}></WeeklyView>
           </View>
         )}
         {monthlyVisibility && (

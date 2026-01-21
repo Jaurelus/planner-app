@@ -26,7 +26,8 @@ import {
 import { Select } from 'components/Select';
 import { Card } from './ui';
 
-function AgendaTasks() {
+function AgendaTasks({ api }) {
+  const API_URL = api + 'tasks';
   const [selectedDate, setSelectedDate] = useState<string>(new Date().toISOString().slice(0, 10));
   const [startHour, setStartHour] = useState<Date>(new Date());
   const [endHour, setEndHour] = useState<Date>(new Date());
@@ -144,7 +145,7 @@ function AgendaTasks() {
 
   //---------- API Calls -----------
 
-  const API_URL = 'http://localhost:3000/api/tasks';
+  //const API_URL = 'http://localhost:3000/api/tasks';
 
   // Function to get task data
   const viewTasks = async () => {

@@ -3,7 +3,8 @@ import { View, Text } from 'react-native';
 import { Agenda, CalendarProvider, ExpandableCalendar } from 'react-native-calendars';
 import { useColorScheme } from 'react-native';
 
-function Daily({ navigation }) {
+function Daily({ route, navigation }) {
+  const { api } = route.params;
   const colorScheme = useColorScheme();
   const isDark = colorScheme === 'dark';
 
@@ -32,7 +33,7 @@ function Daily({ navigation }) {
   return (
     <CalendarProvider date={prepareDate()}>
       <View className="flex flex-1 flex-col">
-        <AgendaTasks></AgendaTasks>
+        <AgendaTasks api={api}></AgendaTasks>
       </View>
     </CalendarProvider>
   );

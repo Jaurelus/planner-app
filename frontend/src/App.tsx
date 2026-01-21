@@ -1,4 +1,5 @@
 import { StatusBar } from 'expo-status-bar';
+import * as Device from 'expo-device';
 import { View } from 'react-native';
 import './global.css';
 import { NavigationContainer } from '@react-navigation/native';
@@ -9,15 +10,20 @@ import Daily from '@/screens/today';
 import CalendarScreen from '@/screens/calendarScreen';
 
 export default function App() {
+  //If system is is a simulator, then set the API URL to :
+
+  console.log(Device.isDevice);
+  const API_URL = Device.isDevice ? 'http://10.32.99.57:3000/api/' : 'http://localhost:3000/api/';
+
   const Stack = createNativeStackNavigator();
   return (
     <View className="flex flex-1">
       <NavigationContainer>
         <Stack.Navigator>
           <Stack.Screen name="Home" component={HomePage} />
-          <Stack.Screen name="Goals" component={CalendarScreen} />
+          <Stack.Screen name="Goals" component={CalendarScreen} initialParams={{ api: API_URL }} />
           <Stack.Screen name="Personal" component={Personal} />
-          <Stack.Screen name="Today" component={Daily} />
+          <Stack.Screen name="Today" component={Daily} initialParams={{ api: API_URL }} />
         </Stack.Navigator>
       </NavigationContainer>
     </View>

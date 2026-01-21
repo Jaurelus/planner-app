@@ -19,7 +19,8 @@ import { TextInput } from 'react-native';
 import { CalendarContext } from 'react-native-calendars';
 import { findFocusedRoute } from '@react-navigation/native';
 
-function Goals() {
+function Goals({ api }: { api: string }) {
+  const API_URL = api + 'goals';
   const [goals, setGoals] = useState([]);
   const [alertDT, setAlertDT] = useState('Mark Goal Complete?');
   const [alertDD, setAlertDD] = useState(
@@ -45,7 +46,7 @@ function Goals() {
   };
   //-------- API Calls ---------
 
-  const API_URL = 'http://localhost:3000/api/goals';
+  //const API_URL = 'http://localhost:3000/api/goals';
 
   //Add new goal
   const saveNewGoal = async () => {
