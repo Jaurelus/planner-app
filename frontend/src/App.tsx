@@ -13,7 +13,9 @@ export default function App() {
   //If system is is a simulator, then set the API URL to :
 
   console.log(Device.isDevice);
-  const API_URL = Device.isDevice ? 'http://10.32.99.57:3000/api/' : 'http://localhost:3000/api/';
+  const API_URL = Device.isDevice
+    ? 'http://192.168.12.175:3000/api/'
+    : 'http://localhost:3000/api/';
 
   const Stack = createNativeStackNavigator();
   return (

@@ -112,7 +112,7 @@ function Goals({ api }: { api: string }) {
       flag = -6;
     } else flag = 1;
 
-    let firstDay = date.getDate() - ((date.getDay() || 7) % 7) + flag;
+    let firstDay = date.getDate() - ((date.getDay() || 7) % 7) - flag;
     return new Date(
       date.getFullYear() + '-' + String(date.getMonth() + 1).padStart(2, '0') + '-' + firstDay
     );
@@ -193,14 +193,14 @@ function Goals({ api }: { api: string }) {
   // ---------- App Content Build ------------
 
   return (
-    <View className="">
+    <View className=" mb-10 px-5 py-5">
       {/* Goal display (cards) */}
 
-      <Card className="py-5">
+      <Card className="flex flex-1 px-10 py-5">
         <CardHeader>
           <CardTitle className="pt-2 text-center"> This Week's Goals</CardTitle>
         </CardHeader>
-        <CardContent className="items-stretch gap-5 !py-0">
+        <CardContent className=" gap-5 ">
           {currGoals.map((goal) => (
             //
             <Card key={goal._id} className="mb-0 min-h-32 flex-col p-0">
@@ -307,7 +307,7 @@ function Goals({ api }: { api: string }) {
                   <View className="flex flex-1 flex-col items-stretch justify-stretch ">
                     <AlertDialog>
                       <AlertDialogTrigger asChild>
-                        <Pressable className="flex-1 px-[38] py-2">
+                        <Pressable className="ml-4 flex-1 py-2">
                           <BouncyCheckbox
                             pointerEvents="none"
                             className=""

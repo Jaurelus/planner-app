@@ -7,14 +7,25 @@ function Navbar() {
   const navigator = useNavigation();
   return (
     //
-    <View className="flex w-full flex-row justify-between bg-secondary py-5">
-      <Button variant="ghost" onPress={() => navigator.navigate('Goals')} className="ml-10">
+    <View className="flex w-full flex-row justify-between bg-primary py-5 ">
+      <Button
+        variant="ghost"
+        onPress={() => navigator.navigate('Goals')}
+        textClassName="color-white"
+        className="ml-10">
         Calendar
       </Button>
-      <Button variant="ghost" onPress={() => navigator.navigate('Today')}>
+      <Button
+        variant="ghost"
+        onPress={() => navigator.navigate('Today')}
+        textClassName="color-white">
         Today
       </Button>
-      <Button variant="ghost" onPress={() => navigator.navigate('Personal')} className="mr-10">
+      <Button
+        variant="ghost"
+        onPress={() => navigator.navigate('Personal')}
+        className="mr-10"
+        textClassName="color-white">
         Personal
       </Button>
     </View>

@@ -35,8 +35,8 @@ function AgendaTasks({ api }) {
   const [taskDesc, setTaskDesc] = useState('');
   const [taskCat, setTaskCat] = useState('');
 
-  const [uTaskEnd, setUTaskEnd] = useState<Date>(new Date());
-  const [uTaskStart, setUTaskStart] = useState<Date>(new Date());
+  const [uTaskEnd, setUTaskEnd] = useState<Date | null>(null);
+  const [uTaskStart, setUTaskStart] = useState<Date | null>(null);
   const [uTaskName, setuTaskName] = useState('');
   const [uTaskDesc, setUTaskDesc] = useState('');
   const [uTaskCat, setUTaskCat] = useState('');
@@ -294,11 +294,14 @@ function AgendaTasks({ api }) {
                   <AlertDialog
                     onOpenChange={(open) => {
                       if (open) {
+                        const startDate = new Date(event.start.replace(' ', 'T'));
+                        const endDate = new Date(event.end.replace(' ', 'T'));
+
                         setPH(event.category || 'Choose a classification for these tasks');
                         setUTaskDesc(event.summary || '');
-                        setUTaskEnd(new Date(event.end));
-                        setUTaskStart(new Date(event.start));
                         setuTaskName(event.title);
+                        setUTaskStart(startDate);
+                        setUTaskEnd(endDate);
                       }
                       if (!open) {
                         setuTaskName('');
@@ -323,15 +326,13 @@ function AgendaTasks({ api }) {
                       <View className="items-center gap-2">
                         <View className="mt-5 items-center gap-5">
                           <TextInput
-                            value={uTaskName}
+                            value={uTaskName || event.title}
                             onChangeText={setuTaskName}
-                            placeholder={event.title}
                             className="w-80 rounded-xl border border-primary bg-white p-2  placeholder:text-center"></TextInput>
                           <TextInput
                             multiline={true}
                             value={uTaskDesc}
                             onChangeText={setUTaskDesc}
-                            placeholder={event.summary}
                             className="w-80 rounded-xl border border-primary bg-white p-2 placeholder:text-center"></TextInput>
                         </View>
 
@@ -343,7 +344,7 @@ function AgendaTasks({ api }) {
                             <DateTimePicker
                               mode="time"
                               value={uTaskStart || new Date(event.start)}
-                              onChange={(event, date) => setUTaskStart(new Date(date))}
+                              onChange={(event, date) => setUTaskStart(date)}
                             />
                           </View>
                           <View>

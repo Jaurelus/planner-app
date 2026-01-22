@@ -40,7 +40,7 @@ function WeeklyView({ api }: { api: string }) {
             context.setDate(date.dateString, 'weeklyView');
           }}></WeekCalendar>
       </View>
-      <View className="">
+      <View className="mb-15">
         <Goals api={api} />
       </View>
     </ScrollView>
