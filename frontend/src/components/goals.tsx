@@ -107,12 +107,21 @@ function Goals({ api }: { api: string }) {
     );
   };
   const findFirstDay = (date: Date) => {
+    if (date.getDay() == 0) {
+      return new Date(
+        date.getFullYear() +
+          '-' +
+          String(date.getMonth() + 1).padStart(2, '0') +
+          '-' +
+          date.getDate()
+      );
+    }
     let flag;
     if (date.getDay() == 0) {
       flag = -6;
-    } else flag = 1;
+    } else flag = 0;
 
-    let firstDay = date.getDate() - ((date.getDay() || 7) % 7) - flag;
+    let firstDay = date.getDate() - ((date.getDay() || 7) % 7) + flag;
     return new Date(
       date.getFullYear() + '-' + String(date.getMonth() + 1).padStart(2, '0') + '-' + firstDay
     );
@@ -355,7 +364,7 @@ function Goals({ api }: { api: string }) {
               <Button>Create Goal</Button>
             </AlertDialogTrigger>
             <View className="">
-              <AlertDialogContent className=" !w-[90%] rounded-3xl bg-primary p-2">
+              <AlertDialogContent className=" !w-[90%] rounded-3xl bg-white p-2 px-10">
                 <AlertDialogHeader>
                   <AlertDialogTitle className="mt-2 color-dark">Add New Goal</AlertDialogTitle>
                 </AlertDialogHeader>
@@ -372,12 +381,12 @@ function Goals({ api }: { api: string }) {
                   className="w-100 mb-5 h-64 rounded-xl border border-primary bg-white p-2 text-center"
                   placeholder="Goal Description"></TextInput>
                 <AlertDialogFooter className="mt-5 flex-row justify-center text-white">
-                  <AlertDialogCancel variant="outline" className="mr-5 border border-white">
+                  <AlertDialogCancel variant="destructive" className="mr-5 border border-white">
                     <Text className="text-white">Cancel</Text>
                   </AlertDialogCancel>
                   <AlertDialogAction
-                    variant="outline"
-                    className="border border-white"
+                    variant="default"
+                    className="mt-2 border border-primary"
                     onPress={saveNewGoal}>
                     <Text className="text-white">Confirm</Text>
                   </AlertDialogAction>

@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { CalendarList, Calendar } from 'react-native-calendars';
 import { useColorScheme } from 'react-native';
 
-function ScrollView() {
+function ScrollView({ curr }) {
   const colorScheme = useColorScheme();
   const isDark = colorScheme === 'dark';
 
@@ -21,6 +21,14 @@ function ScrollView() {
     textMonthFontWeight: 'bold',
     textDayHeaderFontWeight: '600',
   };
+
+  // View the week on short press pass the variable to calendarscreen (newcounter==2)
+  const handleShortPress = () => {
+    //Set date
+    //Weekly view
+  };
+  //Add a marked date on long press
+  const handleLongPress = () => {};
 
   return (
     <View>
