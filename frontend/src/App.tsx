@@ -47,21 +47,15 @@ export default function App() {
   };
 
   return (
-    <CalendarProvider date={prepareDate()} theme={calendarTheme}>
-      <View className="flex flex-1">
-        <NavigationContainer>
-          <Stack.Navigator>
-            <Stack.Screen name="Home" component={HomePage} />
-            <Stack.Screen
-              name="Goals"
-              component={CalendarScreen}
-              initialParams={{ api: API_URL }}
-            />
-            <Stack.Screen name="Personal" component={Personal} />
-            <Stack.Screen name="Today" component={Daily} initialParams={{ api: API_URL }} />
-          </Stack.Navigator>
-        </NavigationContainer>
-      </View>
-    </CalendarProvider>
+    <View className="flex flex-1">
+      <NavigationContainer>
+        <Stack.Navigator>
+          <Stack.Screen name="Home" component={HomePage} />
+          <Stack.Screen name="Goals" component={CalendarScreen} initialParams={{ api: API_URL }} />
+          <Stack.Screen name="Personal" component={Personal} />
+          <Stack.Screen name="Today" component={Daily} initialParams={{ api: API_URL }} />
+        </Stack.Navigator>
+      </NavigationContainer>
+    </View>
   );
 }

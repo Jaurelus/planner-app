@@ -71,6 +71,16 @@ function AgendaTasks({ api }) {
     return `${hour}:${minute} ${mFlag}`;
   };
 
+  const prepareDate = () => {
+    return (
+      new Date().getFullYear() +
+      '-' +
+      String(new Date().getMonth() + 1).padStart(2, '0') +
+      '-' +
+      String(new Date().getDate()).padStart(2, '0')
+    );
+  };
+
   //Format timestamps to display on timeline
   const formatTime = (time: string) => {
     let normalizedTime = time.padStart(11, '0');
@@ -249,253 +259,255 @@ function AgendaTasks({ api }) {
   };
 
   return (
-    <View className="flex flex-1">
-      <ExpandableCalendar
-        initialDate={context.date}
-        className="block"
-        theme={calendarTheme}
-        closeOnDayPress
-        firstDay={1}
-        markingType="custom"
-        markedDates={{}}
-        horizontal
-        pagingEnabled
-        onDayPress={(day) => {
-          setSelectedDate(day.dateString);
-        }}
-        onDayLongPress={(day) => {
-          //Add the date to marked dates
-        }}
-      />
-      <Timeline
-        date={context.date}
-        timelineLeftInset={45}
-        rightEdgeSpacing={10}
-        format24h={false}
-        events={timelineEvents}
-        scrollToNow={true}
-        renderEvent={(event) => {
-          return (
-            <View className="ml-auto mr-auto flex flex-1 flex-row items-center justify-center gap-5 border-0">
-              <View className="ml-auto mr-auto flex flex-1 flex-col items-center justify-center ">
-                <Text className="color-red">{event.title}</Text>
-                <Text className="max-w-64 text-center">{event.summary}</Text>
-                <Text>
-                  {convert12(event.start.slice(11, 19))} - {convert12(event.end.slice(11, 19))}
-                </Text>
-              </View>
-              <View
-                className="top-0 -mt-2 flex h-full flex-col border-l-2  pt-0"
-                style={{ borderColor: event.color }}>
+    <CalendarProvider date={prepareDate()}>
+      <View className="flex flex-1">
+        <ExpandableCalendar
+          initialDate={context.date}
+          className="block"
+          theme={calendarTheme}
+          closeOnDayPress
+          firstDay={1}
+          markingType="custom"
+          markedDates={{}}
+          horizontal
+          pagingEnabled
+          onDayPress={(day) => {
+            setSelectedDate(day.dateString);
+          }}
+          onDayLongPress={(day) => {
+            //Add the date to marked dates
+          }}
+        />
+        <Timeline
+          date={context.date}
+          timelineLeftInset={45}
+          rightEdgeSpacing={10}
+          format24h={false}
+          events={timelineEvents}
+          scrollToNow={true}
+          renderEvent={(event) => {
+            return (
+              <View className="ml-auto mr-auto flex flex-1 flex-row items-center justify-center gap-5 border-0">
+                <View className="ml-auto mr-auto flex flex-1 flex-col items-center justify-center ">
+                  <Text className="color-red">{event.title}</Text>
+                  <Text className="max-w-64 text-center">{event.summary}</Text>
+                  <Text>
+                    {convert12(event.start.slice(11, 19))} - {convert12(event.end.slice(11, 19))}
+                  </Text>
+                </View>
                 <View
-                  className="top-0 mt-0 flex flex-1 items-center border-b-2"
+                  className="top-0 -mt-2 flex h-full flex-col border-l-2  pt-0"
                   style={{ borderColor: event.color }}>
-                  {/* Edit Task */}
+                  <View
+                    className="top-0 mt-0 flex flex-1 items-center border-b-2"
+                    style={{ borderColor: event.color }}>
+                    {/* Edit Task */}
 
-                  <AlertDialog
-                    onOpenChange={(open) => {
-                      if (open) {
-                        const startDate = new Date(event.start.replace(' ', 'T'));
-                        const endDate = new Date(event.end.replace(' ', 'T'));
+                    <AlertDialog
+                      onOpenChange={(open) => {
+                        if (open) {
+                          const startDate = new Date(event.start.replace(' ', 'T'));
+                          const endDate = new Date(event.end.replace(' ', 'T'));
 
-                        setPH(event.category || 'Choose a classification for these tasks');
-                        setUTaskDesc(event.summary || '');
-                        setuTaskName(event.title);
-                        setUTaskStart(startDate);
-                        setUTaskEnd(endDate);
-                      }
-                      if (!open) {
-                        setuTaskName('');
-                        setUTaskDesc('');
-                      }
-                    }}>
-                    <AlertDialogTrigger asChild>
-                      <Button
-                        variant="ghost"
-                        className="flex flex-1 items-center justify-center rounded-none"
-                        textClassName="color-black"
-                        style={{ backgroundColor: `${event.color}1A` }}>
-                        <SquarePen color="#3c0275" />
-                      </Button>
-                    </AlertDialogTrigger>
-                    <AlertDialogContent className="!w-[90%] gap-3 bg-white">
-                      <AlertDialogHeader>
-                        <AlertDialogTitle className="mt-2 color-dark">
-                          Edit This Task?
-                        </AlertDialogTitle>
-                      </AlertDialogHeader>
-                      <View className="items-center gap-2">
-                        <View className="mt-5 items-center gap-5">
-                          <TextInput
-                            value={uTaskName || event.title}
-                            onChangeText={setuTaskName}
-                            className="w-80 rounded-xl border border-primary bg-white p-2  placeholder:text-center"></TextInput>
-                          <TextInput
-                            multiline={true}
-                            value={uTaskDesc}
-                            onChangeText={setUTaskDesc}
-                            className="w-80 rounded-xl border border-primary bg-white p-2 placeholder:text-center"></TextInput>
+                          setPH(event.category || 'Choose a classification for these tasks');
+                          setUTaskDesc(event.summary || '');
+                          setuTaskName(event.title);
+                          setUTaskStart(startDate);
+                          setUTaskEnd(endDate);
+                        }
+                        if (!open) {
+                          setuTaskName('');
+                          setUTaskDesc('');
+                        }
+                      }}>
+                      <AlertDialogTrigger asChild>
+                        <Button
+                          variant="ghost"
+                          className="flex flex-1 items-center justify-center rounded-none"
+                          textClassName="color-black"
+                          style={{ backgroundColor: `${event.color}1A` }}>
+                          <SquarePen color="#3c0275" />
+                        </Button>
+                      </AlertDialogTrigger>
+                      <AlertDialogContent className="!w-[90%] gap-3 bg-white">
+                        <AlertDialogHeader>
+                          <AlertDialogTitle className="mt-2 color-dark">
+                            Edit This Task?
+                          </AlertDialogTitle>
+                        </AlertDialogHeader>
+                        <View className="items-center gap-2">
+                          <View className="mt-5 items-center gap-5">
+                            <TextInput
+                              value={uTaskName || event.title}
+                              onChangeText={setuTaskName}
+                              className="w-80 rounded-xl border border-primary bg-white p-2  placeholder:text-center"></TextInput>
+                            <TextInput
+                              multiline={true}
+                              value={uTaskDesc}
+                              onChangeText={setUTaskDesc}
+                              className="w-80 rounded-xl border border-primary bg-white p-2 placeholder:text-center"></TextInput>
+                          </View>
+
+                          {/* Times */}
+
+                          <View className="flex w-[80%] flex-row items-center justify-center gap-5">
+                            <View className="flex flex-col py-3">
+                              <Text className="ml-3 text-center text-black">Start Time</Text>
+                              <DateTimePicker
+                                mode="time"
+                                value={uTaskStart || new Date(event.start)}
+                                onChange={(event, date) => setUTaskStart(date)}
+                              />
+                            </View>
+                            <View>
+                              <Text className="ml-3 justify-center text-center text-black">
+                                End Time
+                              </Text>
+
+                              <DateTimePicker
+                                mode="time"
+                                value={uTaskEnd || new Date(event.end)}
+                                onChange={(event, date) => {
+                                  setUTaskEnd(date);
+                                }}
+                              />
+                            </View>
+                          </View>
+                          <Select
+                            placeholder={PH || event.taskCategory}
+                            options={[
+                              { choiceNum: 1, option: 'Physical' },
+                              { choiceNum: 2, option: 'Mental(School)' },
+                              { choiceNum: 3, option: 'Intellecutal(Personal)' },
+                              { choiceNum: 4, option: 'Creative' },
+                              { choiceNum: 5, option: 'Social' },
+                              { choiceNum: 6, option: 'Daily Living/Chore' },
+                              { choiceNum: 7, option: 'Recreation/Hobby' },
+                              { choiceNum: 8, option: 'Work/Occupation' },
+                              { choiceNum: 9, option: 'Misc' },
+                            ]}
+                            onSelect={(value) => {
+                              setUTaskCat(catMap[value].name);
+                              setPH(catMap[value].name);
+                            }}
+                            labelKey="option"
+                            valueKey="choiceNum"></Select>
                         </View>
 
-                        {/* Times */}
+                        <AlertDialogFooter className="mb-5 mt-5 flex flex-row items-center justify-center gap-3">
+                          <AlertDialogCancel
+                            variant="destructive"
+                            onPress={() => {
+                              setuTaskName('');
+                              setUTaskDesc('');
+                            }}>
+                            Cancel
+                          </AlertDialogCancel>
+                          <AlertDialogAction
+                            onPress={() => {
+                              editTask(event.id);
+                            }}>
+                            Confirm
+                          </AlertDialogAction>
+                        </AlertDialogFooter>
+                      </AlertDialogContent>
+                    </AlertDialog>
+                  </View>
+                  <View className="flex flex-1">
+                    {/* Delete Task*/}
 
-                        <View className="flex w-[80%] flex-row items-center justify-center gap-5">
-                          <View className="flex flex-col py-3">
-                            <Text className="ml-3 text-center text-black">Start Time</Text>
-                            <DateTimePicker
-                              mode="time"
-                              value={uTaskStart || new Date(event.start)}
-                              onChange={(event, date) => setUTaskStart(date)}
-                            />
-                          </View>
-                          <View>
-                            <Text className="ml-3 justify-center text-center text-black">
-                              End Time
-                            </Text>
-
-                            <DateTimePicker
-                              mode="time"
-                              value={uTaskEnd || new Date(event.end)}
-                              onChange={(event, date) => {
-                                setUTaskEnd(date);
-                              }}
-                            />
-                          </View>
-                        </View>
-                        <Select
-                          placeholder={PH || event.taskCategory}
-                          options={[
-                            { choiceNum: 1, option: 'Physical' },
-                            { choiceNum: 2, option: 'Mental(School)' },
-                            { choiceNum: 3, option: 'Intellecutal(Personal)' },
-                            { choiceNum: 4, option: 'Creative' },
-                            { choiceNum: 5, option: 'Social' },
-                            { choiceNum: 6, option: 'Daily Living/Chore' },
-                            { choiceNum: 7, option: 'Recreation/Hobby' },
-                            { choiceNum: 8, option: 'Work/Occupation' },
-                            { choiceNum: 9, option: 'Misc' },
-                          ]}
-                          onSelect={(value) => {
-                            setUTaskCat(catMap[value].name);
-                            setPH(catMap[value].name);
-                          }}
-                          labelKey="option"
-                          valueKey="choiceNum"></Select>
-                      </View>
-
-                      <AlertDialogFooter className="mb-5 mt-5 flex flex-row items-center justify-center gap-3">
-                        <AlertDialogCancel
-                          variant="destructive"
-                          onPress={() => {
-                            setuTaskName('');
-                            setUTaskDesc('');
-                          }}>
-                          Cancel
-                        </AlertDialogCancel>
-                        <AlertDialogAction
-                          onPress={() => {
-                            editTask(event.id);
-                          }}>
-                          Confirm
-                        </AlertDialogAction>
-                      </AlertDialogFooter>
-                    </AlertDialogContent>
-                  </AlertDialog>
+                    <Button
+                      onPress={() => {
+                        if (!event.id) {
+                          console.log('No event id');
+                          return;
+                        }
+                        deleteTask(event.id);
+                      }}
+                      className="flex flex-1"
+                      textClassName="color-black"
+                      style={{ backgroundColor: `${event.color}1A` }}>
+                      <CircleX color="red" />
+                    </Button>
+                  </View>
                 </View>
-                <View className="flex flex-1">
-                  {/* Delete Task*/}
-
-                  <Button
-                    onPress={() => {
-                      if (!event.id) {
-                        console.log('No event id');
-                        return;
-                      }
-                      deleteTask(event.id);
+              </View>
+            );
+          }}></Timeline>
+        <AlertDialog>
+          <AlertDialogTrigger asChild>
+            <Button className=" absolute bottom-10 right-10 rounded-full border p-2" size="lg">
+              <CopyPlus color={'white'} />
+            </Button>
+          </AlertDialogTrigger>
+          <AlertDialogContent className="!w-[90%] gap-3 bg-white">
+            <AlertDialogHeader>
+              <AlertDialogTitle className="mt-2 color-dark">Add New Task</AlertDialogTitle>
+            </AlertDialogHeader>
+            <View className="items-center gap-2">
+              <View className="mt-5 items-center gap-5">
+                <TextInput
+                  value={taskName}
+                  onChangeText={setTaskName}
+                  placeholder="Task Name"
+                  className="w-80 rounded-xl border border-primary bg-white p-2  placeholder:text-center"></TextInput>
+                <TextInput
+                  multiline={true}
+                  value={taskDesc}
+                  onChangeText={setTaskDesc}
+                  placeholder="Task Description"
+                  className="w-80 rounded-xl border border-primary bg-white p-2 placeholder:text-center"></TextInput>
+              </View>
+              {/* Times */}
+              <View className="flex w-[80%] flex-row items-center justify-center gap-5">
+                <View className="flex flex-col py-3">
+                  <Text className="ml-3 text-center text-black">Start Time</Text>
+                  <DateTimePicker
+                    mode="time"
+                    value={startHour}
+                    onChange={(event, date) => setStartHour(date)}
+                  />
+                </View>
+                <View>
+                  <Text className="ml-3 justify-center text-center text-black">End Time</Text>
+                  <DateTimePicker
+                    mode="time"
+                    value={endHour}
+                    onChange={(event, date) => {
+                      setEndHour(date);
+                      console.log(date);
                     }}
-                    className="flex flex-1"
-                    textClassName="color-black"
-                    style={{ backgroundColor: `${event.color}1A` }}>
-                    <CircleX color="red" />
-                  </Button>
+                  />
                 </View>
               </View>
+              <Select
+                placeholder={taskCat || 'Choose a classification for these tasks'}
+                options={[
+                  { choiceNum: 1, option: 'Physical' },
+                  { choiceNum: 2, option: 'Mental(School)' },
+                  { choiceNum: 3, option: 'Intellecutal(Personal)' },
+                  { choiceNum: 4, option: 'Creative' },
+                  { choiceNum: 5, option: 'Social' },
+                  { choiceNum: 6, option: 'Daily Living/Chore' },
+                  { choiceNum: 7, option: 'Recreation/Hobby' },
+                  { choiceNum: 8, option: 'Work/Occupation' },
+                  { choiceNum: 9, option: 'Misc' },
+                ]}
+                onSelect={(value) => {
+                  setTaskCat(catMap[value].name);
+                }}
+                labelKey="option"
+                valueKey="choiceNum"></Select>
             </View>
-          );
-        }}></Timeline>
-      <AlertDialog>
-        <AlertDialogTrigger asChild>
-          <Button className=" absolute bottom-10 right-10 rounded-full border p-2" size="lg">
-            <CopyPlus color={'white'} />
-          </Button>
-        </AlertDialogTrigger>
-        <AlertDialogContent className="!w-[90%] gap-3 bg-white">
-          <AlertDialogHeader>
-            <AlertDialogTitle className="mt-2 color-dark">Add New Task</AlertDialogTitle>
-          </AlertDialogHeader>
-          <View className="items-center gap-2">
-            <View className="mt-5 items-center gap-5">
-              <TextInput
-                value={taskName}
-                onChangeText={setTaskName}
-                placeholder="Task Name"
-                className="w-80 rounded-xl border border-primary bg-white p-2  placeholder:text-center"></TextInput>
-              <TextInput
-                multiline={true}
-                value={taskDesc}
-                onChangeText={setTaskDesc}
-                placeholder="Task Description"
-                className="w-80 rounded-xl border border-primary bg-white p-2 placeholder:text-center"></TextInput>
-            </View>
-            {/* Times */}
-            <View className="flex w-[80%] flex-row items-center justify-center gap-5">
-              <View className="flex flex-col py-3">
-                <Text className="ml-3 text-center text-black">Start Time</Text>
-                <DateTimePicker
-                  mode="time"
-                  value={startHour}
-                  onChange={(event, date) => setStartHour(date)}
-                />
-              </View>
-              <View>
-                <Text className="ml-3 justify-center text-center text-black">End Time</Text>
-                <DateTimePicker
-                  mode="time"
-                  value={endHour}
-                  onChange={(event, date) => {
-                    setEndHour(date);
-                    console.log(date);
-                  }}
-                />
-              </View>
-            </View>
-            <Select
-              placeholder={taskCat || 'Choose a classification for these tasks'}
-              options={[
-                { choiceNum: 1, option: 'Physical' },
-                { choiceNum: 2, option: 'Mental(School)' },
-                { choiceNum: 3, option: 'Intellecutal(Personal)' },
-                { choiceNum: 4, option: 'Creative' },
-                { choiceNum: 5, option: 'Social' },
-                { choiceNum: 6, option: 'Daily Living/Chore' },
-                { choiceNum: 7, option: 'Recreation/Hobby' },
-                { choiceNum: 8, option: 'Work/Occupation' },
-                { choiceNum: 9, option: 'Misc' },
-              ]}
-              onSelect={(value) => {
-                setTaskCat(catMap[value].name);
-              }}
-              labelKey="option"
-              valueKey="choiceNum"></Select>
-          </View>
 
-          <AlertDialogFooter className="mb-5 mt-5 flex flex-row items-center justify-center gap-3">
-            <AlertDialogCancel variant="destructive">Cancel</AlertDialogCancel>
-            <AlertDialogAction onPress={createTask}>Confirm</AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
-    </View>
+            <AlertDialogFooter className="mb-5 mt-5 flex flex-row items-center justify-center gap-3">
+              <AlertDialogCancel variant="destructive">Cancel</AlertDialogCancel>
+              <AlertDialogAction onPress={createTask}>Confirm</AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
+      </View>
+    </CalendarProvider>
   );
 }
 
