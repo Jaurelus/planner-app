@@ -1,9 +1,15 @@
 import { View, Text } from 'react-native';
 import { useState } from 'react';
-import { CalendarList, Calendar } from 'react-native-calendars';
+import { CalendarList, Calendar, CalendarContext, DateData } from 'react-native-calendars';
 import { useColorScheme } from 'react-native';
+import { CalendarContextProps } from 'react-native-calendars/src/expandableCalendar/Context';
 
-function ScrollView({ curr }) {
+interface ScrollViewProps {
+  onChange: (value: number) => void;
+  setDate: (value: Date) => void;
+}
+
+function ScrollView({ onChange, setDate }: ScrollViewProps) {
   const colorScheme = useColorScheme();
   const isDark = colorScheme === 'dark';
 
@@ -18,14 +24,17 @@ function ScrollView({ curr }) {
     dayTextColor: isDark ? '#F6DBFA' : '#200524',
     textDisabledColor: isDark ? '#6B4A7A' : '#C4A8D4',
     monthTextColor: isDark ? '#F6DBFA' : '#200524',
-    textMonthFontWeight: 'bold',
+    textMonthFontWeight: '200',
     textDayHeaderFontWeight: '600',
   };
 
-  // View the week on short press pass the variable to calendarscreen (newcounter==2)
-  const handleShortPress = () => {
+  // View the week on short press pass the variable to calendarscreen (newcounter==1)
+  const handleShortPress = (day: DateData) => {
     //Set date
+    let tmpDate = new Date(day.dateString);
+    setDate(tmpDate);
     //Weekly view
+    onChange(1);
   };
   //Add a marked date on long press
   const handleLongPress = () => {};
@@ -36,8 +45,11 @@ function ScrollView({ curr }) {
         className=""
         enableSwipeMonths={true}
         theme={calendarTheme}
-        todayBottomMargin
-        onDayLongPress={() => {}}
+        onDayPress={(day) => {
+          console.log(day);
+          handleShortPress(day);
+        }}
+        onDayLongPress={(day) => {}}
         //current={new Date().toISOString().slice(0, 7)}
       ></CalendarList>
     </View>

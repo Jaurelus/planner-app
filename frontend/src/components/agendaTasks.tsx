@@ -273,11 +273,12 @@ function AgendaTasks({ api }) {
         rightEdgeSpacing={10}
         format24h={false}
         events={timelineEvents}
+        scrollToNow={true}
         renderEvent={(event) => {
           return (
             <View className="ml-auto mr-auto flex flex-1 flex-row items-center justify-center gap-5 border-0">
               <View className="ml-auto mr-auto flex flex-1 flex-col items-center justify-center ">
-                <Text>{event.title}</Text>
+                <Text className="color-red">{event.title}</Text>
                 <Text className="max-w-64 text-center">{event.summary}</Text>
                 <Text>
                   {convert12(event.start.slice(11, 19))} - {convert12(event.end.slice(11, 19))}

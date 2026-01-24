@@ -2,18 +2,27 @@ import { View, ScrollView } from 'react-native';
 import {
   WeekCalendar,
   CalendarContext,
-  DateData,
+  CalendarProvider,
   ExpandableCalendar,
 } from 'react-native-calendars';
 import { useColorScheme } from 'react-native';
 import Goals from './goals';
-import { useContext, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 
-function WeeklyView({ api }: { api: string }) {
+interface WeeklyViewProps {
+  api: string;
+  scrollDate: Date;
+}
+
+function WeeklyView({ api, scrollDate }: WeeklyViewProps) {
   const colorScheme = useColorScheme();
   const isDark = colorScheme === 'dark';
   const context = useContext(CalendarContext);
-  const [date, setDate] = useState<string>();
+  const [date, setDate] = useState<string>(scrollDate.toISOString().slice(0, 10));
+  useEffect(() => {
+    setDate(scrollDate.toISOString().slice(0, 10));
+  }, [scrollDate]);
+
   const calendarTheme = {
     backgroundColor: isDark ? '#200524' : '#FFFFFF',
     calendarBackground: isDark ? '#200524' : '#FFFFFF',
@@ -30,18 +39,25 @@ function WeeklyView({ api }: { api: string }) {
   return (
     <ScrollView className="flex-col">
       <View className=" block">
-        <WeekCalendar
-          theme={calendarTheme}
-          date={date || context.date}
-          closeOnDayPress={true}
-          firstDay={1}
-          onDayPress={(date) => {
-            setDate(date.dateString);
-            context.setDate(date.dateString, 'weeklyView');
-          }}></WeekCalendar>
+        <CalendarProvider
+          date={date}
+          onDateChanged={(date) => {
+            setDate(date);
+          }}>
+          <ExpandableCalendar
+            hideKnob={true}
+            theme={calendarTheme}
+            //disablePan={true}
+            //current={date}
+            firstDay={1}
+            onDayPress={(date) => {
+              setDate(date.dateString);
+              context.setDate(date.dateString, 'weeklyView');
+            }}></ExpandableCalendar>
+        </CalendarProvider>
       </View>
       <View className="mb-15">
-        <Goals api={api} />
+        <Goals api={api} scrollDate={date} />
       </View>
     </ScrollView>
   );

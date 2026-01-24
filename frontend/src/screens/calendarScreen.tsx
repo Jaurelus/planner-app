@@ -1,8 +1,8 @@
 import WeeklyView from '@/components/weeklyView';
 import MonthlyView from '@/components/monthlyView';
 import { View, Text } from 'react-native';
-import ScrollView from '@/components/ui/scrollview';
-import { useState } from 'react';
+import ScrollView from '@/components/scrollview';
+import { useEffect, useState } from 'react';
 import Button from '@/components/ui/button';
 import { Eye } from 'lucide-react-native';
 import { CalendarProvider } from 'react-native-calendars';
@@ -14,9 +14,27 @@ function CalendarScreen({ route, navigation }) {
   const [monthlyVisibility, setMonthlyVisibility] = useState(false);
   const [counter, setCounter] = useState(0);
 
-  const handleView = () => {
+  const [viewVar, setViewVar] = useState(0);
+
+  const [date, setSelectedDate] = useState(new Date());
+  useEffect(() => {
+    if (viewVar == 1) {
+      handleView(1);
+      setViewVar(0);
+    }
+  }, [viewVar]);
+
+  const handleView = (viewVar?: Number) => {
     const newCounter = (counter + 1) % 3;
     setCounter(newCounter);
+
+    if (viewVar == 1) {
+      setScrollVisiblity(false);
+      setWeeklyVisbility(true);
+      setMonthlyVisibility(false);
+      setCounter(1);
+      return;
+    }
 
     //Cycle through visibilisty
     if (newCounter == 0) {
@@ -47,28 +65,31 @@ function CalendarScreen({ route, navigation }) {
   };
 
   return (
-    <CalendarProvider date={prepareDate()}>
-      <View className="flex flex-1">
-        <Button variant="ghost" onPress={handleView} className=" h-20">
-          <Eye />
-        </Button>
-        {scrollVisibility && (
-          <View className="">
-            <ScrollView />
-          </View>
-        )}
-        {weeklyVisibility && (
-          <View className="top-0 mt-0">
-            <WeeklyView api={api}></WeeklyView>
-          </View>
-        )}
-        {monthlyVisibility && (
-          <View className="">
-            <MonthlyView></MonthlyView>
-          </View>
-        )}
-      </View>
-    </CalendarProvider>
+    <View className="flex flex-1">
+      <Button
+        variant="ghost"
+        onPress={() => {
+          handleView(viewVar);
+        }}
+        className=" h-20">
+        <Eye />
+      </Button>
+      {scrollVisibility && (
+        <View className="">
+          <ScrollView setDate={setSelectedDate} onChange={setViewVar} />
+        </View>
+      )}
+      {weeklyVisibility && (
+        <View className="top-0 mt-0">
+          <WeeklyView api={api} scrollDate={date}></WeeklyView>
+        </View>
+      )}
+      {monthlyVisibility && (
+        <View className="">
+          <MonthlyView></MonthlyView>
+        </View>
+      )}
+    </View>
   );
 }
 export default CalendarScreen;

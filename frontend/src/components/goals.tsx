@@ -19,7 +19,7 @@ import { TextInput } from 'react-native';
 import { CalendarContext } from 'react-native-calendars';
 import { findFocusedRoute } from '@react-navigation/native';
 
-function Goals({ api }: { api: string }) {
+function Goals({ api, scrollDate }: { api: string; scrollDate: string }) {
   const API_URL = api + 'goals';
   const [goals, setGoals] = useState([]);
   const [alertDT, setAlertDT] = useState('Mark Goal Complete?');
@@ -33,6 +33,10 @@ function Goals({ api }: { api: string }) {
   const [gDesc, setGDesc] = useState('');
   const [gTitleEdit, setGTitleEdit] = useState('');
   const [gDescEdit, setGDescEdit] = useState('');
+  const [inputDate, setInputDate] = useState('');
+  useEffect(() => {
+    setInputDate(scrollDate);
+  }, [scrollDate]);
   const updateAlertText = () => {
     if (alertDT == 'Mark Goal Complete?') {
       setAlertDT('Mark Goal Incomplete');
@@ -130,7 +134,7 @@ function Goals({ api }: { api: string }) {
   const currGoals = goals.filter(
     (goals) =>
       formatTimeLineDates(findFirstDay(new Date(goals.date))) ===
-      formatTimeLineDates(findFirstDay(new Date(context.date)))
+      formatTimeLineDates(findFirstDay(new Date(inputDate)))
   );
 
   //Edit goals
@@ -213,7 +217,7 @@ function Goals({ api }: { api: string }) {
           {currGoals.map((goal) => (
             //
             <Card key={goal._id} className="mb-0 min-h-32 flex-col p-0">
-              <View className=" !p-0. flex-1 flex-row items-stretch rounded-md border-2">
+              <View className=" !p-0. flex-1 flex-row  rounded-md border-2">
                 {/* Text View */}
                 <View className="min-w-40 flex-1 flex-col items-center justify-center">
                   <CardTitle className="text-center">{goal.title}</CardTitle>
