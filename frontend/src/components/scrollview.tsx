@@ -24,7 +24,7 @@ function ScrollView({ onChange, setDate }: ScrollViewProps) {
     dayTextColor: isDark ? '#F6DBFA' : '#200524',
     textDisabledColor: isDark ? '#6B4A7A' : '#C4A8D4',
     monthTextColor: isDark ? '#F6DBFA' : '#200524',
-    textMonthFontWeight: '200',
+    textMonthFontWeight: '600',
     textDayHeaderFontWeight: '600',
   };
 

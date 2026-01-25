@@ -58,7 +58,7 @@ function Goals({ api, scrollDate }: { api: string; scrollDate: string }) {
       const payload = {
         goalTitle: gTitle,
         goalDescription: gDesc,
-        goalDate: new Date(context.selectedDate),
+        goalDate: new Date(scrollDate),
       };
       const response = await fetch(API_URL, {
         method: 'POST',
@@ -227,7 +227,7 @@ function Goals({ api, scrollDate }: { api: string; scrollDate: string }) {
 
                 {/* Buttons Panel */}
 
-                <View className="mr-0 mt-0 flex-1 flex-col items-stretch justify-stretch border-l-2  p-0">
+                <View className="mr-0 mt-0 flex-1 flex-col justify-stretch border-l-2  p-0">
                   {/* Edit */}
 
                   <View className=" mt-0 flex flex-1 flex-col items-stretch justify-stretch border-b-2 p-0">
