@@ -15,9 +15,10 @@ import CustTdyBtn from './ui/custTodayBtn';
 interface WeeklyViewProps {
   api: string;
   scrollDate: Date;
+  markedDates: {};
 }
 
-function WeeklyView({ api, scrollDate }: WeeklyViewProps) {
+function WeeklyView({ api, scrollDate, markedDates }: WeeklyViewProps) {
   const colorScheme = useColorScheme();
   const isDark = colorScheme === 'dark';
   const context = useContext(CalendarContext);
@@ -80,6 +81,7 @@ function WeeklyView({ api, scrollDate }: WeeklyViewProps) {
             setDate(date);
           }}>
           <ExpandableCalendar
+            markedDates={markedDates}
             hideKnob={true}
             theme={calendarTheme}
             //disablePan={true}

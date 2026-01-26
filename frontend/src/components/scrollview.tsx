@@ -1,5 +1,5 @@
 import { View, Text } from 'react-native';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { CalendarList, Calendar, CalendarContext, DateData } from 'react-native-calendars';
 import { useColorScheme } from 'react-native';
 import { CalendarContextProps } from 'react-native-calendars/src/expandableCalendar/Context';
@@ -7,13 +7,21 @@ import { CalendarContextProps } from 'react-native-calendars/src/expandableCalen
 interface ScrollViewProps {
   onChange: (value: number) => void;
   setDate: (value: Date) => void;
+  markedDates: {};
 }
 
-function ScrollView({ onChange, setDate }: ScrollViewProps) {
+function ScrollView({ onChange, setDate, markedDates }: ScrollViewProps) {
   const colorScheme = useColorScheme();
   const isDark = colorScheme === 'dark';
 
-  const [markedCalDates, setMarkedCalDates] = useState([]);
+  const [holidays, setHolidays] = useState({});
+  useEffect(() => {
+    setHolidays(markedDates);
+  });
+  useEffect(() => {
+    setHolidays(markedDates);
+    console.log(holidays);
+  }, [markedDates]);
   const calendarTheme = {
     backgroundColor: isDark ? '#200524' : '#FFFFFF',
     calendarBackground: isDark ? '#200524' : '#FFFFFF',
@@ -42,6 +50,7 @@ function ScrollView({ onChange, setDate }: ScrollViewProps) {
   return (
     <View>
       <CalendarList
+        markedDates={markedDates}
         className=""
         enableSwipeMonths={true}
         theme={calendarTheme}

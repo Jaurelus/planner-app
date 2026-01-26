@@ -3,10 +3,13 @@ import express from "express";
 import cors from "cors";
 import dotenv from "dotenv/config";
 import mongoose from "mongoose";
+import Holidays from "date-holidays";
 
 import goalsRoutes from "./modules/goals/goalsRoutes.js";
 import tasksRoutes from "./modules/tasks/tasksRoutes.js";
 
+var hd = new Holidays("US");
+console.log(hd.getHolidays("2026"));
 const app = express();
 const PORT = process.env.PORT || 3000;
 
@@ -17,6 +20,20 @@ app.use(express.json());
 //Routes
 app.use("/api/goals", goalsRoutes);
 app.use("/api/tasks", tasksRoutes);
+app.get("/api/holidays/:year", (req, res) => {
+  try {
+    const { year } = req.params;
+    const country = req.query.country || "US";
+    let countryHolidays = new Holidays(country);
+    let yearCountryHolidays = countryHolidays.getHolidays(year);
+    return res.status(200).json({
+      message: "Holidays successfully retrieved",
+      holidays: yearCountryHolidays,
+    });
+  } catch (error) {
+    return res.status(400).json({ message: "Error", error });
+  }
+});
 
 mongoose
   .connect(process.env.MONGO_URI)

@@ -5,7 +5,6 @@ import ScrollView from '@/components/scrollview';
 import { useEffect, useState } from 'react';
 import Button from '@/components/ui/button';
 import { Eye } from 'lucide-react-native';
-import { CalendarProvider } from 'react-native-calendars';
 
 function CalendarScreen({ route, navigation }) {
   const { api } = route.params;
@@ -17,6 +16,9 @@ function CalendarScreen({ route, navigation }) {
   const [viewVar, setViewVar] = useState(0);
 
   const [date, setSelectedDate] = useState(new Date());
+  const [country, setCountry] = useState('US');
+  const [holidays, setHolidays] = useState([]);
+  const [formattedHolidays, setFormattedHolidays] = useState({});
   useEffect(() => {
     if (viewVar == 1) {
       handleView(1);
@@ -53,16 +55,28 @@ function CalendarScreen({ route, navigation }) {
       setMonthlyVisibility(true);
     }
   };
+  //-------- API Call -----------
+  const getHolidays = async () => {
+    try {
+      const response = await fetch(`${api}holidays/${date.getFullYear()}?country=${country}`);
+      if (response.status == 200) {
+        const data = await response.json();
+        setHolidays(data.holidays);
 
-  const prepareDate = () => {
-    return (
-      new Date().getFullYear() +
-      '-' +
-      String(new Date().getMonth() + 1).padStart(2, '0') +
-      '-' +
-      String(new Date().getDate()).padStart(2, '0')
-    );
+        const reducedHolidays = data.holidays.reduce((acc, currHoliday) => {
+          let dateH = currHoliday.date.slice(0, 10);
+          acc[dateH] = { marked: true, dotColor: 'red', ...currHoliday };
+          return acc;
+        }, {});
+        setFormattedHolidays(reducedHolidays);
+      }
+    } catch (error) {
+      console.log(error);
+    }
   };
+  useEffect(() => {
+    getHolidays();
+  }, [date.getFullYear()]);
 
   return (
     <View className="flex flex-1">
@@ -76,17 +90,21 @@ function CalendarScreen({ route, navigation }) {
       </Button>
       {scrollVisibility && (
         <View className="">
-          <ScrollView setDate={setSelectedDate} onChange={setViewVar} />
+          <ScrollView
+            setDate={setSelectedDate}
+            onChange={setViewVar}
+            markedDates={formattedHolidays}
+          />
         </View>
       )}
       {weeklyVisibility && (
         <View className="top-0 mt-0">
-          <WeeklyView api={api} scrollDate={date}></WeeklyView>
+          <WeeklyView api={api} scrollDate={date} markedDates={formattedHolidays}></WeeklyView>
         </View>
       )}
       {monthlyVisibility && (
         <View className="">
-          <MonthlyView></MonthlyView>
+          <MonthlyView markedDates={formattedHolidays}></MonthlyView>
         </View>
       )}
     </View>
