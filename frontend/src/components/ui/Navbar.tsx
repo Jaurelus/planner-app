@@ -13,7 +13,7 @@ function Navbar() {
         onPress={() => navigator.navigate('Goals')}
         textClassName="color-white"
         className="ml-10">
-        Calendar
+        Goals
       </Button>
       <Button
         variant="ghost"

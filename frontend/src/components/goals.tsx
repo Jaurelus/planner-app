@@ -320,7 +320,7 @@ function Goals({ api, scrollDate }: { api: string; scrollDate: string }) {
                   <View className="flex flex-1 flex-col items-stretch justify-stretch ">
                     <AlertDialog>
                       <AlertDialogTrigger asChild>
-                        <Pressable className="ml-4 flex-1 py-2">
+                        <Pressable className="flex flex-1 items-center py-2">
                           <BouncyCheckbox
                             pointerEvents="none"
                             className=""

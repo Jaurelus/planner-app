@@ -119,7 +119,7 @@ function AgendaTasks({ api }) {
 
   const prepareEvents = () => {
     const todayEvents = allTasks.filter(
-      (task) => formatTimeLineDates(new Date(task.timeStart)) === context.date
+      (task) => formatTimeLineDates(new Date(task.timeStart)) === selectedDate
     );
 
     const currEvents = todayEvents.map((task, i) => ({
@@ -179,7 +179,7 @@ function AgendaTasks({ api }) {
     if (allTasks.length > 0 && selectedDate) {
       prepareEvents();
     }
-  }, [allTasks, selectedDate]);
+  }, [allTasks, selectedDate, context.date]);
 
   //Function to create a task
 
@@ -279,7 +279,7 @@ function AgendaTasks({ api }) {
           }}
         />
         <Timeline
-          date={context.date}
+          date={selectedDate}
           timelineLeftInset={45}
           rightEdgeSpacing={10}
           format24h={false}
