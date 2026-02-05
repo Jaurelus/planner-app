@@ -124,6 +124,7 @@ function MonthlyView({ markedDates }: { markedDates: {} }) {
               )}
               <View className="mt-0 flex h-full items-center">
                 <Text className="text-xl font-semibold">Mark This Day?</Text>
+                <View></View>
               </View>
             </View>
           </View>

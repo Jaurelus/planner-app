@@ -9,6 +9,8 @@ import Personal from '@/screens/personal';
 import Daily from '@/screens/today';
 import CalendarScreen from '@/screens/calendarScreen';
 import { CalendarProvider } from 'react-native-calendars';
+import LoginScreen from './screens/loginScreen';
+import RegisterScreen from './screens/registerScreen';
 
 export default function App() {
   const colorScheme = useColorScheme();
@@ -22,30 +24,6 @@ export default function App() {
 
   const Stack = createNativeStackNavigator();
 
-  const prepareDate = () => {
-    return (
-      new Date().getFullYear() +
-      '-' +
-      String(new Date().getMonth() + 1).padStart(2, '0') +
-      '-' +
-      String(new Date().getDate()).padStart(2, '0')
-    );
-  };
-
-  const calendarTheme = {
-    backgroundColor: isDark ? '#200524' : '#FFFFFF',
-    calendarBackground: isDark ? '#200524' : '#FFFFFF',
-    textSectionTitleColor: isDark ? '#F6DBFA' : '#754ABF',
-    selectedDayBackgroundColor: isDark ? '#A77ED6' : '#F6DBFA',
-    selectedDayTextColor: '#000000',
-    todayTextColor: isDark ? '#E89B6E' : '#D48354',
-    dayTextColor: isDark ? '#FFFFFF' : '#200524',
-    textDisabledColor: isDark ? '#6B4A7A' : '#C4A8D4',
-    monthTextColor: isDark ? '#F6DBFA' : '#200524',
-    textMonthFontWeight: 'bold',
-    textDayHeaderFontWeight: '600',
-  };
-
   return (
     <View className="flex flex-1">
       <NavigationContainer>
@@ -54,6 +32,12 @@ export default function App() {
           <Stack.Screen name="Goals" component={CalendarScreen} initialParams={{ api: API_URL }} />
           <Stack.Screen name="Personal" component={Personal} />
           <Stack.Screen name="Today" component={Daily} initialParams={{ api: API_URL }} />
+          <Stack.Screen name="Login" component={LoginScreen} initialParams={{ api: API_URL }} />
+          <Stack.Screen
+            name="Register"
+            component={RegisterScreen}
+            initialParams={{ api: API_URL }}
+          />
         </Stack.Navigator>
       </NavigationContainer>
     </View>

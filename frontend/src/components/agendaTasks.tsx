@@ -179,7 +179,7 @@ function AgendaTasks({ api }) {
     if (allTasks.length > 0 && selectedDate) {
       prepareEvents();
     }
-  }, [allTasks, selectedDate, context.date]);
+  }, [allTasks, selectedDate]);
 
   //Function to create a task
 
@@ -262,6 +262,7 @@ function AgendaTasks({ api }) {
     <CalendarProvider date={prepareDate()}>
       <View className="flex flex-1">
         <ExpandableCalendar
+          //onPressArrowLeft={}
           initialDate={context.date}
           className="block"
           theme={calendarTheme}

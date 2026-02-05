@@ -7,6 +7,7 @@ import Holidays from "date-holidays";
 
 import goalsRoutes from "./modules/goals/goalsRoutes.js";
 import tasksRoutes from "./modules/tasks/tasksRoutes.js";
+import authRoutes from "./modules/user/authRoutes.js";
 
 var hd = new Holidays("US");
 console.log(hd.getHolidays("2026"));
@@ -18,8 +19,6 @@ app.use(cors());
 app.use(express.json());
 
 //Routes
-app.use("/api/goals", goalsRoutes);
-app.use("/api/tasks", tasksRoutes);
 app.get("/api/holidays/:year", (req, res) => {
   try {
     const { year } = req.params;
@@ -34,6 +33,10 @@ app.get("/api/holidays/:year", (req, res) => {
     return res.status(400).json({ message: "Error", error });
   }
 });
+
+app.use("/api/goals", goalsRoutes);
+app.use("/api/tasks", tasksRoutes);
+app.use("/api/user", authRoutes);
 
 mongoose
   .connect(process.env.MONGO_URI)
