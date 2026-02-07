@@ -21,7 +21,9 @@ function RegisterScreen({ route }) {
   const [initialERender, setInitialERender] = useState(true);
   const [initialPWRender, setInitialPWRender] = useState(true);
   const [initialPWCRender, setInitialPWCRender] = useState(true);
-
+  const [showVerification, setShowVerification] = useState(false);
+  const [user, setUser] = useState({});
+  console.log(user, 'j');
   //Handle valid and invlaid input from email box
   const handleIntitilView = () => {};
   const handleEmailInput = (email: string) => {
@@ -63,10 +65,6 @@ function RegisterScreen({ route }) {
       setNumFlag(tmp2);
       setUpperFlag(tmp3);
 
-      console.log('NumFlag ', numFlag);
-      console.log(upperFlag);
-      console.log('Length , ', lengthCheck);
-
       if (tmp1 && tmp2 && tmp3) {
         setPWCheck(true);
         console.log(PWCheck);
@@ -96,32 +94,42 @@ function RegisterScreen({ route }) {
     try {
       const payload = {
         userEmail: email,
-        userPassword: PW,
+        userPW: PW,
       };
       console.log(api);
-      const response = await fetch(api + '  user', {
+      const response = await fetch(api + 'user/register', {
         body: JSON.stringify(payload),
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
       });
+      const data = await response.json();
       if (response.status == 201) {
         console.log('User Added');
+        setUser(data.user);
         setPW('');
         setEmail('');
         setConfirmPW('');
         setPWCheck(false);
         setValidEmail(false);
+        setShowVerification(true);
       }
       if (response.status == 400) {
-        console.log('Error');
+        console.log('Error', data.message);
       } else console.log(response.status);
     } catch (error) {
-      console.log('Error', error);
+      console.log('Error1', error);
     }
   };
+
+  //---------- App Build -------------
+
   return (
     <View className=" flex flex-1 items-center justify-center">
-      <VerificationModal visibility={false}></VerificationModal>
+      <VerificationModal
+        isVisible={showVerification}
+        user={user}
+        onUserUpdate={setUser}
+        api={api}></VerificationModal>
       <Card className="w-[80%] items-center">
         <CardHeader>
           <CardTitle>Sign Up </CardTitle>

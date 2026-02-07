@@ -4,7 +4,7 @@ import Task from "../tasks/tasksModel.js";
 
 const UserModel = new mongoose.Schema({
   email: { type: String, require: true },
-  phoneNumber: { type: Number },
+  phoneNumber: { type: String },
   password: { type: String, require: true },
   firstName: { type: String, require: true, default: "" },
   lastName: { type: String },

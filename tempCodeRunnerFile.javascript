@@ -1,0 +1,1 @@
+console.log(Math.random().toString().slice(3,9))

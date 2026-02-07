@@ -10,7 +10,6 @@ import tasksRoutes from "./modules/tasks/tasksRoutes.js";
 import authRoutes from "./modules/user/authRoutes.js";
 
 var hd = new Holidays("US");
-console.log(hd.getHolidays("2026"));
 const app = express();
 const PORT = process.env.PORT || 3000;
 
