@@ -4,7 +4,11 @@ import Button from 'components/ui/button';
 import { useState } from 'react';
 import { View, Text, TextInput } from 'react-native';
 
-function LoginScreen({ route }) {
+interface LoginProps {
+  route: any;
+}
+function LoginScreen({ route }: LoginProps) {
+  const { onChange } = route.params;
   const [enteredEmail, setEnteredEmail] = useState('');
   const [enteredPW, setEnteredPW] = useState('');
   const navigator = useNavigation();
@@ -25,6 +29,8 @@ function LoginScreen({ route }) {
       const data = await response.json();
       if (response.status == 200) {
         console.log('User successfully logged in');
+        console.log(data.user);
+        onChange(data.user);
         navigator.navigate('Home');
       } else console.log('Error logging in', data.message);
     } catch (error) {

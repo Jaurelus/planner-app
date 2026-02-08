@@ -45,9 +45,15 @@ export const validateUser = async (req, res) => {
         });
 
       if (verStat.status == "approved") {
-        await User.findByIdAndUpdate(id, { isVerified: true }, { new: true });
+        const updatedUser = await User.findByIdAndUpdate(
+          id,
+          { isVerified: true },
+          { new: true },
+        );
         //login
-        return res.status(200).json({ message: "User verified" });
+        return res
+          .status(200)
+          .json({ message: "User verified", user: updatedUser });
       } else return res.status(401).json({ message: "Incorrect code" });
     }
   } catch (error) {
@@ -101,7 +107,9 @@ export const loginUser = async (req, res) => {
       if (await bcrypt.compare(tdbUPW, intendedU.password)) {
         //login user
         jwt.sign({ email: tbdUEmail }, sKey, { expiresIn: "7d" });
-        return res.status(200).json({ message: "User sucessfully logged in" });
+        return res
+          .status(200)
+          .json({ message: "User sucessfully logged in", user: intendedU });
       } else
         return res.status(400).json({ message: "Incorrect email or password" });
     }

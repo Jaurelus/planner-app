@@ -7,7 +7,7 @@ const UserModel = new mongoose.Schema({
   phoneNumber: { type: String },
   password: { type: String, require: true },
   firstName: { type: String, require: true, default: "" },
-  lastName: { type: String },
+  lastName: { type: String, default: "" },
   userGoals: [{ type: Schema.Types.ObjectId, ref: "Goal" }],
   userTasks: [{ type: Schema.Types.ObjectId, ref: "Task" }],
   isVerified: { type: Boolean, default: false },

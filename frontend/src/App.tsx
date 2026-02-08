@@ -11,6 +11,7 @@ import CalendarScreen from '@/screens/calendarScreen';
 import { CalendarProvider } from 'react-native-calendars';
 import LoginScreen from './screens/loginScreen';
 import RegisterScreen from './screens/registerScreen';
+import { useState } from 'react';
 
 export default function App() {
   const colorScheme = useColorScheme();
@@ -23,6 +24,8 @@ export default function App() {
     : 'http://localhost:3000/api/';
 
   const Stack = createNativeStackNavigator();
+  const [user, setUser] = useState({});
+  console.log(user, 'k');
 
   return (
     <View className="flex flex-1">
@@ -30,9 +33,13 @@ export default function App() {
         <Stack.Navigator>
           <Stack.Screen name="Home" component={HomePage} />
           <Stack.Screen name="Goals" component={CalendarScreen} initialParams={{ api: API_URL }} />
-          <Stack.Screen name="Personal" component={Personal} />
+          <Stack.Screen name="Personal" component={Personal} initialParams={{ userInfo: user }} />
           <Stack.Screen name="Today" component={Daily} initialParams={{ api: API_URL }} />
-          <Stack.Screen name="Login" component={LoginScreen} initialParams={{ api: API_URL }} />
+          <Stack.Screen
+            name="Login"
+            component={LoginScreen}
+            initialParams={{ api: API_URL, onChange: setUser }}
+          />
           <Stack.Screen
             name="Register"
             component={RegisterScreen}

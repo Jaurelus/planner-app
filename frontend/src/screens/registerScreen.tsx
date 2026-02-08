@@ -1,12 +1,18 @@
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui';
 import { useNavigation } from '@react-navigation/native';
 import Button from 'components/ui/button';
-import { useRef, useState } from 'react';
+import { useRef, useState, useEffect } from 'react';
 import { View, Text, TextInput } from 'react-native';
 import { Check } from 'lucide-react-native';
 import VerificationModal from '@/components/verificationModal';
 
-function RegisterScreen({ route }) {
+interface RegisterProps {
+  route: any;
+  userG: Record<string, string>;
+  setUserG: React.Dispatch<React.SetStateAction<any>>;
+}
+
+function RegisterScreen({ route, userG, setUserG }: RegisterProps) {
   const { api } = route.params;
   const [email, setEmail] = useState('');
   const [PW, setPW] = useState('');

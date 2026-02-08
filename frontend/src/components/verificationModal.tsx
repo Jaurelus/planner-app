@@ -108,6 +108,7 @@ function VerificationModal({ isVisible, user, api, onUserUpdate }: VerificationM
       const data = await response.json();
       if (response.status == 200) {
         console.log('User verified');
+        onUserUpdate(data.updatedUser);
         //login
         login(user);
       } else if (response.status == 401) {
