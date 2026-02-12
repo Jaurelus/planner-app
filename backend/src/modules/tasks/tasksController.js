@@ -4,6 +4,8 @@ import Task from "./tasksModel.js";
 export const addTask = async (req, res) => {
   try {
     //Destructure req
+    const { userid } = req.headers;
+
     const { uTaskName, uTaskDesc, uTaskStart, uTaskEnd, uTaskCat } = req.body;
     if (!uTaskName) {
       return res.status(400).json({ message: "Missing task name" });
@@ -13,6 +15,7 @@ export const addTask = async (req, res) => {
       return res.status(400).json({ message: "Missing task end time" });
     } else {
       const NewTask = new Task({
+        userID: userid,
         taskName: uTaskName,
         taskDescription: uTaskDesc || "",
         timeStart: uTaskStart,
@@ -72,7 +75,8 @@ export const deleteTask = async (req, res) => {
 
 export const viewAllTasks = async (req, res) => {
   try {
-    const tasks = await Task.find();
+    const { UserID } = req.headers;
+    const tasks = await Task.find({ userID: UserID });
     return res
       .status(200)
       .json({ message: "Tasks sucessfully retrieved", tasks });

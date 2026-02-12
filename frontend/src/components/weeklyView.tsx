@@ -78,17 +78,21 @@ function WeeklyView({ api, scrollDate, markedDates }: WeeklyViewProps) {
           }}
           date={date}
           onDateChanged={(date) => {
+            console.log(date);
+
             setDate(date);
           }}>
           <ExpandableCalendar
             markedDates={markedDates}
             hideKnob={true}
             theme={calendarTheme}
+            hideArrows={true}
             //disablePan={true}
             //current={date}
             firstDay={1}
-            onDayPress={(date) => {
-              setDate(date.dateString);
+            onDayPress={(day) => {
+              console.log(day);
+              setDate(day.dateString);
             }}></ExpandableCalendar>
           {/*View to display a button to change the date to today */}
           <View className="h-[vh] w-full items-center justify-end bg-white">

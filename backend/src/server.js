@@ -8,6 +8,7 @@ import Holidays from "date-holidays";
 import goalsRoutes from "./modules/goals/goalsRoutes.js";
 import tasksRoutes from "./modules/tasks/tasksRoutes.js";
 import authRoutes from "./modules/user/authRoutes.js";
+import dateRoutes from "./modules/dates/dateRoutes.js";
 
 var hd = new Holidays("US");
 const app = express();
@@ -36,6 +37,7 @@ app.get("/api/holidays/:year", (req, res) => {
 app.use("/api/goals", goalsRoutes);
 app.use("/api/tasks", tasksRoutes);
 app.use("/api/user", authRoutes);
+app.use("/api/dates", dateRoutes);
 
 mongoose
   .connect(process.env.MONGO_URI)

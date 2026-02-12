@@ -3,25 +3,30 @@ import { useState, useEffect } from 'react';
 import { CalendarList, Calendar, CalendarContext, DateData } from 'react-native-calendars';
 import { useColorScheme } from 'react-native';
 import { CalendarContextProps } from 'react-native-calendars/src/expandableCalendar/Context';
+import MarkedDateModal from './markedDateModal';
 
 interface ScrollViewProps {
   onChange: (value: number) => void;
   setDate: (value: Date) => void;
   markedDates: {};
+  api: string;
 }
 
-function ScrollView({ onChange, setDate, markedDates }: ScrollViewProps) {
+function ScrollView({ onChange, setDate, markedDates, api }: ScrollViewProps) {
   const colorScheme = useColorScheme();
   const isDark = colorScheme === 'dark';
 
+  const [longDate, setLongDate] = useState<Date>();
   const [holidays, setHolidays] = useState({});
+  const [modalVisible, setModalVisible] = useState(false);
+
   useEffect(() => {
     setHolidays(markedDates);
   });
   useEffect(() => {
     setHolidays(markedDates);
-    console.log(holidays);
   }, [markedDates]);
+
   const calendarTheme = {
     backgroundColor: isDark ? '#200524' : '#FFFFFF',
     calendarBackground: isDark ? '#200524' : '#FFFFFF',
@@ -45,10 +50,14 @@ function ScrollView({ onChange, setDate, markedDates }: ScrollViewProps) {
     onChange(1);
   };
   //Add a marked date on long press
-  const handleLongPress = () => {};
+  const handleLongPress = (day: DateData) => {
+    setModalVisible(true);
+    let tmpDate = new Date(day.dateString);
+    setLongDate(tmpDate);
+  };
 
   return (
-    <View>
+    <View className=" flex items-center">
       <CalendarList
         markedDates={markedDates}
         className=""
@@ -58,9 +67,18 @@ function ScrollView({ onChange, setDate, markedDates }: ScrollViewProps) {
           console.log(day);
           handleShortPress(day);
         }}
-        onDayLongPress={(day) => {}}
-        //current={new Date().toISOString().slice(0, 7)}
-      ></CalendarList>
+        onDayLongPress={(day) => {
+          handleLongPress(day);
+        }}></CalendarList>
+      <View className=" ">
+        {longDate && (
+          <MarkedDateModal
+            date={longDate.toISOString()}
+            api={api}
+            visible={modalVisible}
+            setVisible={setModalVisible}></MarkedDateModal>
+        )}
+      </View>
     </View>
   );
 }

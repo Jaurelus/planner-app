@@ -11,6 +11,8 @@ import Button from './ui/button';
 import { CircleX, SquarePen } from 'lucide-react-native';
 import { CopyPlus, Square, Check, BicepsFlexed } from 'lucide-react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
+import * as SecureStore from 'expo-secure-store';
+import { getUserInfo } from 'utils/SecureStoreManager';
 
 import {
   AlertDialog,
@@ -24,7 +26,6 @@ import {
   AlertDialogTrigger,
 } from 'components/ui';
 import { Select } from 'components/Select';
-import { Card } from './ui';
 
 function AgendaTasks({ api }) {
   const API_URL = api + 'tasks';
@@ -42,6 +43,8 @@ function AgendaTasks({ api }) {
   const [uTaskCat, setUTaskCat] = useState('');
   const [allTasks, setAllTasks] = useState([]);
   const [PH, setPH] = useState('');
+  const [userInfo, setUserInfo] = useState<any>(null);
+  const [userToken, setUserToken] = useState('');
   const catMap = {
     1: { name: 'Physical' },
     2: { name: 'Mental(School)' },
@@ -53,6 +56,7 @@ function AgendaTasks({ api }) {
     8: { name: 'Work/Occupation' },
     9: { name: 'Misc' },
   };
+
   const eventColors = ['#F6DBFA', '#E89B6E', '#754ABF', '#D7BE69'];
 
   const context = useContext(CalendarContext);
@@ -155,12 +159,14 @@ function AgendaTasks({ api }) {
 
   //---------- API Calls -----------
 
-  //const API_URL = 'http://localhost:3000/api/tasks';
-
   // Function to get task data
   const viewTasks = async () => {
+    if (!userInfo) return;
     try {
-      const response = await fetch(API_URL, { method: 'GET' });
+      const response = await fetch(API_URL, {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json', AuthToken: userToken, UserID: userInfo._id },
+      });
       if (response.status == 200) {
         const data = await response.json();
         setAllTasks(data.tasks);
@@ -170,10 +176,18 @@ function AgendaTasks({ api }) {
       console.log('Error', error);
     }
   };
-
+  useEffect(() => {
+    const fetchData = async () => {
+      const token = await SecureStore.getItemAsync('token');
+      setUserToken(token ? token : '');
+      const user = await SecureStore.getItemAsync('userInfo');
+      setUserInfo(user ? JSON.parse(user) : null);
+    };
+    fetchData();
+  }, []);
   useEffect(() => {
     viewTasks();
-  }, []);
+  }, [userInfo, userToken]);
 
   useEffect(() => {
     if (allTasks.length > 0 && selectedDate) {
@@ -184,6 +198,7 @@ function AgendaTasks({ api }) {
   //Function to create a task
 
   const createTask = async () => {
+    if (!userInfo) return;
     const tPayload = {
       uTaskName: taskName,
       uTaskDesc: taskDesc,
@@ -193,20 +208,20 @@ function AgendaTasks({ api }) {
     };
     try {
       const response = await fetch(API_URL, {
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', AuthToken: userToken, UserID: userInfo._id },
         method: 'POST',
         body: JSON.stringify(tPayload),
       });
-
+      const data = await response.json();
       //Sucessful add
       if (response.status == 201) {
         console.log('Task sucessfully created');
-        viewTasks();
+        await viewTasks();
 
         //Reset fields
         setTaskName('');
         setTaskDesc('');
-      }
+      } else console.log(data.message);
     } catch (error) {
       console.log('Error', error);
     }
@@ -216,7 +231,10 @@ function AgendaTasks({ api }) {
 
   const deleteTask = async (taskID: string) => {
     try {
-      const response = await fetch(API_URL + '/' + taskID, { method: 'DELETE' });
+      const response = await fetch(API_URL + '/' + taskID, {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json', AuthToken: userToken, UserID: userInfo._id },
+      });
 
       if (response.status == 200) {
         await viewTasks();
@@ -238,14 +256,14 @@ function AgendaTasks({ api }) {
 
     try {
       const response = await fetch(API_URL + '/' + taskID, {
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', AuthToken: userToken, UserID: userInfo.id },
         method: 'PUT',
         body: JSON.stringify(payload),
       });
       const data = await response.json();
       if (response.status == 200) {
         console.log('Successul update');
-        viewTasks();
+        await viewTasks();
         prepareEvents();
         setuTaskName('');
         setUTaskDesc('');

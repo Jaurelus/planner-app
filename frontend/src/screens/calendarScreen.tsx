@@ -7,7 +7,9 @@ import Button from '@/components/ui/button';
 import { Eye } from 'lucide-react-native';
 
 function CalendarScreen({ route, navigation }) {
-  const { api } = route.params;
+  const { api, userInfo } = route.params;
+  console.log(api);
+  console.log(userInfo);
   const [scrollVisibility, setScrollVisiblity] = useState(true);
   const [weeklyVisibility, setWeeklyVisbility] = useState(false);
   const [monthlyVisibility, setMonthlyVisibility] = useState(false);
@@ -94,6 +96,7 @@ function CalendarScreen({ route, navigation }) {
             setDate={setSelectedDate}
             onChange={setViewVar}
             markedDates={formattedHolidays}
+            api={api}
           />
         </View>
       )}

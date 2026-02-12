@@ -105,11 +105,18 @@ export const loginUser = async (req, res) => {
       });
     } else {
       if (await bcrypt.compare(tdbUPW, intendedU.password)) {
+        console.log("Compare passed");
+        const id = intendedU._id;
         //login user
-        jwt.sign({ email: tbdUEmail }, sKey, { expiresIn: "7d" });
+
+        let token = jwt.sign({ email: tbdUEmail }, sKey, { expiresIn: "7d" });
         return res
           .status(200)
-          .json({ message: "User sucessfully logged in", user: intendedU });
+          .json({
+            message: "User sucessfully logged in",
+            user: intendedU,
+            token: token,
+          });
       } else
         return res.status(400).json({ message: "Incorrect email or password" });
     }

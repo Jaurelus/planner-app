@@ -3,6 +3,8 @@ import Goal from "./goalsModel.js";
 //Create a goal (Post)
 export const createGoal = async (req, res) => {
   try {
+    const { userid } = req.headers;
+
     const { goalTitle, goalDescription, goalDate } = req.body;
 
     if (!goalTitle) {
@@ -10,6 +12,7 @@ export const createGoal = async (req, res) => {
     }
 
     const newGoal = new Goal({
+      userID: userid,
       title: goalTitle,
       description: goalDescription || "",
       date: goalDate || new Date(),
@@ -72,7 +75,25 @@ export const deleteGoal = async (req, res) => {
 //Get all goals
 export const getGoals = async (req, res) => {
   try {
-    const goals = await Goal.find();
+    const { userid } = req.headers;
+    const { startDate, endDate } = req.query;
+    let jsObjectStart = new Date(startDate);
+    jsObjectStart.setUTCHours(0, 0, 0);
+    let jsObjectEnd = new Date(endDate);
+    jsObjectEnd.setUTCHours(23, 59, 59);
+    console.log(jsObjectEnd, jsObjectStart);
+
+    console.log(startDate.split("-")[2]);
+
+    startDate.split("-")[3];
+
+    console.log(endDate);
+    //get date num, iterate throuhg date nums, return only goals that match date
+    const goals = await Goal.find({
+      userID: userid,
+      date: { $gte: jsObjectStart, $lte: jsObjectEnd },
+    });
+    console.log(goals);
     return res.status(200).json({ message: "Goals retrieved", goals });
   } catch {
     return res.status(400).json({ message: "Error retrieving goals." });

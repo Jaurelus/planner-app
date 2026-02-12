@@ -7,12 +7,6 @@ function HomePage({ navigation }) {
   const navigator = useNavigation();
   return (
     <View className="flex flex-1">
-      <Button
-        onPress={() => {
-          navigator.navigate('Login');
-        }}>
-        Login
-      </Button>
       <View className="flex flex-1 items-center">
         <Image
           style={{ width: 200, height: 200 }}

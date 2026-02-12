@@ -1,8 +1,10 @@
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui';
 import { useNavigation } from '@react-navigation/native';
-import Button from 'components/ui/button';
-import { useState } from 'react';
 import { View, Text, TextInput } from 'react-native';
+import { useState } from 'react';
+
+import Button from 'components/ui/button';
+import * as SecureStore from 'expo-secure-store';
 
 interface LoginProps {
   route: any;
@@ -29,8 +31,15 @@ function LoginScreen({ route }: LoginProps) {
       const data = await response.json();
       if (response.status == 200) {
         console.log('User successfully logged in');
-        console.log(data.user);
-        onChange(data.user);
+
+        console.log(JSON.stringify(data.user));
+        const tmpTok = data.token;
+        const tmpUsr = JSON.stringify(data.user);
+
+        onChange(true);
+        await SecureStore.setItemAsync('token', tmpTok);
+        await SecureStore.setItemAsync('userInfo', tmpUsr);
+
         navigator.navigate('Home');
       } else console.log('Error logging in', data.message);
     } catch (error) {
