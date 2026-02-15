@@ -8,13 +8,23 @@ import Daily from '@/screens/today';
 import CalendarScreen from '@/screens/calendarScreen';
 import LoginScreen from './screens/loginScreen';
 import RegisterScreen from './screens/registerScreen';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import * as Device from 'expo-device';
+import * as SecureStore from 'expo-secure-store';
 
 export default function App() {
   const colorScheme = useColorScheme();
   const isDark = colorScheme === 'dark';
   const [user, setUser] = useState(false);
+  const [userToken, setUserToken] = useState('');
+  const [userInfo, setUserInfo] = useState<any>(null);
+  const [userDates, setUserDates] = useState<any>(null);
+  const [formattedHolidays, setFormattedHolidays] = useState({});
+  const [formattedUserDates, setFormattedUserDates] = useState({});
+
+  useEffect(() => {
+    console.log(userDates, 'App User dates');
+  }, [userDates]);
 
   //If system is is a simulator, then set the API URL to :
 
@@ -24,27 +34,125 @@ export default function App() {
 
   const Stack = createNativeStackNavigator();
 
-  //Function to format all marked dates
-  const formatMarkedDates = () => {
-    //Assign color based on type
+  //Function to merge  marked dates and holidays
+  const mergeDates = (object1: any, object2: any) => {
+    if (!object1 && !object2) return;
+    let dateKeys = Object.keys(object1).splice(8, Object.keys(object1).length);
+    let dateKey = 0;
+
+    dateKeys.forEach((obj) => {
+      //If date from 2 in 1 add it into dots
+      if (Object.keys(object2).includes(obj)) {
+        console.log(obj, 'obj IF');
+        let tmp = JSON.stringify(object1[dateKeys[dateKey]].dots);
+        tmp = tmp.slice(1, tmp.length - 1);
+        tmp = JSON.parse(tmp);
+        console.log(typeof tmp);
+        object2[obj].dots = [tmp, ...object2[obj].dots];
+        console.log(object2[obj].dots);
+      } else {
+        let line = { [obj]: object1[obj] };
+        if (Object.keys(object2).includes(obj)) {
+          return;
+        }
+
+        console.log(line, 'line');
+        Object.assign(object2, line);
+        //console.log(object2);
+      }
+
+      dateKey += 1;
+
+      return object2;
+    });
+    console.log(object2);
+    console.log(Object.keys(object2));
+    setFormattedUserDates(object2);
+    return object2;
   };
+
+  //--------- API CALLS -------------
+
   //Function to get all marked dates
   const getMarkedDates = async () => {
+    if (!userToken || !userInfo._id) return;
+    console.log('getting dates');
     try {
       const response = await fetch(API_URL + 'dates', {
         method: 'GET',
-        headers: { 'Content-Type': 'application/json', AuthToken: 'token' },
+        headers: { 'Content-Type': 'application/json', AuthToken: userToken, userid: userInfo._id },
       });
+      const data = await response.json();
       if (response.status == 200) {
-        console.log('Success');
+        console.log('Success!!');
+        const formattedDates = data.userDates.reduce((acc, currVal) => {
+          acc[currVal.date.slice(0, 10)] = {
+            dots: [{ key: currVal.name, color: currVal.color }],
+            ...currVal,
+          };
+
+          return acc;
+        });
+        setUserDates(formattedDates);
       } else {
-        console.log('error retrieving marked dates');
+        console.log('error retrieving marked dates', data.message);
       }
     } catch (error) {
       console.log(error);
     }
   };
+  //Function to get all holidays
+  const getHolidays = async () => {
+    console.log('Top');
 
+    try {
+      const response = await fetch(API_URL + 'holidays');
+      const data = await response.json();
+      if (response.status == 200) {
+        const reducedHolidays = data.holidays.reduce((acc, currHoliday) => {
+          let dateH = currHoliday.date.slice(0, 10);
+          acc[dateH] = {
+            dots: [
+              {
+                key: currHoliday.name,
+                color: currHoliday.color || 'red',
+                selectedColor: currHoliday.color || 'red',
+              },
+            ],
+            ...currHoliday,
+          };
+          return acc;
+        }, {});
+        setFormattedHolidays(reducedHolidays);
+      } else console.log(String(response.status), data.message);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  //Use Effects to initiliaze data
+  useEffect(() => {
+    const fetchData = async () => {
+      const token = await SecureStore.getItemAsync('token');
+      setUserToken(token ? token : '');
+      const user = await SecureStore.getItemAsync('userInfo');
+      setUserInfo(user ? JSON.parse(user) : null);
+    };
+    fetchData();
+    getHolidays();
+    console.log('Holidays\n\n ', formattedHolidays);
+  }, []);
+  useEffect(() => {
+    getMarkedDates();
+  }, [userToken, userInfo]);
+  useEffect(() => {
+    getHolidays();
+  }, []);
+  useEffect(() => {
+    if (userDates != null && formattedHolidays != null) {
+      mergeDates(userDates, formattedHolidays);
+    }
+  }, [userDates, formattedHolidays]);
   return (
     <View className="flex flex-1">
       <NavigationContainer>
@@ -57,15 +165,24 @@ export default function App() {
             />
           )}
           <Stack.Screen name="Home" component={HomePage} />
-          <Stack.Screen
-            name="Goals"
-            component={CalendarScreen}
-            initialParams={{
-              api: API_URL,
-            }}
-          />
+          {formattedUserDates && (
+            <Stack.Screen
+              name="Goals"
+              component={CalendarScreen}
+              initialParams={{
+                api: API_URL,
+                dates: formattedUserDates,
+              }}
+            />
+          )}
           <Stack.Screen name="Personal" component={Personal} />
-          <Stack.Screen name="Today" component={Daily} initialParams={{ api: API_URL }} />
+          {formattedUserDates && (
+            <Stack.Screen
+              name="Today"
+              component={Daily}
+              initialParams={{ api: API_URL, dates: formattedUserDates }}
+            />
+          )}
 
           <Stack.Screen
             name="Register"

@@ -18,13 +18,11 @@ const PORT = process.env.PORT || 3000;
 app.use(cors());
 app.use(express.json());
 
-//Routes
-app.get("/api/holidays/:year", (req, res) => {
+app.get("/api/holidays", (req, res) => {
   try {
-    const { year } = req.params;
-    const country = req.query.country || "US";
+    const country = "US";
     let countryHolidays = new Holidays(country);
-    let yearCountryHolidays = countryHolidays.getHolidays(year);
+    let yearCountryHolidays = countryHolidays.getHolidays();
     return res.status(200).json({
       message: "Holidays successfully retrieved",
       holidays: yearCountryHolidays,
@@ -34,6 +32,7 @@ app.get("/api/holidays/:year", (req, res) => {
   }
 });
 
+//Routes
 app.use("/api/goals", goalsRoutes);
 app.use("/api/tasks", tasksRoutes);
 app.use("/api/user", authRoutes);

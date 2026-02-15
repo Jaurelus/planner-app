@@ -74,9 +74,22 @@ export const deleteTask = async (req, res) => {
 //Function to view all tasks
 
 export const viewAllTasks = async (req, res) => {
+  console.log("Backend View cooking");
   try {
-    const { UserID } = req.headers;
-    const tasks = await Task.find({ userID: UserID });
+    const { userid } = req.headers;
+    const { date } = req.query;
+    console.log(date);
+    const testDate = new Date(date);
+    testDate.setUTCHours(0, 0, 0);
+
+    let testDate1 = new Date(date);
+    testDate1.setUTCHours(23, 59, 59);
+
+    const tasks = await Task.find({
+      userID: userid,
+      timeStart: { $gte: testDate, $lte: testDate1 },
+    });
+    //console.log(tasks);
     return res
       .status(200)
       .json({ message: "Tasks sucessfully retrieved", tasks });

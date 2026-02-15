@@ -5,27 +5,43 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle } from './ui';
 import Button from 'components/ui/button';
 import { useState } from 'react';
 import { AlertDialog, AlertDialogHeader, AlertDialogTrigger } from 'components/ui';
+import * as SecureStore from 'expo-secure-store';
+import ColorSelector from './colorSelector';
 
 interface MarkedDateModalProps {
   date: String;
   api: string;
   visible: boolean;
   setVisible: React.Dispatch<React.SetStateAction<any>>;
+  changeFlag: boolean;
 }
-function MarkedDateModal({ date, api, visible, setVisible }: MarkedDateModalProps) {
+function MarkedDateModal({ date, api, visible, setVisible, changeFlag }: MarkedDateModalProps) {
+  const [userToken, setUserToken] = useState('');
+  const [userInfo, setUserInfo] = useState<any>(null);
   const [dateName, setDateName] = useState('');
   const [contextDate, setContextDate] = useState('');
+
+  console.log('Contect', contextDate);
+  const [dateType, setDateType] = useState('');
+  const [dateRule, setDateRule] = useState('');
+
   useEffect(() => {
     setContextDate(date.toString());
   }, [date]);
-  console.log('Contect', contextDate);
-  const [dateType, setDateType] = useState('');
 
-  const [dateRule, setDateRule] = useState('');
-  console.log(contextDate.toString(), 'String ');
+  useEffect(() => {
+    const fetchData = async () => {
+      const token = await SecureStore.getItemAsync('token');
+      setUserToken(token ? token : '');
+      const user = await SecureStore.getItemAsync('userInfo');
+      setUserInfo(user ? JSON.parse(user) : null);
+    };
+    fetchData();
+  }, []);
   //-------- API CALL --------------
   //Function to add marked dates
   const markDate = async () => {
+    if (!userInfo || !userToken) return;
     const payload: any = {};
 
     try {
@@ -41,12 +57,11 @@ function MarkedDateModal({ date, api, visible, setVisible }: MarkedDateModalProp
       if (dateRule) {
         payload.newDateRule = dateRule;
       }
-      console.log(typeof contextDate);
       console.log('Pre fetch');
       console.log(payload);
       const response = await fetch(api + 'dates', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', Authtoken: 'token' },
+        headers: { 'Content-Type': 'application/json', Authtoken: userToken, userid: userInfo._id },
         body: JSON.stringify(payload),
       });
       console.log('post fetch');
@@ -54,13 +69,14 @@ function MarkedDateModal({ date, api, visible, setVisible }: MarkedDateModalProp
 
       const data = await response.json();
       console.log(data.message);
-      if (response.status == 200) {
+      if (response.status == 201) {
         console.log('Date sucessfully marked');
+        changeFlag = true;
       } else {
-        console.log('Server side error' + data.message);
+        console.log('Server side error ' + data.message);
       }
     } catch (error) {
-      console.log('Client-side eror', error);
+      console.log('Client-side eror ', error);
     }
   };
   //----------- APP BUILD --------------
@@ -83,6 +99,7 @@ function MarkedDateModal({ date, api, visible, setVisible }: MarkedDateModalProp
             placeholder="Type (Ex: Birthdays)"
             value={dateType}
             onChangeText={setDateType}></TextInput>
+          <ColorSelector></ColorSelector>
         </CardContent>
         <CardFooter>
           <Button

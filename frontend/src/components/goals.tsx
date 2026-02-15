@@ -17,10 +17,10 @@ import {
 } from 'components/ui';
 import { TextInput } from 'react-native';
 import { CalendarContext } from 'react-native-calendars';
-import { findFocusedRoute } from '@react-navigation/native';
 import * as SecureStore from 'expo-secure-store';
 
 function Goals({ api, scrollDate }: { api: string; scrollDate: string }) {
+  console.log('SXeoll Date', scrollDate);
   const API_URL = api + 'goals';
   const [goals, setGoals] = useState([]);
   const [alertDT, setAlertDT] = useState('Mark Goal Complete?');
@@ -126,7 +126,6 @@ function Goals({ api, scrollDate }: { api: string; scrollDate: string }) {
       2,
       '0'
     );
-    console.log('FD', firsDay);
     const lasDayNum = String(Number(scrollDate.split('-')[2]) + 6);
     let dateArray = scrollDate.split('-');
 
@@ -173,7 +172,7 @@ function Goals({ api, scrollDate }: { api: string; scrollDate: string }) {
 
   useEffect(() => {
     showGoals();
-  }, [scrollDate]);
+  }, []);
 
   //Edit goals
   const editGoals = async (GID) => {

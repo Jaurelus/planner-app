@@ -130,6 +130,7 @@ function MonthlyView({ markedDates }: { markedDates: {} }) {
           </View>
         </Modal>
         <Calendar
+          markingType="multi-dot"
           markedDates={markedDates}
           ref={calendarRef}
           key={prepareDate(undefined, selectedDate)}

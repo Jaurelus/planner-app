@@ -17,15 +17,8 @@ function ScrollView({ onChange, setDate, markedDates, api }: ScrollViewProps) {
   const isDark = colorScheme === 'dark';
 
   const [longDate, setLongDate] = useState<Date>();
-  const [holidays, setHolidays] = useState({});
-  const [modalVisible, setModalVisible] = useState(false);
 
-  useEffect(() => {
-    setHolidays(markedDates);
-  });
-  useEffect(() => {
-    setHolidays(markedDates);
-  }, [markedDates]);
+  const [modalVisible, setModalVisible] = useState(false);
 
   const calendarTheme = {
     backgroundColor: isDark ? '#200524' : '#FFFFFF',
@@ -59,6 +52,10 @@ function ScrollView({ onChange, setDate, markedDates, api }: ScrollViewProps) {
   return (
     <View className=" flex items-center">
       <CalendarList
+        onVisibleMonthsChange={(month) => {
+          console.log(month);
+        }}
+        markingType="multi-dot"
         markedDates={markedDates}
         className=""
         enableSwipeMonths={true}

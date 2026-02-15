@@ -5,12 +5,13 @@ import {
   editGoal,
   deleteGoal,
 } from "./goalsController.js";
+import { validateToken } from "../../middleware.js";
 
 const router = express.Router();
 
-router.post("/", createGoal);
-router.get("/", getGoals);
-router.put("/:id", editGoal);
-router.delete("/:id", deleteGoal);
+router.post("/", validateToken, createGoal);
+router.get("/", validateToken, getGoals);
+router.put("/:id", validateToken, editGoal);
+router.delete("/:id", validateToken, deleteGoal);
 
 export default router;

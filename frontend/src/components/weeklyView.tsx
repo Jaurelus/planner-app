@@ -83,6 +83,7 @@ function WeeklyView({ api, scrollDate, markedDates }: WeeklyViewProps) {
             setDate(date);
           }}>
           <ExpandableCalendar
+            markingType="multi-dot"
             markedDates={markedDates}
             hideKnob={true}
             theme={calendarTheme}
