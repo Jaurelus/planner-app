@@ -44,11 +44,8 @@ export default function App() {
       //If date from 2 in 1 add it into dots
       if (Object.keys(object2).includes(obj)) {
         console.log(obj, 'obj IF');
-        let tmp = JSON.stringify(object1[dateKeys[dateKey]].dots);
-        tmp = tmp.slice(1, tmp.length - 1);
-        tmp = JSON.parse(tmp);
-        console.log(typeof tmp);
-        object2[obj].dots = [tmp, ...object2[obj].dots];
+
+        object2[obj].dots = [object1[obj].dots, ...object2[obj].dots];
         console.log(object2[obj].dots);
       } else {
         let line = { [obj]: object1[obj] };
@@ -85,14 +82,19 @@ export default function App() {
       const data = await response.json();
       if (response.status == 200) {
         console.log('Success!!');
-        const formattedDates = data.userDates.reduce((acc, currVal) => {
-          acc[currVal.date.slice(0, 10)] = {
-            dots: [{ key: currVal.name, color: currVal.color }],
-            ...currVal,
-          };
+        console.log(data);
+        let formattedDates;
+        if (data.userDates.length >= 0) {
+          formattedDates = data.userDates.reduce((acc, currVal) => {
+            acc[currVal.date.slice(0, 10)] = {
+              dots: [{ key: currVal.name, color: currVal.color }],
+              ...currVal,
+            };
 
-          return acc;
-        });
+            return acc;
+          });
+        }
+
         setUserDates(formattedDates);
       } else {
         console.log('error retrieving marked dates', data.message);

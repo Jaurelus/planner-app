@@ -20,7 +20,6 @@ import { CalendarContext } from 'react-native-calendars';
 import * as SecureStore from 'expo-secure-store';
 
 function Goals({ api, scrollDate }: { api: string; scrollDate: string }) {
-  console.log('SXeoll Date', scrollDate);
   const API_URL = api + 'goals';
   const [goals, setGoals] = useState([]);
   const [alertDT, setAlertDT] = useState('Mark Goal Complete?');
@@ -172,7 +171,7 @@ function Goals({ api, scrollDate }: { api: string; scrollDate: string }) {
 
   useEffect(() => {
     showGoals();
-  }, []);
+  }, [scrollDate]);
 
   //Edit goals
   const editGoals = async (GID) => {
@@ -249,19 +248,19 @@ function Goals({ api, scrollDate }: { api: string; scrollDate: string }) {
   // ---------- App Content Build ------------
 
   return (
-    <View className=" mb-10 px-5 py-5">
+    <View className="mb-10 flex px-5 py-5">
       {/* Goal display (cards) */}
 
-      <Card className=" px-10 py-5">
+      <Card className="flex  px-10 py-5">
         <CardHeader>
           <CardTitle className="flex flex-1 pt-2 text-center"> This Week's Goals</CardTitle>
         </CardHeader>
         {goals && (
-          <CardContent className=" gap-5 ">
+          <CardContent className="flex gap-5 ">
             {goals.map((goal) => (
               //
               <Card key={goal._id} className="mb-0 min-h-32 flex-col p-0">
-                <View className=" !p-0. flex-1 flex-row  rounded-md border-2">
+                <View className=" !p-0.  flex-row  rounded-md border-2">
                   {/* Text View */}
                   <View className="min-w-40 flex-1 flex-col items-center justify-center">
                     <CardTitle className="text-center">{goal.title}</CardTitle>
@@ -271,10 +270,10 @@ function Goals({ api, scrollDate }: { api: string; scrollDate: string }) {
 
                   {/* Buttons Panel */}
 
-                  <View className="mr-0 mt-0 flex-1 flex-col justify-stretch border-l-2  p-0">
+                  <View className="flex items-center  border-l-2 ">
                     {/* Edit */}
 
-                    <View className=" mt-0 flex flex-1 flex-col items-stretch justify-stretch border-b-2 p-0">
+                    <View className=" ml-auto mr-auto flex items-center justify-center border-b-2">
                       <AlertDialog
                         onOpenChange={(open) => {
                           if (open) {
@@ -288,8 +287,7 @@ function Goals({ api, scrollDate }: { api: string; scrollDate: string }) {
                         }}>
                         <AlertDialogTrigger asChild>
                           <Button
-                            variant="ghost"
-                            className="ml-0 flex-1 rounded-none p-0"
+                            className="rounded"
                             onPress={() => {
                               setGTitleEdit(goal.title);
                               setGDescEdit(goal.description);
@@ -329,10 +327,10 @@ function Goals({ api, scrollDate }: { api: string; scrollDate: string }) {
                     </View>
 
                     {/*Delete */}
-                    <View className=" mt-0 flex flex-1 flex-col items-stretch justify-stretch border-b-2 p-0">
+                    <View className=" mt-0   border-b-2 p-0">
                       <AlertDialog>
                         <AlertDialogTrigger asChild>
-                          <Button variant="ghost" className="mr-0 flex-1 p-0">
+                          <Button className="mr-0 rounded p-0">
                             <CircleX color="red" size={18} />
                           </Button>
                         </AlertDialogTrigger>
