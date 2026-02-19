@@ -3,17 +3,21 @@ import { Calendar, CalendarList } from 'react-native-calendars';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { use, useEffect, useRef, useState } from 'react';
 import Button from './ui/button';
+import { Card } from './ui';
+import AddObjectiveModal from './addObjectiveModal';
 
 function MonthlyView({ markedDates }: { markedDates: {} }) {
   const colorScheme = useColorScheme();
   const isDark = colorScheme === 'dark';
-  const [selected, setSelected] = useState(false);
-
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
-  const [myVar, setmyVar] = useState(false);
-  const calendarRef = useRef<any>(null);
-  const [addMark, setAddMark] = useState(false);
   const [currLongPressDate, setCurrLongPressDate] = useState<Date>(new Date());
+  const [empty, setEmpty] = useState(true);
+  const [visbility, setVisibility] = useState(false);
+  const [selected, setSelected] = useState(false);
+  const [myVar, setmyVar] = useState(false);
+  const [addMark, setAddMark] = useState(false);
+  const calendarRef = useRef<any>(null);
+
   const [dateKey, setDateKey] = useState('');
 
   let max = new Date();
@@ -89,46 +93,6 @@ function MonthlyView({ markedDates }: { markedDates: {} }) {
           </Pressable>
         </Modal>
 
-        {/*Modal for modifying a marked date */}
-
-        <Modal visible={addMark}>
-          <View className="flex h-screen w-screen flex-1 items-center justify-start py-12">
-            <View className="flex w-full flex-row justify-end">
-              <Button
-                className="mr-4 mt-4 rounded-full"
-                variant="destructive"
-                onPress={() => {
-                  setAddMark(false);
-                }}>
-                X
-              </Button>
-            </View>
-            <View className="gap-4">
-              <Text className="mt-4 text-center font-bold">
-                {currLongPressDate?.toUTCString().slice(4, 11).split(' ').reverse().join(' ')}
-                {currLongPressDate?.getFullYear()}
-              </Text>
-              {Object.hasOwn(markedDates, currLongPressDate.toISOString().slice(0, 10)) && (
-                <View className="mb-10 mt-10 flex flex-row justify-center">
-                  <Text className="mt-1">
-                    {markedDates[currLongPressDate.toISOString().slice(0, 10)].name}
-                  </Text>
-                  <Text
-                    className="-mt-5 text-5xl font-bold"
-                    style={{
-                      color: markedDates[currLongPressDate.toISOString().slice(0, 10)].dotColor,
-                    }}>
-                    .
-                  </Text>
-                </View>
-              )}
-              <View className="mt-0 flex h-full items-center">
-                <Text className="text-xl font-semibold">Mark This Day?</Text>
-                <View></View>
-              </View>
-            </View>
-          </View>
-        </Modal>
         <Calendar
           markingType="multi-dot"
           markedDates={markedDates}
@@ -172,9 +136,30 @@ function MonthlyView({ markedDates }: { markedDates: {} }) {
             );
           }}></Calendar>
       </View>
-      <View className="justify-center">
+      <View className="justify-center gap-3 px-4">
         <Text className="mt-3 text-center"> Monthly Overview</Text>
-        <Button onPress={() => {}}>Test API</Button>
+        {empty ? (
+          <Card className="px-4">
+            {/*If no monthly goals  */}
+
+            <Text className="text-center">
+              Hint: In most cases, your monthly objectives should be something measureable.
+            </Text>
+          </Card>
+        ) : (
+          <View> {/*If there are monthly Goals */}</View>
+        )}
+        <Button
+          onPress={() => {
+            setVisibility(true);
+          }}>
+          Add Objective
+        </Button>
+        <View className="">
+          <AddObjectiveModal
+            visbility={visbility}
+            changeVisbility={setVisibility}></AddObjectiveModal>
+        </View>
       </View>
     </View>
   );

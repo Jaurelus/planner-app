@@ -37,6 +37,12 @@ function Goals({ api, scrollDate }: { api: string; scrollDate: string }) {
   const [userToken, setUserToken] = useState('');
   const [userInfo, setUserInfo] = useState<any>(null);
 
+  const colors = ['#D8EED2', '#FEE2C3', '#E1D9FB', 'D0E9FA'];
+  let i = 0;
+  const incI = (i: number) => {
+    return (i += 1);
+  };
+
   useEffect(() => {
     setInputDate(scrollDate);
   }, [scrollDate]);
@@ -248,208 +254,83 @@ function Goals({ api, scrollDate }: { api: string; scrollDate: string }) {
   // ---------- App Content Build ------------
 
   return (
-    <View className="mb-10 flex px-5 py-5">
+    <View className=" mb-10 gap-3 px-5 py-5">
       {/* Goal display (cards) */}
 
-      <Card className="flex  px-10 py-5">
-        <CardHeader>
-          <CardTitle className="flex flex-1 pt-2 text-center"> This Week's Goals</CardTitle>
-        </CardHeader>
-        {goals && (
-          <CardContent className="flex gap-5 ">
-            {goals.map((goal) => (
-              //
-              <Card key={goal._id} className="mb-0 min-h-32 flex-col p-0">
-                <View className=" !p-0.  flex-row  rounded-md border-2">
-                  {/* Text View */}
-                  <View className="min-w-40 flex-1 flex-col items-center justify-center">
-                    <CardTitle className="text-center">{goal.title}</CardTitle>
+      {goals.map((goal, index) => (
+        //
+        <Card
+          key={goal._id}
+          className="flex flex-row items-center"
+          style={{ backgroundColor: colors[index % colors.length] }}>
+          {/*Card View*/}
 
-                    <Text className="p-1">{goal.description}</Text>
-                  </View>
+          <View className="flex-1 flex-col gap-1">
+            <CardHeader>
+              <CardTitle className="text-center">{goal.title}</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <Text className="text-center">{goal.description}</Text>
+            </CardContent>
+          </View>
+          <CardFooter>
+            {/*Button View*/}
 
-                  {/* Buttons Panel */}
+            <View className="flex-row">
+              <Button size="icon" className="rounded-full " variant="ghost">
+                <SquarePen size={18} />
+              </Button>
+              <Button size="icon" className="rounded-full " variant="ghost">
+                <LucideCircleX size={20} color={'red'} />
+              </Button>
 
-                  <View className="flex items-center  border-l-2 ">
-                    {/* Edit */}
+              {/*Checkbox View*/}
 
-                    <View className=" ml-auto mr-auto flex items-center justify-center border-b-2">
-                      <AlertDialog
-                        onOpenChange={(open) => {
-                          if (open) {
-                            setGTitleEdit(goal.title);
-                            setGDescEdit(goal.description);
-                          }
-                          if (!open) {
-                            setGTitleEdit('');
-                            setGDescEdit('');
-                          }
-                        }}>
-                        <AlertDialogTrigger asChild>
-                          <Button
-                            className="rounded"
-                            onPress={() => {
-                              setGTitleEdit(goal.title);
-                              setGDescEdit(goal.description);
-                            }}>
-                            <SquarePen color="#D48354" size={16} />
-                          </Button>
-                        </AlertDialogTrigger>
-                        <AlertDialogContent className="flex !w-[90%] flex-row items-center justify-center bg-white">
-                          <AlertDialogHeader className="flex-col">
-                            <AlertDialogTitle className="mt-2 color-dark">
-                              Edit Goal?
-                            </AlertDialogTitle>
-                            <TextInput
-                              className="mb-5 mt-5 !w-[90%] rounded-xl border border-primary bg-white p-1 text-center"
-                              value={gTitleEdit || goal.title}
-                              onChangeText={setGTitleEdit}></TextInput>
-                            <TextInput
-                              multiline={true}
-                              className="mb-5 min-h-20 !w-[90%] rounded-xl border border-primary bg-white  p-1 text-center color-black"
-                              value={gDescEdit || goal.description}
-                              onChangeText={setGDescEdit}></TextInput>
-                            <AlertDialogDescription className="px-4 pb-3 text-base color-dark">
-                              Are you sure you would like to edit the contents of this goal to the
-                              text entered?
-                            </AlertDialogDescription>
-                          </AlertDialogHeader>
-                          <AlertDialogFooter className="mb-5 flex-row justify-center gap-2">
-                            <AlertDialogCancel variant="destructive">Cancel</AlertDialogCancel>
-                            <AlertDialogAction
-                              className="mt-1.5"
-                              onPress={() => editGoals(goal._id)}>
-                              Confirm Edit
-                            </AlertDialogAction>
-                          </AlertDialogFooter>
-                        </AlertDialogContent>
-                      </AlertDialog>
-                    </View>
-
-                    {/*Delete */}
-                    <View className=" mt-0   border-b-2 p-0">
-                      <AlertDialog>
-                        <AlertDialogTrigger asChild>
-                          <Button className="mr-0 rounded p-0">
-                            <CircleX color="red" size={18} />
-                          </Button>
-                        </AlertDialogTrigger>
-                        <AlertDialogContent className="!w-[90%] gap-5 bg-white">
-                          <AlertDialogHeader>
-                            <AlertDialogTitle className="mt-2 color-dark">
-                              Are you sure?
-                            </AlertDialogTitle>
-                            <AlertDialogDescription className="px-5 py-2 text-base text-dark">
-                              Are you sure that you want to delete and remove this goal?
-                            </AlertDialogDescription>
-                          </AlertDialogHeader>
-                          <AlertDialogFooter className="mb-5 mt-5 flex-row items-center justify-center gap-5">
-                            <AlertDialogCancel
-                              variant="outline"
-                              className="border-2 border-primary">
-                              <Text className="color-dark">Cancel</Text>
-                            </AlertDialogCancel>
-                            <AlertDialogAction
-                              variant="destructive"
-                              className="mt-1.5"
-                              onPress={() => {
-                                deleteGoals(goal._id);
-                              }}>
-                              Delete
-                            </AlertDialogAction>
-                          </AlertDialogFooter>
-                        </AlertDialogContent>
-                      </AlertDialog>
-                    </View>
-
-                    {/* Marking a goal as complete */}
-                    <View className="flex flex-1 flex-col items-stretch justify-stretch ">
-                      <AlertDialog>
-                        <AlertDialogTrigger asChild>
-                          <Pressable className="flex flex-1 items-center py-2">
-                            <BouncyCheckbox
-                              pointerEvents="none"
-                              className=""
-                              isChecked={goal.complete}
-                              disableText
-                              fillColor="green"
-                              size={20}
-                              useBuiltInState={false}
-                              iconStyle={{ borderColor: 'green' }}
-                            />
-                          </Pressable>
-                        </AlertDialogTrigger>
-                        <AlertDialogContent className="scale-10 !w-[90%] bg-white">
-                          <AlertDialogHeader>
-                            <AlertDialogTitle className="pt-3 color-dark">
-                              {alertDT}
-                            </AlertDialogTitle>
-                            <AlertDialogDescription className="px-5 py-1 text-dark">
-                              {alertDD}
-                            </AlertDialogDescription>
-                          </AlertDialogHeader>
-                          <AlertDialogFooter className="mb-5 mt-5 flex-row items-center justify-center gap-5">
-                            <AlertDialogCancel variant="destructive" className="">
-                              Cancel
-                            </AlertDialogCancel>
-                            <AlertDialogAction
-                              className="mt-1.5"
-                              onPress={() => {
-                                handleCheckboxPress(goal._id, goal.complete);
-                                updateAlertText();
-                              }}>
-                              Confirm
-                            </AlertDialogAction>
-                          </AlertDialogFooter>
-                        </AlertDialogContent>
-                      </AlertDialog>
-                    </View>
-                  </View>
-                </View>
-              </Card>
-            ))}
-
-            {/* Adding a new goal */}
-          </CardContent>
-        )}
-        <CardFooter>
-          <AlertDialog>
-            <AlertDialogTrigger asChild>
-              <Button>Create Goal</Button>
-            </AlertDialogTrigger>
-            <View className="">
-              <AlertDialogContent className=" !w-[90%] rounded-3xl bg-white p-2 px-10">
-                <AlertDialogHeader>
-                  <AlertDialogTitle className="mt-2 color-dark">Add New Goal</AlertDialogTitle>
-                </AlertDialogHeader>
-                <TextInput
-                  className="mb-5 mt-5 rounded-xl border border-primary  bg-white p-1 text-center"
-                  value={gTitle}
-                  onChangeText={setGTitle}
-                  placeholder="Goal Title"></TextInput>
-                <TextInput
-                  value={gDesc}
-                  onChangeText={setGDesc}
-                  multiline
-                  scrollEnabled={false}
-                  className="w-100 mb-5 h-64 rounded-xl border border-primary bg-white p-2 text-center"
-                  placeholder="Goal Description"></TextInput>
-                <AlertDialogFooter className="mt-5 flex-row justify-center text-white">
-                  <AlertDialogCancel variant="destructive" className="mr-5 border border-white">
-                    <Text className="text-white">Cancel</Text>
-                  </AlertDialogCancel>
-                  <AlertDialogAction
-                    variant="default"
-                    className="mt-2 border border-primary"
-                    onPress={saveNewGoal}>
-                    <Text className="text-white">Confirm</Text>
-                  </AlertDialogAction>
-                </AlertDialogFooter>
-              </AlertDialogContent>
+              <View className="ml-2 mt-2">
+                <BouncyCheckbox size={20} fillColor="green"></BouncyCheckbox>
+              </View>
             </View>
-          </AlertDialog>
-        </CardFooter>
-      </Card>
+          </CardFooter>
+        </Card>
+      ))}
+
+      {/* Adding a new goal */}
+
+      <AlertDialog>
+        <AlertDialogTrigger asChild>
+          <Button>Create Goal</Button>
+        </AlertDialogTrigger>
+        <View className="">
+          <AlertDialogContent className=" !w-[90%] rounded-3xl bg-white p-2 px-10">
+            <AlertDialogHeader>
+              <AlertDialogTitle className="mt-2 color-dark">Add New Goal</AlertDialogTitle>
+            </AlertDialogHeader>
+            <TextInput
+              className="mb-5 mt-5 rounded-xl border border-primary  bg-white p-1 text-center"
+              value={gTitle}
+              onChangeText={setGTitle}
+              placeholder="Goal Title"></TextInput>
+            <TextInput
+              value={gDesc}
+              onChangeText={setGDesc}
+              multiline
+              scrollEnabled={false}
+              className="w-100 mb-5 h-64 rounded-xl border border-primary bg-white p-2 text-center"
+              placeholder="Goal Description"></TextInput>
+            <AlertDialogFooter className="mt-5 flex-row justify-center text-white">
+              <AlertDialogCancel variant="destructive" className="mr-5 border border-white">
+                <Text className="text-white">Cancel</Text>
+              </AlertDialogCancel>
+              <AlertDialogAction
+                variant="default"
+                className="mt-2 border border-primary"
+                onPress={saveNewGoal}>
+                <Text className="text-white">Confirm</Text>
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </View>
+      </AlertDialog>
     </View>
   );
 }
