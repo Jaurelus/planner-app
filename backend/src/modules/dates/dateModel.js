@@ -9,17 +9,15 @@ const COLORS = [
   "#14B8A6", // teal
 ];
 
-function getRandomColor() {
-  return COLORS[Math.floor(Math.random() * COLORS.length)];
-}
-
 const DateModel = mongoose.Schema({
   userID: { type: String, required: true },
   date: { type: Date, required: true },
   name: { type: String, required: true },
-  type: { type: String, default: "" },
   rule: { type: String, default: "" },
-  color: { type: String, default: getRandomColor() },
+  category: {
+    type: { type: String, default: "" },
+    color: { type: String, default: "" },
+  },
 });
 
 const MarkedDate = mongoose.model("MarkedDate", DateModel);
