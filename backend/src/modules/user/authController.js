@@ -93,7 +93,6 @@ export const loginUser = async (req, res) => {
     //Check if user login info is valid
     const { tbdUEmail, tdbUPW } = req.body;
     const intendedU = await User.findOne({ email: tbdUEmail });
-    console.log("Intended User", intendedU);
     if (!intendedU) {
       return res.status(400).json({
         message:
@@ -101,7 +100,6 @@ export const loginUser = async (req, res) => {
       });
     } else {
       if (await bcrypt.compare(tdbUPW, intendedU.password)) {
-        console.log("Compare passed");
         const id = intendedU._id;
         //login user
 

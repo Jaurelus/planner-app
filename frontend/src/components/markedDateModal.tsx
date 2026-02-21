@@ -20,6 +20,7 @@ function MarkedDateModal({ date, api, visible, setVisible, changeFlag }: MarkedD
   const [userInfo, setUserInfo] = useState<any>(null);
   const [dateName, setDateName] = useState('');
   const [contextDate, setContextDate] = useState('');
+  const [exisitingMarkedDates, setExisitingMarkedDate] = useState(true);
 
   console.log('Contect', contextDate);
   const [dateType, setDateType] = useState('');
@@ -84,23 +85,27 @@ function MarkedDateModal({ date, api, visible, setVisible, changeFlag }: MarkedD
     <Modal transparent={true} visible={visible}>
       <Card className="mb-auto ml-auto mr-auto mt-auto w-[75%] items-center justify-center">
         <CardHeader>
-          <CardTitle>Add Marked Date?</CardTitle>
+          <CardTitle>{exisitingMarkedDates ? 'Edit Marked Date?' : 'Add Marked Date?'}</CardTitle>
           <Text className="text-center">{new Date(date.toString()).toLocaleDateString()}</Text>
         </CardHeader>
 
-        <CardContent className="w-full items-center gap-3 ">
-          <TextInput
-            className=" w-3/4 rounded-lg border border-primary p-1 text-center"
-            placeholder="Name"
-            value={dateName}
-            onChangeText={setDateName}></TextInput>
-          <TextInput
-            className="w-3/4 rounded-lg border border-primary p-1 text-center"
-            placeholder="Type (Ex: Birthdays)"
-            value={dateType}
-            onChangeText={setDateType}></TextInput>
-          <ColorSelector></ColorSelector>
-        </CardContent>
+        {!exisitingMarkedDates ? (
+          <CardContent className="w-full items-center gap-3 ">
+            <TextInput
+              className=" w-3/4 rounded-lg border border-primary p-1 text-center"
+              placeholder="Name"
+              value={dateName}
+              onChangeText={setDateName}></TextInput>
+            <TextInput
+              className="w-3/4 rounded-lg border border-primary p-1 text-center"
+              placeholder="Type (Ex: Birthdays)"
+              value={dateType}
+              onChangeText={setDateType}></TextInput>
+            <ColorSelector></ColorSelector>
+          </CardContent>
+        ) : (
+          <CardContent></CardContent>
+        )}
         <CardFooter>
           <Button
             onPress={() => {

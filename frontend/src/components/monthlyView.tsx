@@ -1,12 +1,25 @@
-import { View, useColorScheme, Text, Modal, Pressable } from 'react-native';
+import { View, useColorScheme, Text, Modal, Pressable, TextInput } from 'react-native';
 import { Calendar, CalendarList } from 'react-native-calendars';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { use, useEffect, useRef, useState } from 'react';
 import Button from './ui/button';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from './ui';
 import AddObjectiveModal from './addObjectiveModal';
+import { SquarePen, LucideCircleX, CircleQuestionMark } from 'lucide-react-native';
+import {
+  AlertDescription,
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from 'components/ui';
 
 function MonthlyView({ markedDates, api }: { markedDates: {}; api: string }) {
+  console.log(api);
   const colorScheme = useColorScheme();
   const isDark = colorScheme === 'dark';
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
@@ -23,6 +36,11 @@ function MonthlyView({ markedDates, api }: { markedDates: {}; api: string }) {
   }, [userObjectives]);
 
   const [dateKey, setDateKey] = useState('');
+
+  const [objectiveTitle, setObjectiveTitle] = useState('');
+  const [objectiveDescription, setObjectiveDescription] = useState('');
+  const [objectiveProgress, setObjectiveProgress] = useState('');
+  const [objectiveGoalNumber, setObjectiveGoalNumber] = useState('');
 
   let max = new Date();
   max.setFullYear(new Date().getFullYear() + 5);
@@ -65,7 +83,8 @@ function MonthlyView({ markedDates, api }: { markedDates: {}; api: string }) {
       String(new Date().getDate()).padStart(2, '0')
     );
   };
-
+  //----------- API CALL ---------------
+  const editDates = async () => {};
   return (
     <View className="flex">
       <View>
@@ -143,7 +162,7 @@ function MonthlyView({ markedDates, api }: { markedDates: {}; api: string }) {
       <View className="justify-center gap-3 px-4">
         <Text className="mt-3 text-center"> Monthly Overview</Text>
         {empty ? (
-          <Card className="px-4">
+          <Card className="">
             {/*If no monthly goals  */}
 
             <Text className="text-center">
@@ -152,22 +171,109 @@ function MonthlyView({ markedDates, api }: { markedDates: {}; api: string }) {
           </Card>
         ) : (
           <View>
-            <Text>T</Text>
             {userObjectives.map((objective) => {
               return (
                 <Card className="items-center " key={objective._id}>
-                  <View>
-                    <CardHeader>
-                      <CardTitle>{objective.title}</CardTitle>
-                    </CardHeader>
-                    <CardContent>
+                  <CardHeader>
+                    <CardTitle>{objective.title}</CardTitle>
+                  </CardHeader>
+                  <View className="flex-row">
+                    <CardContent className="w-[60%]">
                       <Text>{objective.description}</Text>
                       <Text>Progress Bar </Text>
+                      <View className="border-black-2 w-[80%] bg-white"></View>
                     </CardContent>
                     <CardFooter>
-                      <Button size="icon" className="h-8 w-8 rounded-full">
-                        Edit
-                      </Button>
+                      {/* Edit Objective */}
+
+                      <AlertDialog
+                        onOpenChange={(open) => {
+                          if (open) {
+                            setObjectiveTitle(objective.title);
+                            setObjectiveDescription(objective.description);
+                            console.log('Finna set', objective.title);
+                          } else {
+                          }
+                        }}>
+                        <AlertDialogTrigger asChild>
+                          <Button size="icon" className="rounded-full " variant="ghost">
+                            <SquarePen size={20} />
+                          </Button>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent className="!w-[90%] bg-white px-2">
+                          <AlertDialogHeader>
+                            <AlertDialogTitle>Edit Objective</AlertDialogTitle>
+                          </AlertDialogHeader>
+                          <AlertDescription>
+                            <TextInput
+                              className=" mt-5 rounded-xl border border-primary  bg-white p-1 text-center"
+                              value={objectiveTitle || objective.title}
+                              onChangeText={setObjectiveTitle}></TextInput>
+                            <TextInput
+                              className=" mt-5 rounded-xl border border-primary  bg-white p-1 text-center"
+                              multiline={true}
+                              value={objectiveDescription || objective.description}
+                              onChangeText={setObjectiveDescription}></TextInput>
+                            {/*Progress Hint */}
+                            <View className="relative mt-5 ">
+                              <TextInput
+                                className="  rounded-xl border border-primary  bg-white p-1 text-center"
+                                value={objectiveProgress || objective.progress}
+                                onChangeText={setObjectiveProgress}
+                                placeholder="Objective Progress"></TextInput>
+                              <View className="absolute right-2 top-2">
+                                <Button
+                                  onPress={() => {}}
+                                  size="icon"
+                                  variant="default"
+                                  className="h-4 w-4 rounded-full bg-slate-500 text-white">
+                                  <CircleQuestionMark color="white" />
+                                </Button>
+                              </View>
+                            </View>
+                            <View className="relative mt-5 ">
+                              <TextInput
+                                className="  rounded-xl border border-primary  bg-white p-1 text-center"
+                                value={objectiveGoalNumber || objectiveGoalNumber}
+                                onChangeText={setObjectiveGoalNumber}
+                                placeholder="Objective Goal"></TextInput>
+                              <View className="absolute right-2 top-2">
+                                <Button
+                                  onPress={() => {}}
+                                  size="icon"
+                                  variant="default"
+                                  className="h-4 w-4 rounded-full bg-slate-500 text-white">
+                                  <CircleQuestionMark color="white" />
+                                </Button>
+                              </View>
+                            </View>
+                          </AlertDescription>
+                          <AlertDialogFooter className="flex-row">
+                            <AlertDialogCancel>Cancel</AlertDialogCancel>
+                            <AlertDialogAction>Submit Changes</AlertDialogAction>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
+                      {/* Delete Objective */}
+                      <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                          <Button size="icon" className="rounded-full " variant="ghost">
+                            <LucideCircleX size={20} color={'red'} />
+                          </Button>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent className="!w-[90%] bg-white">
+                          <AlertDialogHeader>
+                            <AlertDialogTitle>Delete Objective?</AlertDialogTitle>
+                          </AlertDialogHeader>
+                          <AlertDescription>
+                            Are you sure that you want to delete this objective
+                          </AlertDescription>
+                          <AlertDialogFooter className="flex-row">
+                            <AlertDialogCancel>Cancel</AlertDialogCancel>
+                            <AlertDialogAction>Delete</AlertDialogAction>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
                     </CardFooter>
                   </View>
                 </Card>

@@ -50,7 +50,7 @@ function AddObjectiveModal({
   useEffect(() => {
     getObjectives();
     console.log(objectives);
-  }, [userInfo]);
+  }, [userInfo, userToken]);
   //--------- API Calls --------
 
   //Function to add objective
@@ -70,8 +70,8 @@ function AddObjectiveModal({
       if (objectiveProgress) {
         payload.objectiveProgress = objectiveProgress;
       }
-      if (objectiveProgress) {
-        payload.objectiveGoalNumber = objectiveProgress;
+      if (objectiveGoalNumber) {
+        payload.objectiveGoalNumber = objectiveGoalNumber;
       }
 
       const response = await fetch(api + 'objectives', {
@@ -101,8 +101,11 @@ function AddObjectiveModal({
   //Function to get objectives
   const getObjectives = async () => {
     if (!userToken || !userInfo) return;
+    console.log('Show');
+    console.log('API', `${api}objectives?currMonth=${objectiveMonth}`);
+
     try {
-      const response = await fetch(api + `objectives?currMonth=${objectiveMonth}`, {
+      const response = await fetch(`${api}objectives?currMonth=${objectiveMonth}`, {
         headers: { Authtoken: userToken, userid: userInfo._id },
         method: 'GET',
       });

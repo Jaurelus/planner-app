@@ -74,11 +74,9 @@ export const deleteTask = async (req, res) => {
 //Function to view all tasks
 
 export const viewAllTasks = async (req, res) => {
-  console.log("Backend View cooking");
   try {
     const { userid } = req.headers;
     const { date } = req.query;
-    console.log(date);
     const testDate = new Date(date);
     testDate.setUTCHours(0, 0, 0);
 

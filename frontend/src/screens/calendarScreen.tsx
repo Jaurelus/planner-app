@@ -89,7 +89,7 @@ function CalendarScreen({ route, navigation }) {
       )}
       {monthlyVisibility && (
         <View className="">
-          <MonthlyView markedDates={dates}></MonthlyView>
+          <MonthlyView api={api} markedDates={dates}></MonthlyView>
         </View>
       )}
     </View>
