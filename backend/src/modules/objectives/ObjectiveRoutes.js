@@ -8,7 +8,7 @@ import {
   deleteObjective,
 } from "../objectives/objectivesController.js";
 
-const router = express.router();
+const router = express.Router();
 router.post("/", validateToken, addObjective);
 router.get("/", validateToken, getObjectives);
 router.patch("/", validateToken, editObjective);

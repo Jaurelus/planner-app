@@ -10,4 +10,4 @@ const objective = new mongoose.Schema({
 });
 
 const Objectives = mongoose.model("Objective", objective);
-export default Objective;
+export default Objectives;

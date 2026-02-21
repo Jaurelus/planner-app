@@ -62,11 +62,7 @@ export const validateUser = async (req, res) => {
 };
 
 export const registerUser = async (req, res) => {
-  console.log("Here");
-
   try {
-    console.log("Here1");
-
     const { userEmail, userPW } = req.body;
     if (!userEmail) {
       return res.status(400).json({ message: "No username" });
@@ -110,13 +106,11 @@ export const loginUser = async (req, res) => {
         //login user
 
         let token = jwt.sign({ email: tbdUEmail }, sKey, { expiresIn: "7d" });
-        return res
-          .status(200)
-          .json({
-            message: "User sucessfully logged in",
-            user: intendedU,
-            token: token,
-          });
+        return res.status(200).json({
+          message: "User sucessfully logged in",
+          user: intendedU,
+          token: token,
+        });
       } else
         return res.status(400).json({ message: "Incorrect email or password" });
     }

@@ -37,7 +37,8 @@ export default function App() {
   //Function to merge  marked dates and holidays
   const mergeDates = (object1: any, object2: any) => {
     if (!object1 && !object2) return;
-    let dateKeys = Object.keys(object1).splice(8, Object.keys(object1).length);
+    console.log('-------Keys-----\n', Object.keys(object1));
+    let dateKeys = Object.keys(object1);
     let dateKey = 0;
 
     dateKeys.forEach((obj) => {
@@ -87,12 +88,12 @@ export default function App() {
         if (data.userDates.length >= 0) {
           formattedDates = data.userDates.reduce((acc, currVal) => {
             acc[currVal.date.slice(0, 10)] = {
-              dots: [{ key: currVal.name, color: currVal.color }],
+              dots: [{ key: currVal.name, color: currVal.category.color || currVal.color }],
               ...currVal,
             };
 
             return acc;
-          });
+          }, {});
         }
 
         setUserDates(formattedDates);

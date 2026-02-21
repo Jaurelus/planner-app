@@ -38,10 +38,8 @@ function Goals({ api, scrollDate }: { api: string; scrollDate: string }) {
   const [userInfo, setUserInfo] = useState<any>(null);
 
   const colors = ['#D8EED2', '#FEE2C3', '#E1D9FB', 'D0E9FA'];
-  let i = 0;
-  const incI = (i: number) => {
-    return (i += 1);
-  };
+
+  const catIconMap = {};
 
   useEffect(() => {
     setInputDate(scrollDate);

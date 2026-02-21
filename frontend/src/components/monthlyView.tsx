@@ -3,20 +3,24 @@ import { Calendar, CalendarList } from 'react-native-calendars';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { use, useEffect, useRef, useState } from 'react';
 import Button from './ui/button';
-import { Card } from './ui';
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from './ui';
 import AddObjectiveModal from './addObjectiveModal';
 
-function MonthlyView({ markedDates }: { markedDates: {} }) {
+function MonthlyView({ markedDates, api }: { markedDates: {}; api: string }) {
   const colorScheme = useColorScheme();
   const isDark = colorScheme === 'dark';
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   const [currLongPressDate, setCurrLongPressDate] = useState<Date>(new Date());
-  const [empty, setEmpty] = useState(true);
+  const [empty, setEmpty] = useState(false);
   const [visbility, setVisibility] = useState(false);
   const [selected, setSelected] = useState(false);
   const [myVar, setmyVar] = useState(false);
   const [addMark, setAddMark] = useState(false);
+  const [userObjectives, setUserObjectives] = useState([]);
   const calendarRef = useRef<any>(null);
+  useEffect(() => {
+    console.log(userObjectives);
+  }, [userObjectives]);
 
   const [dateKey, setDateKey] = useState('');
 
@@ -147,7 +151,29 @@ function MonthlyView({ markedDates }: { markedDates: {} }) {
             </Text>
           </Card>
         ) : (
-          <View> {/*If there are monthly Goals */}</View>
+          <View>
+            <Text>T</Text>
+            {userObjectives.map((objective) => {
+              return (
+                <Card className="items-center " key={objective._id}>
+                  <View>
+                    <CardHeader>
+                      <CardTitle>{objective.title}</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <Text>{objective.description}</Text>
+                      <Text>Progress Bar </Text>
+                    </CardContent>
+                    <CardFooter>
+                      <Button size="icon" className="h-8 w-8 rounded-full">
+                        Edit
+                      </Button>
+                    </CardFooter>
+                  </View>
+                </Card>
+              );
+            })}
+          </View>
         )}
         <Button
           onPress={() => {
@@ -155,8 +181,11 @@ function MonthlyView({ markedDates }: { markedDates: {} }) {
           }}>
           Add Objective
         </Button>
-        <View className="">
+        <View className="!w-[90%] px-4">
           <AddObjectiveModal
+            setUserObjectives={setUserObjectives}
+            api={api}
+            date={selectedDate}
             visbility={visbility}
             changeVisbility={setVisibility}></AddObjectiveModal>
         </View>

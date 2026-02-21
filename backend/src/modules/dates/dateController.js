@@ -36,7 +36,7 @@ export const addNewDate = async (req, res) => {
     });
     let existingTypeColor = typeColor
       ? typeColor.category.color
-      : getRandomColor();
+      : await getRandomColor();
     const currDate = new MarkedDate({
       userID: userid,
       date: newDateDate,
@@ -78,7 +78,7 @@ export const deleteDate = async (req, res) => {
   //
   try {
     const { dateID } = req.params;
-    await Objectives.findbyIdAndDelete(dateID);
+    await Objectives.findByIdAndDelete(dateID);
     return res.status(200).json({ message: "Objective successfully added" });
   } catch (error) {
     return res.status(400).json({ message: "Error" + error });
@@ -89,7 +89,7 @@ const editDate = async (req, res) => {
   try {
     const { dateID } = req.params;
 
-    const updatedObjective = Objectives.findbyIdAndUpdate(dateID, {});
+    const updatedObjective = Objectives.findByIdAndUpdate(dateID, {});
   } catch (error) {
     return res.status(400).json({ message: "Error editing this date" });
   }
