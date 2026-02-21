@@ -186,6 +186,13 @@ export default function App() {
               initialParams={{ api: API_URL, dates: formattedUserDates }}
             />
           )}
+          {formattedUserDates && (
+            <Stack.Screen
+              name="Finance"
+              component={FinanceScreen}
+              initialParams={{ api: API_URL, dates: formattedUserDates }}
+            />
+          )}
 
           <Stack.Screen
             name="Register"

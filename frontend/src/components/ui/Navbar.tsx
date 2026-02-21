@@ -2,18 +2,17 @@ import React from 'react';
 import { View, Text } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import Button from './button';
-import { LayoutList, CircleUserRound, Goal } from 'lucide-react-native';
+import { LayoutList, CircleUserRound, Goal, Landmark } from 'lucide-react-native';
 
 function Navbar() {
   const navigator = useNavigation();
   return (
     //
-    <View className="flex w-full flex-row justify-between bg-primary py-5 ">
+    <View className="flex w-full flex-row justify-between bg-primary px-4 py-5">
       <Button
         variant="ghost"
         onPress={() => navigator.navigate('Goals')}
-        textClassName="color-white"
-        className="ml-10">
+        textClassName="color-white">
         <Goal color={'white'} />
       </Button>
       <Button
@@ -22,10 +21,16 @@ function Navbar() {
         textClassName="color-white">
         <LayoutList color={'white'} />
       </Button>
+
+      <Button
+        variant="ghost"
+        onPress={() => navigator.navigate('Finance')}
+        textClassName="color-white">
+        <Landmark color={'white'} />
+      </Button>
       <Button
         variant="ghost"
         onPress={() => navigator.navigate('Personal')}
-        className="mr-10"
         textClassName="color-white">
         <CircleUserRound color={'white'} />
       </Button>
