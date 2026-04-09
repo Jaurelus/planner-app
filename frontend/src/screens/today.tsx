@@ -34,16 +34,16 @@ function Daily({ route, navigation }) {
   };
 
   return (
-    <CalendarProvider date={todayStr}>
+    <CalendarProvider date={todayStr} onDateChanged={(date) => setSelectedDate(date)}>
       <View className="flex flex-1 flex-col">
         <ExpandableCalendar
-          //onP ressArrowLeft={}
+          onPressArrowRight={() => {}}
+          onPressArrowLeft={() => {}}
           theme={calendarTheme}
           closeOnDayPress
           firstDay={1}
           markingType="multi-dot"
           markedDates={dates}
-          horizontal
           pagingEnabled
           onDayPress={(day) => {
             setSelectedDate(day.dateString);

@@ -152,12 +152,10 @@ function AgendaTasks({ api, date }: AgendaTasksProps) {
     });
     setCurrEvents(tmpEvents);
   }, [allTasks]);
-  console.log('------_CURR EVENTS:', currEvents);
 
   const darkenColor = (color: string) => {
     let tmp = color.slice(0, 7);
     tmp = tmp + 'FF';
-    console.log(tmp);
     return tmp;
   };
 
