@@ -4,7 +4,7 @@ const UserModel = new mongoose.Schema({
   email: { type: String, required: true },
   phoneNumber: { type: String },
   password: { type: String, required: true },
-  firstName: { type: String, required: true, default: "" },
+  firstName: { type: String, default: "" },
   lastName: { type: String, default: "" },
 
   isVerified: { type: Boolean, default: false },

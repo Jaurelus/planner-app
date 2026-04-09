@@ -10,6 +10,7 @@ import tasksRoutes from "./modules/tasks/tasksRoutes.js";
 import authRoutes from "./modules/user/authRoutes.js";
 import dateRoutes from "./modules/dates/dateRoutes.js";
 import objectRoutes from "./modules/objectives/ObjectiveRoutes.js";
+import plaidRoutes from "./modules/plaid/plaidRoutes.js";
 
 var hd = new Holidays("US");
 const app = express();
@@ -39,6 +40,7 @@ app.use("/api/tasks", tasksRoutes);
 app.use("/api/user", authRoutes);
 app.use("/api/dates", dateRoutes);
 app.use("/api/objectives", objectRoutes);
+app.use("/api/plaid", plaidRoutes);
 
 mongoose
   .connect(process.env.MONGO_URI)

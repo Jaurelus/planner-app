@@ -182,7 +182,7 @@ function AddObjectiveModal({
             </View>
           </View>
         </AlertDialogDescription>
-        <AlertDialogFooter className="flex-row  justify-center gap-3">
+        <AlertDialogFooter className="mt-3  flex-row justify-center gap-3">
           <Button
             variant="outline"
             className="border-red-600"
@@ -199,6 +199,7 @@ function AddObjectiveModal({
             disabled={!buttonEnabled}
             onPress={() => {
               addNewObjective();
+              changeVisbility(false);
             }}>
             Add Objective
           </Button>

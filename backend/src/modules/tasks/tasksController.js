@@ -78,10 +78,13 @@ export const viewAllTasks = async (req, res) => {
     const { userid } = req.headers;
     const { date } = req.query;
     const testDate = new Date(date);
-    testDate.setUTCHours(0, 0, 0);
+    console.log(testDate);
+    testDate.setHours(0, 0, 0);
 
     let testDate1 = new Date(date);
-    testDate1.setUTCHours(23, 59, 59);
+    testDate1.setDate(testDate.getDate() + 1);
+    testDate1.setHours(23, 59, 59, 999);
+    console.log(testDate1);
 
     const tasks = await Task.find({
       userID: userid,

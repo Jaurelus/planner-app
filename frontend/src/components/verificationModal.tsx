@@ -110,11 +110,11 @@ function VerificationModal({ isVisible, user, api, onUserUpdate }: VerificationM
         console.log('User verified');
         onUserUpdate(data.updatedUser);
         //login
-        login(user);
+        navigator.navigate('Home');
       } else if (response.status == 401) {
         console.log('Error, wrong code');
       } else {
-        console.log(data.message);
+        console.log('Error', data.message);
       }
     } catch (error) {
       console.log(error, 'Front');
@@ -213,7 +213,8 @@ function VerificationModal({ isVisible, user, api, onUserUpdate }: VerificationM
               </View>
               <Button
                 onPress={() => {
-                  login(user);
+                  isVisible = false;
+                  navigator.navigate('Login');
                 }}>
                 Login
               </Button>

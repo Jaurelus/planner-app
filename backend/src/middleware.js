@@ -7,8 +7,6 @@ export const validateToken = (req, res, next) => {
   jwt.verify(authtoken, sKey, (err, decoded) => {
     if (err) {
       //logout
-      console.log(AuthToken);
-      console.log(sKey);
 
       return res.status(400).json({ message: "Invalid token" });
     } else if (decoded) {

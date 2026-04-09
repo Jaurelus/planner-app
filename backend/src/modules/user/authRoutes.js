@@ -5,6 +5,7 @@ import {
   sendVerification,
   validateUser,
   loginUser,
+  getUser,
 } from "./authController.js";
 
 import { validateToken } from "../../middleware.js";
@@ -15,5 +16,6 @@ router.patch("/:id", validateToken, editUser);
 router.post("/login", loginUser);
 router.post("/send", sendVerification);
 router.post("/verify", validateUser);
+router.get("/getUser", validateToken, getUser);
 
 export default router;

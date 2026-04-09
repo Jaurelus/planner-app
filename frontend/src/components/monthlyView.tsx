@@ -84,7 +84,10 @@ function MonthlyView({ markedDates, api }: { markedDates: {}; api: string }) {
     );
   };
   //----------- API CALL ---------------
-  const editDates = async () => {};
+  const editDates = async (OID) => {
+    try {
+    } catch (error) {}
+  };
   return (
     <View className="flex">
       <View>
@@ -170,7 +173,7 @@ function MonthlyView({ markedDates, api }: { markedDates: {}; api: string }) {
             </Text>
           </Card>
         ) : (
-          <View>
+          <View className="gap-3">
             {userObjectives.map((objective) => {
               return (
                 <Card className="items-center " key={objective._id}>

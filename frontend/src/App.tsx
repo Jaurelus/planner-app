@@ -8,6 +8,8 @@ import Daily from '@/screens/today';
 import CalendarScreen from '@/screens/calendarScreen';
 import LoginScreen from './screens/loginScreen';
 import RegisterScreen from './screens/registerScreen';
+import FinanceScreen from './screens/financeScreen';
+
 import { useState, useEffect } from 'react';
 import * as Device from 'expo-device';
 import * as SecureStore from 'expo-secure-store';

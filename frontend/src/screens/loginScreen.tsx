@@ -20,9 +20,7 @@ function LoginScreen({ route }: LoginProps) {
       tbdUEmail: enteredEmail,
       tdbUPW: enteredPW,
     };
-    console.log(payload);
     try {
-      console.log('Logging in: ');
       const response = await fetch(api + 'user/login', {
         body: JSON.stringify(payload),
         method: 'POST',
@@ -32,10 +30,8 @@ function LoginScreen({ route }: LoginProps) {
       if (response.status == 200) {
         console.log('User successfully logged in');
 
-        console.log(JSON.stringify(data.user));
         const tmpTok = data.token;
         const tmpUsr = JSON.stringify(data.user);
-
         onChange(true);
         await SecureStore.setItemAsync('token', tmpTok);
         await SecureStore.setItemAsync('userInfo', tmpUsr);

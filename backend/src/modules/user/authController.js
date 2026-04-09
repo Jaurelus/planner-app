@@ -22,7 +22,7 @@ export const sendVerification = async (req, res) => {
       const vMessage = client.verify.v2
         .services("VA3e65986353629354e3899002ab05605e")
         .verifications.create({
-          to: userPhoneNumber.padStart(12, "+1"),
+          to: "+15614526777",
           channel: "sms",
         });
       return res.status(200).json({ message: "Message sent" });
@@ -41,7 +41,7 @@ export const validateUser = async (req, res) => {
         .services("VA3e65986353629354e3899002ab05605e")
         .verificationChecks.create({
           code: uCode,
-          to: number.padStart(12, "+1"),
+          to: /*number.padStart(12, "+1")*/ "+15614526777",
         });
 
       if (verStat.status == "approved") {
@@ -82,7 +82,7 @@ export const registerUser = async (req, res) => {
       .json({ message: "User successfully added", user: savedUser });
     //return
   } catch (error) {
-    return res.status(400).json({ message: "Try catch failed" });
+    return res.status(400).json({ message: "Try catch failed" + error });
   }
 };
 
@@ -161,6 +161,18 @@ export const editUser = async (req, res) => {
       .json({ message: "User info succesfully updated.", user: updatedUser });
   } catch (error) {
     return res.status(400).json({ message: "Problem" });
+  }
+};
+
+export const getUser = async (req, res) => {
+  try {
+    const { userid } = req.headers;
+    const user = User.findById(userid);
+    return res
+      .status(200)
+      .json({ message: "Success getting user", user: user });
+  } catch (error) {
+    return res.status(400).json({ message: "Error " + error });
   }
 };
 

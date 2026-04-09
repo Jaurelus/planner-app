@@ -32,6 +32,9 @@ function UserCard() {
     userGoals: [],
     userTasks: [],
   };
+
+  //-------- API Calls --------
+  
   return (
     <Card className="relative w-[75%] p-0 pb-5">
       {userInfo != null && (

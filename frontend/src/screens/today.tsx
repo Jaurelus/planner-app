@@ -9,8 +9,13 @@ function Daily({ route, navigation }) {
   const { api, dates } = route.params;
   const colorScheme = useColorScheme();
   const today = new Date();
-  today.setUTCHours(0, 0, 0);
-  const [selectedDate, setSelectedDate] = useState<string>(today.toISOString().slice(0, 10));
+  const todayStr =
+    today.getFullYear() +
+    '-' +
+    (today.getMonth() + 1).toString().padStart(2, '0') +
+    '-' +
+    today.getDate().toString().padStart(2, '0');
+  const [selectedDate, setSelectedDate] = useState<any>(null);
 
   const isDark = colorScheme === 'dark';
 
@@ -29,7 +34,7 @@ function Daily({ route, navigation }) {
   };
 
   return (
-    <CalendarProvider date={selectedDate}>
+    <CalendarProvider date={todayStr}>
       <View className="flex flex-1 flex-col">
         <ExpandableCalendar
           //onP ressArrowLeft={}
@@ -42,12 +47,13 @@ function Daily({ route, navigation }) {
           pagingEnabled
           onDayPress={(day) => {
             setSelectedDate(day.dateString);
+            console.log(day.dateString);
           }}
           onDayLongPress={(day) => {
             //Add the date to marked dates
           }}
         />
-        <AgendaTasks api={api} date={selectedDate}></AgendaTasks>
+        <AgendaTasks api={api} date={selectedDate || todayStr}></AgendaTasks>
       </View>
     </CalendarProvider>
   );

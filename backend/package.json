@@ -19,6 +19,7 @@
     "express": "^5.1.0",
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^9.0.0",
+    "plaid": "^41.3.0",
     "twilio": "^5.12.1"
   },
   "devDependencies": {
