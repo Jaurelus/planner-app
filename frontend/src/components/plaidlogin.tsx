@@ -24,10 +24,26 @@ function PlaidLogin({ api }: { api: string }) {
   const [tEndDate, setTEndDate] = useState<any>(null);
   const [transactions, setTransactions] = useState<any>(null);
 
+  //Recurring transaction variables
+  const [rIncome, setRIncome] = useState<any>(null);
+  const [rExpense, setRExpense] = useState<any>(null);
+  useEffect(() => {
+    if (rIncome) {
+      rIncome.forEach((element) => {
+        console.log('Income', element, '\n');
+      });
+    }
+    if (rExpense) {
+      rExpense.forEach((element) => {
+        console.log('Expense', element, '\n');
+      });
+    }
+  }, [rIncome, rExpense]);
+
   useEffect(() => {
     if (transactions) {
       transactions.forEach((transaction) => {
-        console.log('Transactions: ', transaction);
+        //console.log('Transactions: ', transaction);
       });
     }
   }, [transactions]);
@@ -142,9 +158,11 @@ function PlaidLogin({ api }: { api: string }) {
       });
       const data = await response.json();
       if (response.status == 200) {
-        console.log('Recurring DataTransfer', data);
-        console.log('IN', data.income);
-        console.log('OUT', data.expenses);
+        console.log('Recurring DataTransfer');
+        console.log('IN');
+        console.log('OUT');
+        setRIncome(data.income);
+        setRExpense(data.expenses);
       } else console.log(data.message);
     } catch (error) {
       console.log(error);

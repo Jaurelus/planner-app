@@ -26,7 +26,7 @@ function Goals({ api, scrollDate }: { api: string; scrollDate: string }) {
   const [alertDD, setAlertDD] = useState(
     'By pressing confirm, you are agreeing that you completed this goal'
   );
-
+  console.log('SCROLL ', scrollDate);
   const context = useContext(CalendarContext);
 
   const [gTitle, setGTitle] = useState('');
@@ -125,6 +125,9 @@ function Goals({ api, scrollDate }: { api: string; scrollDate: string }) {
   //Show Goals
   const showGoals = async () => {
     if (!userInfo) return;
+    if (!scrollDate) {
+      scrollDate = new Date().toISOString().slice(0, 10);
+    }
     const firsDay = String(findFirstDay(new Date(scrollDate)).toISOString().slice(0, 10)).padStart(
       2,
       '0'
@@ -175,7 +178,7 @@ function Goals({ api, scrollDate }: { api: string; scrollDate: string }) {
 
   useEffect(() => {
     showGoals();
-  }, [scrollDate]);
+  }, [scrollDate, userInfo]);
 
   //Edit goals
   const editGoals = async (GID) => {
@@ -198,7 +201,7 @@ function Goals({ api, scrollDate }: { api: string; scrollDate: string }) {
 
     try {
       const response = await fetch(API_URL + '/' + GID, {
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', authtoken: userToken },
         method: 'PUT',
         body: JSON.stringify(payload),
       });
@@ -218,6 +221,7 @@ function Goals({ api, scrollDate }: { api: string; scrollDate: string }) {
     try {
       const response = await fetch(API_URL + '/' + GID, {
         method: 'DELETE',
+        headers: { authtoken: userToken },
       });
       if (response.status == 200) {
         showGoals();
@@ -232,17 +236,17 @@ function Goals({ api, scrollDate }: { api: string; scrollDate: string }) {
 
     try {
       const response = await fetch(API_URL + '/' + GID, {
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', authtoken: userToken },
         method: 'PUT',
         body: JSON.stringify({ goalCompletion: !currCompletion }),
       });
-
+      const data = await response.json();
       if (response.status == 200) {
         //
         console.log('Goal completion status changed.');
         showGoals();
       } else if (response.status == 400) {
-        console.log('Error updating the goal');
+        console.log('Error updating the goal' + data.message);
       }
     } catch (error) {
       console.log(error);
@@ -275,17 +279,35 @@ function Goals({ api, scrollDate }: { api: string; scrollDate: string }) {
             {/*Button View*/}
 
             <View className="flex-row">
-              <Button size="icon" className="rounded-full " variant="ghost">
+              <Button
+                size="icon"
+                onPress={() => {
+                  editGoals(goal._id);
+                }}
+                className="rounded-full "
+                variant="ghost">
                 <SquarePen size={18} />
               </Button>
-              <Button size="icon" className="rounded-full " variant="ghost">
+              <Button
+                onPress={() => {
+                  deleteGoals(goal._id);
+                }}
+                size="icon"
+                className="rounded-full "
+                variant="ghost">
                 <LucideCircleX size={20} color={'red'} />
               </Button>
 
               {/*Checkbox View*/}
 
               <View className="ml-2 mt-2">
-                <BouncyCheckbox size={20} fillColor="green"></BouncyCheckbox>
+                <BouncyCheckbox
+                  onPress={() => {
+                    handleCheckboxPress(goal._id, goal.complete);
+                  }}
+                  isChecked={goal.complete}
+                  size={20}
+                  fillColor="green"></BouncyCheckbox>
               </View>
             </View>
           </CardFooter>

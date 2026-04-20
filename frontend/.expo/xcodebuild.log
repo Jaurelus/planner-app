@@ -1003,20 +1003,20 @@ ExecuteExternalTool /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeD
 
 ExecuteExternalTool /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang -v -E -dM -arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.0.sdk -x c -c /dev/null
 
-ExecuteExternalTool /Applications/Xcode.app/Contents/Developer/usr/bin/ibtool --version --output-format xml1
-
-ExecuteExternalTool /Applications/Xcode.app/Contents/Developer/usr/bin/actool --print-asset-tag-combinations --output-format xml1 /Users/bandmannnjayyy/Desktop/Coding_Projects/planner-app/frontend/ios/myexpoapp/Images.xcassets
-
 ExecuteExternalTool /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc --version
 
 ExecuteExternalTool /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/libtool -V
+
+ExecuteExternalTool /Applications/Xcode.app/Contents/Developer/usr/bin/ibtool --version --output-format xml1
+
+ExecuteExternalTool /Applications/Xcode.app/Contents/Developer/usr/bin/actool --print-asset-tag-combinations --output-format xml1 /Users/bandmannnjayyy/Desktop/Coding_Projects/planner-app/frontend/ios/myexpoapp/Images.xcassets
 
 ExecuteExternalTool /Applications/Xcode.app/Contents/Developer/usr/bin/actool --version --output-format xml1
 
 ExecuteExternalTool /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/ld -version_details
 
-Build description signature: 6050d0c943c7d4cc05579eeab16f972e
-Build description path: /Users/bandmannnjayyy/Library/Developer/Xcode/DerivedData/myexpoapp-abpazoodnqhdbmaxwsedusownfrm/Build/Intermediates.noindex/XCBuildData/6050d0c943c7d4cc05579eeab16f972e.xcbuilddata
+Build description signature: 3ba1a98af3251a75dbe42f0749c9b81f
+Build description path: /Users/bandmannnjayyy/Library/Developer/Xcode/DerivedData/myexpoapp-abpazoodnqhdbmaxwsedusownfrm/Build/Intermediates.noindex/XCBuildData/3ba1a98af3251a75dbe42f0749c9b81f.xcbuilddata
 ClangStatCache /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang-stat-cache /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.0.sdk /Users/bandmannnjayyy/Library/Developer/Xcode/DerivedData/SDKStatCaches.noindex/iphonesimulator26.0-23A339-26257891a6c027eb51374368541b8346.sdkstatcache
     cd /Users/bandmannnjayyy/Desktop/Coding_Projects/planner-app/frontend/ios
     /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang-stat-cache /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.0.sdk -o /Users/bandmannnjayyy/Library/Developer/Xcode/DerivedData/SDKStatCaches.noindex/iphonesimulator26.0-23A339-26257891a6c027eb51374368541b8346.sdkstatcache
@@ -2580,13 +2580,13 @@ PhaseScriptExecution [CP-User]\ [RNDeps]\ Replace\ React\ Native\ Core\ for\ the
 Node found at: /usr/local/bin/node
 No previous build detected, but Debug Configuration. No need to replace React-Core-prebuilt
 
-ProcessInfoPlistFile /Users/bandmannnjayyy/Library/Developer/Xcode/DerivedData/myexpoapp-abpazoodnqhdbmaxwsedusownfrm/Build/Products/Debug-iphonesimulator/React-cxxreact/React-cxxreact_privacy.bundle/Info.plist /Users/bandmannnjayyy/Desktop/Coding_Projects/planner-app/frontend/ios/Pods/Target\ Support\ Files/React-cxxreact/ResourceBundle-React-cxxreact_privacy-React-cxxreact-Info.plist (in target 'React-cxxreact-React-cxxreact_privacy' from project 'Pods')
-    cd /Users/bandmannnjayyy/Desktop/Coding_Projects/planner-app/frontend/ios/Pods
-    builtin-infoPlistUtility /Users/bandmannnjayyy/Desktop/Coding_Projects/planner-app/frontend/ios/Pods/Target\ Support\ Files/React-cxxreact/ResourceBundle-React-cxxreact_privacy-React-cxxreact-Info.plist -producttype com.apple.product-type.bundle -expandbuildsettings -format binary -platform iphonesimulator -o /Users/bandmannnjayyy/Library/Developer/Xcode/DerivedData/myexpoapp-abpazoodnqhdbmaxwsedusownfrm/Build/Products/Debug-iphonesimulator/React-cxxreact/React-cxxreact_privacy.bundle/Info.plist
-
 ProcessInfoPlistFile /Users/bandmannnjayyy/Library/Developer/Xcode/DerivedData/myexpoapp-abpazoodnqhdbmaxwsedusownfrm/Build/Products/Debug-iphonesimulator/React-Core/React-Core_privacy.bundle/Info.plist /Users/bandmannnjayyy/Desktop/Coding_Projects/planner-app/frontend/ios/Pods/Target\ Support\ Files/React-Core/ResourceBundle-React-Core_privacy-React-Core-Info.plist (in target 'React-Core-React-Core_privacy' from project 'Pods')
     cd /Users/bandmannnjayyy/Desktop/Coding_Projects/planner-app/frontend/ios/Pods
     builtin-infoPlistUtility /Users/bandmannnjayyy/Desktop/Coding_Projects/planner-app/frontend/ios/Pods/Target\ Support\ Files/React-Core/ResourceBundle-React-Core_privacy-React-Core-Info.plist -producttype com.apple.product-type.bundle -expandbuildsettings -format binary -platform iphonesimulator -o /Users/bandmannnjayyy/Library/Developer/Xcode/DerivedData/myexpoapp-abpazoodnqhdbmaxwsedusownfrm/Build/Products/Debug-iphonesimulator/React-Core/React-Core_privacy.bundle/Info.plist
+
+ProcessInfoPlistFile /Users/bandmannnjayyy/Library/Developer/Xcode/DerivedData/myexpoapp-abpazoodnqhdbmaxwsedusownfrm/Build/Products/Debug-iphonesimulator/React-cxxreact/React-cxxreact_privacy.bundle/Info.plist /Users/bandmannnjayyy/Desktop/Coding_Projects/planner-app/frontend/ios/Pods/Target\ Support\ Files/React-cxxreact/ResourceBundle-React-cxxreact_privacy-React-cxxreact-Info.plist (in target 'React-cxxreact-React-cxxreact_privacy' from project 'Pods')
+    cd /Users/bandmannnjayyy/Desktop/Coding_Projects/planner-app/frontend/ios/Pods
+    builtin-infoPlistUtility /Users/bandmannnjayyy/Desktop/Coding_Projects/planner-app/frontend/ios/Pods/Target\ Support\ Files/React-cxxreact/ResourceBundle-React-cxxreact_privacy-React-cxxreact-Info.plist -producttype com.apple.product-type.bundle -expandbuildsettings -format binary -platform iphonesimulator -o /Users/bandmannnjayyy/Library/Developer/Xcode/DerivedData/myexpoapp-abpazoodnqhdbmaxwsedusownfrm/Build/Products/Debug-iphonesimulator/React-cxxreact/React-cxxreact_privacy.bundle/Info.plist
 
 note: Run script build phase '[CP-User] [RN]Check FBReactNativeSpec' will be run during every build because the option to run the script phase "Based on dependency analysis" is unchecked. (in target 'React-RCTFBReactNativeSpec' from project 'Pods')
 PhaseScriptExecution [CP-User]\ [RN]Check\ FBReactNativeSpec /Users/bandmannnjayyy/Library/Developer/Xcode/DerivedData/myexpoapp-abpazoodnqhdbmaxwsedusownfrm/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/React-RCTFBReactNativeSpec.build/Script-46EB2E0001D7F0.sh (in target 'React-RCTFBReactNativeSpec' from project 'Pods')
@@ -3105,6 +3105,10 @@ PhaseScriptExecution [CP-User]\ [RN]Check\ FBReactNativeSpec /Users/bandmannnjay
     /bin/sh -c /Users/bandmannnjayyy/Library/Developer/Xcode/DerivedData/myexpoapp-abpazoodnqhdbmaxwsedusownfrm/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/React-RCTFBReactNativeSpec.build/Script-46EB2E0001D7F0.sh
 Checking whether Codegen has run...
 
+ProcessInfoPlistFile /Users/bandmannnjayyy/Library/Developer/Xcode/DerivedData/myexpoapp-abpazoodnqhdbmaxwsedusownfrm/Build/Products/Debug-iphonesimulator/RNCAsyncStorage/RNCAsyncStorage_resources.bundle/Info.plist /Users/bandmannnjayyy/Desktop/Coding_Projects/planner-app/frontend/ios/Pods/Target\ Support\ Files/RNCAsyncStorage/ResourceBundle-RNCAsyncStorage_resources-RNCAsyncStorage-Info.plist (in target 'RNCAsyncStorage-RNCAsyncStorage_resources' from project 'Pods')
+    cd /Users/bandmannnjayyy/Desktop/Coding_Projects/planner-app/frontend/ios/Pods
+    builtin-infoPlistUtility /Users/bandmannnjayyy/Desktop/Coding_Projects/planner-app/frontend/ios/Pods/Target\ Support\ Files/RNCAsyncStorage/ResourceBundle-RNCAsyncStorage_resources-RNCAsyncStorage-Info.plist -producttype com.apple.product-type.bundle -expandbuildsettings -format binary -platform iphonesimulator -o /Users/bandmannnjayyy/Library/Developer/Xcode/DerivedData/myexpoapp-abpazoodnqhdbmaxwsedusownfrm/Build/Products/Debug-iphonesimulator/RNCAsyncStorage/RNCAsyncStorage_resources.bundle/Info.plist
+
 ProcessInfoPlistFile /Users/bandmannnjayyy/Library/Developer/Xcode/DerivedData/myexpoapp-abpazoodnqhdbmaxwsedusownfrm/Build/Products/Debug-iphonesimulator/RNSVG/RNSVGFilters.bundle/Info.plist /Users/bandmannnjayyy/Desktop/Coding_Projects/planner-app/frontend/ios/Pods/Target\ Support\ Files/RNSVG/ResourceBundle-RNSVGFilters-RNSVG-Info.plist (in target 'RNSVG-RNSVGFilters' from project 'Pods')
     cd /Users/bandmannnjayyy/Desktop/Coding_Projects/planner-app/frontend/ios/Pods
     builtin-infoPlistUtility /Users/bandmannnjayyy/Desktop/Coding_Projects/planner-app/frontend/ios/Pods/Target\ Support\ Files/RNSVG/ResourceBundle-RNSVGFilters-RNSVG-Info.plist -producttype com.apple.product-type.bundle -expandbuildsettings -format binary -platform iphonesimulator -o /Users/bandmannnjayyy/Library/Developer/Xcode/DerivedData/myexpoapp-abpazoodnqhdbmaxwsedusownfrm/Build/Products/Debug-iphonesimulator/RNSVG/RNSVGFilters.bundle/Info.plist
@@ -3112,10 +3116,6 @@ ProcessInfoPlistFile /Users/bandmannnjayyy/Library/Developer/Xcode/DerivedData/m
 ProcessInfoPlistFile /Users/bandmannnjayyy/Library/Developer/Xcode/DerivedData/myexpoapp-abpazoodnqhdbmaxwsedusownfrm/Build/Products/Debug-iphonesimulator/ExpoFileSystem/ExpoFileSystem_privacy.bundle/Info.plist /Users/bandmannnjayyy/Desktop/Coding_Projects/planner-app/frontend/ios/Pods/Target\ Support\ Files/ExpoFileSystem/ResourceBundle-ExpoFileSystem_privacy-ExpoFileSystem-Info.plist (in target 'ExpoFileSystem-ExpoFileSystem_privacy' from project 'Pods')
     cd /Users/bandmannnjayyy/Desktop/Coding_Projects/planner-app/frontend/ios/Pods
     builtin-infoPlistUtility /Users/bandmannnjayyy/Desktop/Coding_Projects/planner-app/frontend/ios/Pods/Target\ Support\ Files/ExpoFileSystem/ResourceBundle-ExpoFileSystem_privacy-ExpoFileSystem-Info.plist -producttype com.apple.product-type.bundle -expandbuildsettings -format binary -platform iphonesimulator -o /Users/bandmannnjayyy/Library/Developer/Xcode/DerivedData/myexpoapp-abpazoodnqhdbmaxwsedusownfrm/Build/Products/Debug-iphonesimulator/ExpoFileSystem/ExpoFileSystem_privacy.bundle/Info.plist
-
-ProcessInfoPlistFile /Users/bandmannnjayyy/Library/Developer/Xcode/DerivedData/myexpoapp-abpazoodnqhdbmaxwsedusownfrm/Build/Products/Debug-iphonesimulator/RNCAsyncStorage/RNCAsyncStorage_resources.bundle/Info.plist /Users/bandmannnjayyy/Desktop/Coding_Projects/planner-app/frontend/ios/Pods/Target\ Support\ Files/RNCAsyncStorage/ResourceBundle-RNCAsyncStorage_resources-RNCAsyncStorage-Info.plist (in target 'RNCAsyncStorage-RNCAsyncStorage_resources' from project 'Pods')
-    cd /Users/bandmannnjayyy/Desktop/Coding_Projects/planner-app/frontend/ios/Pods
-    builtin-infoPlistUtility /Users/bandmannnjayyy/Desktop/Coding_Projects/planner-app/frontend/ios/Pods/Target\ Support\ Files/RNCAsyncStorage/ResourceBundle-RNCAsyncStorage_resources-RNCAsyncStorage-Info.plist -producttype com.apple.product-type.bundle -expandbuildsettings -format binary -platform iphonesimulator -o /Users/bandmannnjayyy/Library/Developer/Xcode/DerivedData/myexpoapp-abpazoodnqhdbmaxwsedusownfrm/Build/Products/Debug-iphonesimulator/RNCAsyncStorage/RNCAsyncStorage_resources.bundle/Info.plist
 
 ProcessInfoPlistFile /Users/bandmannnjayyy/Library/Developer/Xcode/DerivedData/myexpoapp-abpazoodnqhdbmaxwsedusownfrm/Build/Products/Debug-iphonesimulator/EXConstants/EXConstants.bundle/Info.plist /Users/bandmannnjayyy/Desktop/Coding_Projects/planner-app/frontend/ios/Pods/Target\ Support\ Files/EXConstants/ResourceBundle-EXConstants-EXConstants-Info.plist (in target 'EXConstants-EXConstants' from project 'Pods')
     cd /Users/bandmannnjayyy/Desktop/Coding_Projects/planner-app/frontend/ios/Pods
@@ -4284,14 +4284,15 @@ PrecompileSwiftBridgingHeader normal arm64 (in target 'myexpoapp' from project '
 
 SwiftDriverJobDiscovery normal arm64 Compiling bridging header (in target 'myexpoapp' from project 'myexpoapp')
 
-SwiftCompile normal arm64 Compiling\ ExpoModulesProvider.swift /Users/bandmannnjayyy/Desktop/Coding_Projects/planner-app/frontend/ios/Pods/Target\ Support\ Files/Pods-myexpoapp/ExpoModulesProvider.swift (in target 'myexpoapp' from project 'myexpoapp')
+SwiftEmitModule normal arm64 Emitting\ module\ for\ myexpoapp (in target 'myexpoapp' from project 'myexpoapp')
 
-SwiftCompile normal arm64 /Users/bandmannnjayyy/Desktop/Coding_Projects/planner-app/frontend/ios/Pods/Target\ Support\ Files/Pods-myexpoapp/ExpoModulesProvider.swift (in target 'myexpoapp' from project 'myexpoapp')
+EmitSwiftModule normal arm64 (in target 'myexpoapp' from project 'myexpoapp')
     cd /Users/bandmannnjayyy/Desktop/Coding_Projects/planner-app/frontend/ios
     
 
-SwiftEmitModule normal arm64 Emitting\ module\ for\ myexpoapp (in target 'myexpoapp' from project 'myexpoapp')
-EmitSwiftModule normal arm64 (in target 'myexpoapp' from project 'myexpoapp')
+SwiftCompile normal arm64 Compiling\ ExpoModulesProvider.swift /Users/bandmannnjayyy/Desktop/Coding_Projects/planner-app/frontend/ios/Pods/Target\ Support\ Files/Pods-myexpoapp/ExpoModulesProvider.swift (in target 'myexpoapp' from project 'myexpoapp')
+
+SwiftCompile normal arm64 /Users/bandmannnjayyy/Desktop/Coding_Projects/planner-app/frontend/ios/Pods/Target\ Support\ Files/Pods-myexpoapp/ExpoModulesProvider.swift (in target 'myexpoapp' from project 'myexpoapp')
     cd /Users/bandmannnjayyy/Desktop/Coding_Projects/planner-app/frontend/ios
     
 
@@ -4954,14 +4955,18 @@ PhaseScriptExecution [CP]\ Copy\ Pods\ Resources /Users/bandmannnjayyy/Library/D
 Transfer starting: 44 files
 EXConstants.bundle/app.config
 
-sent 3075 bytes  received 42 bytes  611176 bytes/sec
+sent 3075 bytes  received 42 bytes  760243 bytes/sec
 total size is 3908528  speedup is 1253.94
+
+CopySwiftLibs /Users/bandmannnjayyy/Library/Developer/Xcode/DerivedData/myexpoapp-abpazoodnqhdbmaxwsedusownfrm/Build/Products/Debug-iphonesimulator/myexpoapp.app (in target 'myexpoapp' from project 'myexpoapp')
+    cd /Users/bandmannnjayyy/Desktop/Coding_Projects/planner-app/frontend/ios
+    builtin-swiftStdLibTool --copy --verbose --sign - --scan-executable /Users/bandmannnjayyy/Library/Developer/Xcode/DerivedData/myexpoapp-abpazoodnqhdbmaxwsedusownfrm/Build/Products/Debug-iphonesimulator/myexpoapp.app/myexpoapp.debug.dylib --scan-folder /Users/bandmannnjayyy/Library/Developer/Xcode/DerivedData/myexpoapp-abpazoodnqhdbmaxwsedusownfrm/Build/Products/Debug-iphonesimulator/myexpoapp.app/Frameworks --scan-folder /Users/bandmannnjayyy/Library/Developer/Xcode/DerivedData/myexpoapp-abpazoodnqhdbmaxwsedusownfrm/Build/Products/Debug-iphonesimulator/myexpoapp.app/PlugIns --scan-folder /Users/bandmannnjayyy/Library/Developer/Xcode/DerivedData/myexpoapp-abpazoodnqhdbmaxwsedusownfrm/Build/Products/Debug-iphonesimulator/myexpoapp.app/SystemExtensions --scan-folder /Users/bandmannnjayyy/Library/Developer/Xcode/DerivedData/myexpoapp-abpazoodnqhdbmaxwsedusownfrm/Build/Products/Debug-iphonesimulator/myexpoapp.app/Extensions --platform iphonesimulator --toolchain /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain --destination /Users/bandmannnjayyy/Library/Developer/Xcode/DerivedData/myexpoapp-abpazoodnqhdbmaxwsedusownfrm/Build/Products/Debug-iphonesimulator/myexpoapp.app/Frameworks --strip-bitcode --strip-bitcode-tool /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/bitcode_strip --emit-dependency-info /Users/bandmannnjayyy/Library/Developer/Xcode/DerivedData/myexpoapp-abpazoodnqhdbmaxwsedusownfrm/Build/Intermediates.noindex/myexpoapp.build/Debug-iphonesimulator/myexpoapp.build/SwiftStdLibToolInputDependencies.dep --filter-for-swift-os
 
 ExtractAppIntentsMetadata (in target 'myexpoapp' from project 'myexpoapp')
     cd /Users/bandmannnjayyy/Desktop/Coding_Projects/planner-app/frontend/ios
     /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/appintentsmetadataprocessor --toolchain-dir /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain --module-name myexpoapp --sdk-root /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.0.sdk --xcode-version 17A400 --platform-family iOS --deployment-target 15.1 --bundle-identifier com.anonymous.my-expo-app --output /Users/bandmannnjayyy/Library/Developer/Xcode/DerivedData/myexpoapp-abpazoodnqhdbmaxwsedusownfrm/Build/Products/Debug-iphonesimulator/myexpoapp.app --target-triple arm64-apple-ios15.1-simulator --binary-file /Users/bandmannnjayyy/Library/Developer/Xcode/DerivedData/myexpoapp-abpazoodnqhdbmaxwsedusownfrm/Build/Products/Debug-iphonesimulator/myexpoapp.app/myexpoapp --dependency-file /Users/bandmannnjayyy/Library/Developer/Xcode/DerivedData/myexpoapp-abpazoodnqhdbmaxwsedusownfrm/Build/Intermediates.noindex/myexpoapp.build/Debug-iphonesimulator/myexpoapp.build/Objects-normal/arm64/myexpoapp_dependency_info.dat --stringsdata-file /Users/bandmannnjayyy/Library/Developer/Xcode/DerivedData/myexpoapp-abpazoodnqhdbmaxwsedusownfrm/Build/Intermediates.noindex/myexpoapp.build/Debug-iphonesimulator/myexpoapp.build/Objects-normal/arm64/ExtractedAppShortcutsMetadata.stringsdata --source-file-list /Users/bandmannnjayyy/Library/Developer/Xcode/DerivedData/myexpoapp-abpazoodnqhdbmaxwsedusownfrm/Build/Intermediates.noindex/myexpoapp.build/Debug-iphonesimulator/myexpoapp.build/Objects-normal/arm64/myexpoapp.SwiftFileList --metadata-file-list /Users/bandmannnjayyy/Library/Developer/Xcode/DerivedData/myexpoapp-abpazoodnqhdbmaxwsedusownfrm/Build/Intermediates.noindex/myexpoapp.build/Debug-iphonesimulator/myexpoapp.build/myexpoapp.DependencyMetadataFileList --static-metadata-file-list /Users/bandmannnjayyy/Library/Developer/Xcode/DerivedData/myexpoapp-abpazoodnqhdbmaxwsedusownfrm/Build/Intermediates.noindex/myexpoapp.build/Debug-iphonesimulator/myexpoapp.build/myexpoapp.DependencyStaticMetadataFileList --swift-const-vals-list /Users/bandmannnjayyy/Library/Developer/Xcode/DerivedData/myexpoapp-abpazoodnqhdbmaxwsedusownfrm/Build/Intermediates.noindex/myexpoapp.build/Debug-iphonesimulator/myexpoapp.build/Objects-normal/arm64/myexpoapp.SwiftConstValuesFileList --compile-time-extraction --deployment-aware-processing --validate-assistant-intents --no-app-shortcuts-localization
-2026-04-09 09:53:21.387 appintentsmetadataprocessor[82346:1653443] Starting appintentsmetadataprocessor export
-2026-04-09 09:53:21.396 appintentsmetadataprocessor[82346:1653443] warning: Metadata extraction skipped. No AppIntents.framework dependency found.
+2026-04-20 14:36:22.954 appintentsmetadataprocessor[23310:687687] Starting appintentsmetadataprocessor export
+2026-04-20 14:36:22.958 appintentsmetadataprocessor[23310:687687] warning: Metadata extraction skipped. No AppIntents.framework dependency found.
 
 CodeSign /Users/bandmannnjayyy/Library/Developer/Xcode/DerivedData/myexpoapp-abpazoodnqhdbmaxwsedusownfrm/Build/Products/Debug-iphonesimulator/myexpoapp.app/myexpoapp.debug.dylib (in target 'myexpoapp' from project 'myexpoapp')
     cd /Users/bandmannnjayyy/Desktop/Coding_Projects/planner-app/frontend/ios

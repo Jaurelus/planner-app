@@ -17,6 +17,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from 'components/ui';
+import * as Progress from 'react-native-progress';
 
 function MonthlyView({ markedDates, api }: { markedDates: {}; api: string }) {
   console.log(api);
@@ -41,6 +42,7 @@ function MonthlyView({ markedDates, api }: { markedDates: {}; api: string }) {
   const [objectiveDescription, setObjectiveDescription] = useState('');
   const [objectiveProgress, setObjectiveProgress] = useState('');
   const [objectiveGoalNumber, setObjectiveGoalNumber] = useState('');
+  const colors = ['#D8EED2', '#FEE2C3', '#E1D9FB', 'D0E9FA'];
 
   let max = new Date();
   max.setFullYear(new Date().getFullYear() + 5);
@@ -174,26 +176,36 @@ function MonthlyView({ markedDates, api }: { markedDates: {}; api: string }) {
           </Card>
         ) : (
           <View className="gap-3">
-            {userObjectives.map((objective) => {
+            {userObjectives.map((objective, index) => {
               return (
-                <Card className="items-center " key={objective._id}>
+                <Card
+                  className="relative flex items-center justify-center"
+                  key={objective._id}
+                  style={{ backgroundColor: colors[index % colors.length] }}>
                   <CardHeader>
                     <CardTitle>{objective.title}</CardTitle>
                   </CardHeader>
                   <View className="flex-row">
-                    <CardContent className="w-[60%]">
-                      <Text>{objective.description}</Text>
-                      <Text>Progress Bar </Text>
-                      <View className="border-black-2 w-[80%] bg-white"></View>
+                    <CardContent className="w-[70%] justify-center">
+                      <Text className="text-center">{objective.description}</Text>
                     </CardContent>
-                    <CardFooter>
+                    <CardFooter className="mt-2 justify-end">
                       {/* Edit Objective */}
+                      <Progress.Circle
+                        className=" absolute -top-16 left-12"
+                        size={36}
+                        progress={objective.progress / objective.goalNumber}
+                        color="green"
+                        showsText={false}></Progress.Circle>
 
                       <AlertDialog
                         onOpenChange={(open) => {
                           if (open) {
                             setObjectiveTitle(objective.title);
                             setObjectiveDescription(objective.description);
+                            setObjectiveProgress(String(objective.progress));
+                            setObjectiveGoalNumber(String(objective.goalNumber));
+
                             console.log('Finna set', objective.title);
                           } else {
                           }
@@ -221,7 +233,7 @@ function MonthlyView({ markedDates, api }: { markedDates: {}; api: string }) {
                             <View className="relative mt-5 ">
                               <TextInput
                                 className="  rounded-xl border border-primary  bg-white p-1 text-center"
-                                value={objectiveProgress || objective.progress}
+                                value={objectiveProgress || String(objective.progress)}
                                 onChangeText={setObjectiveProgress}
                                 placeholder="Objective Progress"></TextInput>
                               <View className="absolute right-2 top-2">
@@ -237,7 +249,7 @@ function MonthlyView({ markedDates, api }: { markedDates: {}; api: string }) {
                             <View className="relative mt-5 ">
                               <TextInput
                                 className="  rounded-xl border border-primary  bg-white p-1 text-center"
-                                value={objectiveGoalNumber || objectiveGoalNumber}
+                                value={objectiveGoalNumber || String(objective.goalNumber)}
                                 onChangeText={setObjectiveGoalNumber}
                                 placeholder="Objective Goal"></TextInput>
                               <View className="absolute right-2 top-2">
@@ -257,6 +269,7 @@ function MonthlyView({ markedDates, api }: { markedDates: {}; api: string }) {
                           </AlertDialogFooter>
                         </AlertDialogContent>
                       </AlertDialog>
+
                       {/* Delete Objective */}
                       <AlertDialog>
                         <AlertDialogTrigger asChild>

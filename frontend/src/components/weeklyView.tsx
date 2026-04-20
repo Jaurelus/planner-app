@@ -22,7 +22,9 @@ function WeeklyView({ api, scrollDate, markedDates }: WeeklyViewProps) {
   const colorScheme = useColorScheme();
   const isDark = colorScheme === 'dark';
   const context = useContext(CalendarContext);
-  const [date, setDate] = useState<string>(scrollDate.toISOString().slice(0, 10));
+  const [date, setDate] = useState<string>(
+    scrollDate ? scrollDate.toISOString().slice(0, 10) : new Date().toISOString().slice(0, 10)
+  );
 
   const prepareDate = (dateString?: string, dateDate?: Date) => {
     if (dateDate) {
@@ -88,6 +90,7 @@ function WeeklyView({ api, scrollDate, markedDates }: WeeklyViewProps) {
             hideKnob={true}
             theme={calendarTheme}
             hideArrows={true}
+            date={new Date().toISOString().slice(0, 10)}
             //disablePan={true}
             //current={date}
             firstDay={1}
