@@ -34,8 +34,8 @@ interface AgendaTasksProps {
 function AgendaTasks({ api, date }: AgendaTasksProps) {
   const API_URL = api + 'tasks';
   const [selectedDate, setSelectedDate] = useState('');
-  const [startHour, setStartHour] = useState<Date>(new Date());
-  const [endHour, setEndHour] = useState<Date>(new Date());
+  const [startHour, setStartHour] = useState<Date>(new Date(date + 'T12:00:00'));
+  const [endHour, setEndHour] = useState<Date>(new Date(date + 'T12:00:00'));
   const [taskName, setTaskName] = useState('');
   const [taskDesc, setTaskDesc] = useState('');
   const [taskCat, setTaskCat] = useState('');
@@ -96,6 +96,7 @@ function AgendaTasks({ api, date }: AgendaTasksProps) {
   //Format times so the timeline accepts it
   const formatTimeLineTimes = (date: Date) => {
     //2026-04-06 6:00:00 PM
+    date = new Date(date);
     let isoDate = date.toISOString().split('T')[1];
     // Get time info
     let locale = date.toLocaleString([], { hour12: false }).split(',');
@@ -111,7 +112,8 @@ function AgendaTasks({ api, date }: AgendaTasksProps) {
       '-' +
       localeDay.padStart(2, '0') +
       ' ' +
-      localeTime
+      localeTime +
+      ':00'
       /*
         date.getFullYear() +
         '-' +
@@ -145,8 +147,8 @@ function AgendaTasks({ api, date }: AgendaTasksProps) {
         summary: task.taskDescription,
         title: task.taskName,
         color: `${eventColors[i % 4]}73`,
-        start: formatTimeLineTimes(new Date(task.timeStart)), //formatTimeLineTimes(new Date(task.timeStart)),
-        end: formatTimeLineTimes(new Date(task.timeEnd)), //formatTimeLineTimes(new Date(task.timeEnd)),
+        start: formatTimeLineTimes(task.timeStart), //formatTimeLineTimes(new Date(task.timeStart)),
+        end: formatTimeLineTimes(task.timeEnd), //formatTimeLineTimes(new Date(task.timeEnd)),
         ...task,
       };
     });
@@ -180,7 +182,7 @@ function AgendaTasks({ api, date }: AgendaTasksProps) {
 
   // Function to get task data
   const viewTasks = async () => {
-    if (!userInfo && !selectedDate) return;
+    if (!userInfo || !selectedDate) return;
     console.log('Selected Date', selectedDate);
     try {
       const response = await fetch(API_URL + `?date=${selectedDate}`, {
@@ -305,7 +307,7 @@ function AgendaTasks({ api, date }: AgendaTasksProps) {
         renderEvent={(event) => {
           return (
             <View
-              className="ml-auto mr-auto flex flex-1 flex-row items-center justify-center gap-5 rounded-sm "
+              className="ml-auto mr-auto flex flex-1 flex-row items-center justify-center gap-5 rounded-sm min-h-32"
               style={{ borderColor: darkenColor(event.color) }}>
               <View className="ml-auto mr-auto flex flex-1 flex-col items-center justify-center ">
                 <Text className="color-red">{event.title}</Text>
@@ -333,8 +335,8 @@ function AgendaTasks({ api, date }: AgendaTasksProps) {
                   <AlertDialog
                     onOpenChange={(open) => {
                       if (open) {
-                        const startDate = new Date(event.start.replace(' ', 'T'));
-                        const endDate = new Date(event.end.replace(' ', 'T'));
+                        const startDate = new Date(event.start);
+                        const endDate = new Date(event.end);
 
                         setPH(event.category || 'Choose a classification for these tasks');
                         setUTaskDesc(event.summary || '');

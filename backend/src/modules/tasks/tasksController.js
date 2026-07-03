@@ -58,7 +58,7 @@ export const editTask = async (req, res) => {
       .status(200)
       .json({ message: "Goal successfully updated", task: updatedTask });
   } catch (error) {
-    console.log(error);
+    return res.status(401).json({ message: "Error " + error });
   }
 };
 //Function to delete a task
