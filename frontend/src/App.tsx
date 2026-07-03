@@ -162,13 +162,20 @@ export default function App() {
     <View className="flex flex-1">
       <NavigationContainer>
         <Stack.Navigator>
-          {!user && (
+          {!user? (
+            <>
             <Stack.Screen
               name="Login"
               component={LoginScreen}
               initialParams={{ api: API_URL, onChange: setUser }}
             />
-          )}
+             <Stack.Screen
+            name="Register"
+            component={RegisterScreen}
+            initialParams={{ api: API_URL }}
+          />
+            </>
+          ): (<>
           <Stack.Screen name="Home" component={HomePage} />
           {formattedUserDates && (
             <Stack.Screen
@@ -180,7 +187,7 @@ export default function App() {
               }}
             />
           )}
-          <Stack.Screen name="Personal" component={Personal} />
+          <Stack.Screen name="Personal" component={Personal} initialParams={{ api: API_URL, dates: formattedUserDates, onChange: setUser }}/>
           {formattedUserDates && (
             <Stack.Screen
               name="Today"
@@ -194,13 +201,10 @@ export default function App() {
               component={FinanceScreen}
               initialParams={{ api: API_URL, dates: formattedUserDates }}
             />
-          )}
+          )}</>)}
+          
 
-          <Stack.Screen
-            name="Register"
-            component={RegisterScreen}
-            initialParams={{ api: API_URL }}
-          />
+         
         </Stack.Navigator>
       </NavigationContainer>
     </View>

@@ -6,6 +6,7 @@ import {
   validateUser,
   loginUser,
   getUser,
+  logoutUser,
 } from "./authController.js";
 
 import { validateToken } from "../../middleware.js";
@@ -17,5 +18,6 @@ router.post("/login", loginUser);
 router.post("/send", sendVerification);
 router.post("/verify", validateUser);
 router.get("/getUser", validateToken, getUser);
+router.post("/logout", logoutUser);
 
 export default router;

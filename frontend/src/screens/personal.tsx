@@ -1,4 +1,5 @@
 import SettingsCard from '@/components/settings';
+import SignoutCard from '@/components/signoutCard';
 import UserCard from '@/components/usercard';
 import { useSafeAreaEnv } from 'nativewind';
 import { useEffect, useState } from 'react';
@@ -8,6 +9,8 @@ interface PersonalProps {
   route: any;
 }
 function Personal({ route }: PersonalProps) {
+    const { api, onChange } = route.params;
+
   //-------- App Build---------
 
   return (
@@ -21,6 +24,9 @@ function Personal({ route }: PersonalProps) {
       }
       <View className="mt-12">
         <SettingsCard></SettingsCard>
+      </View>
+      <View>
+        <SignoutCard api={api} onLogout={()=>{onChange(false)}}/>
       </View>
     </View>
   );

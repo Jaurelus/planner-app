@@ -176,7 +176,9 @@ export const getUser = async (req, res) => {
   }
 };
 
-const logOut = async (req, res) => {};
+export const logoutUser = async (req, res) => {
+  return res.status(200).json({ message: "Success logging out" });
+};
 
 const refreshToken = async (req, res) => {};
 
