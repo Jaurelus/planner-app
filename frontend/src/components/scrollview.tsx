@@ -73,7 +73,9 @@ function ScrollView({ onChange, setDate, markedDates, api }: ScrollViewProps) {
             date={longDate.toISOString()}
             api={api}
             visible={modalVisible}
-            setVisible={setModalVisible}></MarkedDateModal>
+            setVisible={setModalVisible}
+            changeFlag={false}
+            ></MarkedDateModal>
         )}
       </View>
     </View>

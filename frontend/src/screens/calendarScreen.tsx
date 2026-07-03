@@ -82,13 +82,19 @@ function CalendarScreen({ route, navigation }) {
           />
         </View>
       )}
-      {weeklyVisibility && (
+      {//Make the inital weekly view date the Monday of the week
+      weeklyVisibility && (
         <View className="top-0 mt-0">
-          <WeeklyView api={api} scrollDate={date} markedDates={dates}></WeeklyView>
+          <WeeklyView api={api} scrollDate={(()=>{
+            let tmpTdy = new Date(date)
+            let frmMonday = tmpTdy.getDay()-1
+    tmpTdy.setDate(tmpTdy.getDate()-frmMonday);
+    return tmpTdy;
+          })()} markedDates={dates}></WeeklyView>
         </View>
       )}
       {monthlyVisibility && (
-        <View className="">
+        <View className="mb-5">
           <MonthlyView api={api} markedDates={dates}></MonthlyView>
         </View>
       )}

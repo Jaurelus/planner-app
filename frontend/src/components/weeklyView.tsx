@@ -19,13 +19,20 @@ interface WeeklyViewProps {
 }
 
 function WeeklyView({ api, scrollDate, markedDates }: WeeklyViewProps) {
+  //If no scroll date, set date to be Monday
+  const tmpTdy = new Date();
+    let frmMonday = tmpTdy.getDay()-1
+    tmpTdy.setDate(tmpTdy.getDate()-frmMonday);
   const colorScheme = useColorScheme();
   const isDark = colorScheme === 'dark';
   const context = useContext(CalendarContext);
-  const [date, setDate] = useState<string>(
-    scrollDate ? scrollDate.toISOString().slice(0, 10) : new Date().toISOString().slice(0, 10)
-  );
-
+  const [date, setDate] = useState<string>(scrollDate ? scrollDate.toISOString().slice(0, 10) : tmpTdy.toISOString());
+    const [, forceRender] = useState(0);
+    //Make it Monday
+useEffect(()=>{
+  
+console.log("Initial Date: ", tmpTdy)
+},[])
   const prepareDate = (dateString?: string, dateDate?: Date) => {
     if (dateDate) {
       return (
@@ -46,9 +53,13 @@ function WeeklyView({ api, scrollDate, markedDates }: WeeklyViewProps) {
   };
 
   const handleTdyBtn = () => {
+    console.log("Handle cust butt ")
     let tmpTdy = new Date();
-    console.log(tmpTdy);
+    //Find Monday and set tmp to it
+    let frmMonday = tmpTdy.getDay()-1
+    tmpTdy.setDate(tmpTdy.getDate()-frmMonday);
     setDate(prepareDate(undefined, tmpTdy));
+      forceRender(n => n + 1);
   };
 
   const calendarTheme = {
@@ -69,20 +80,15 @@ function WeeklyView({ api, scrollDate, markedDates }: WeeklyViewProps) {
       <View className="relative flex">
         <CalendarProvider
           className="relative flex flex-1"
-          showTodayButton
-          todayBottomMargin={16}
-          todayButtonStyle={{
-            marginTop: 0,
-            display: 'flex',
-            position: 'absolute',
-            top: 0,
-            zIndex: 1000,
-          }}
+          
           date={date}
           onDateChanged={(date) => {
-            console.log(date);
+            console.log("WEEKLY",date);
+            let tmpTdy = new Date(date)
+            let frmMonday = tmpTdy.getDay()-1
+    tmpTdy.setDate(tmpTdy.getDate()-frmMonday);
 
-            setDate(date);
+            setDate(prepareDate(undefined, tmpTdy));
           }}>
           <ExpandableCalendar
             markingType="multi-dot"
@@ -90,7 +96,8 @@ function WeeklyView({ api, scrollDate, markedDates }: WeeklyViewProps) {
             hideKnob={true}
             theme={calendarTheme}
             hideArrows={true}
-            date={new Date().toISOString().slice(0, 10)}
+            date={date}
+            
             //disablePan={true}
             //current={date}
             firstDay={1}

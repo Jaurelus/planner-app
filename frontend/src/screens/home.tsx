@@ -12,7 +12,7 @@ function HomePage({ navigation }) {
           style={{ width: 200, height: 200 }}
           className="h-[200px] w-[200px]"
           source={require('../../assets/transparent-logo.png')}></Image>
-        <Text>Home</Text>
+        <Text>{new Date().toDateString()} Reminders</Text>
       </View>
       <View className="flex w-full">
         <Navbar />
