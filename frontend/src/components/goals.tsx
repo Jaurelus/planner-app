@@ -14,6 +14,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
   AlertDialogAction,
+  AlertDescription,
 } from 'components/ui';
 import { TextInput } from 'react-native';
 import { CalendarContext } from 'react-native-calendars';
@@ -279,6 +280,42 @@ function Goals({ api, scrollDate }: { api: string; scrollDate: string }) {
             {/*Button View*/}
 
             <View className="flex-row">
+              {/* Edit Goal */}
+              <AlertDialog>
+        <AlertDialogTrigger asChild>
+          <Button>Create Goal</Button>
+        </AlertDialogTrigger>
+        <View className="">
+          <AlertDialogContent className=" !w-[90%] rounded-3xl bg-white p-2 px-10">
+            <AlertDialogHeader>
+              <AlertDialogTitle className="mt-2 color-dark">Add New Goal</AlertDialogTitle>
+            </AlertDialogHeader>
+            <TextInput
+              className="mb-5 mt-5 rounded-xl border border-primary  bg-white p-1 text-center"
+              value={gTitleEdit}
+              onChangeText={setGTitleEdit}
+              placeholder="Goal Title"></TextInput>
+            <TextInput
+              value={gDescEdit}
+              onChangeText={setGDescEdit}
+              multiline
+              scrollEnabled={false}
+              className="w-100 mb-5 h-64 rounded-xl border border-primary bg-white p-2 text-center"
+              placeholder="Goal Description"></TextInput>
+            <AlertDialogFooter className="mt-5 flex-row justify-center text-white">
+              <AlertDialogCancel variant="destructive" className="mr-5 border border-white">
+                <Text className="text-white">Cancel</Text>
+              </AlertDialogCancel>
+              <AlertDialogAction
+                variant="default"
+                className="mt-2 border border-primary"
+                onPress={()=>{editGoals(goal._id)}}>
+                <Text className="text-white">Confirm</Text>
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </View>
+      </AlertDialog>
               <Button
                 size="icon"
                 onPress={() => {
@@ -288,15 +325,27 @@ function Goals({ api, scrollDate }: { api: string; scrollDate: string }) {
                 variant="ghost">
                 <SquarePen size={18} />
               </Button>
-              <Button
-                onPress={() => {
-                  deleteGoals(goal._id);
-                }}
-                size="icon"
-                className="rounded-full "
-                variant="ghost">
-                <LucideCircleX size={20} color={'red'} />
-              </Button>
+              {/* Edit Goal */}
+              <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                          <Button size="icon" className="rounded-full " variant="ghost">
+                            <LucideCircleX size={20} color={'red'} />
+                          </Button>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent className="!w-[90%] bg-white">
+                          <AlertDialogHeader>
+                            <AlertDialogTitle>Delete Objective?</AlertDialogTitle>
+                          </AlertDialogHeader>
+                          <AlertDescription>
+                            Are you sure that you want to delete this objective
+                          </AlertDescription>
+                          <AlertDialogFooter className="flex-row">
+                            <AlertDialogCancel>Cancel</AlertDialogCancel>
+                            <AlertDialogAction onPress={()=>{deleteGoals(goal._id)}}>Delete</AlertDialogAction>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
+              
 
               {/*Checkbox View*/}
 
