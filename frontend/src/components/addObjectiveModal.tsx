@@ -34,8 +34,9 @@ function AddObjectiveModal({
   const objectiveMonth = date.getMonth() + 1;
   const [userToken, setUserToken] = useState<any>(null);
   const [userInfo, setUserInfo] = useState<any>(null);
-  const [objectives, setObjectives] = useState([]);
   const [buttonEnabled, setButtonEnabled] = useState(false);
+  const [, forceRender] = useState(0);
+
   useEffect(() => {
     const fetchData = async () => {
       const token = await SecureStore.getItemAsync('token');
@@ -47,10 +48,7 @@ function AddObjectiveModal({
     console.log(userInfo);
   }, []);
 
-  useEffect(() => {
-    getObjectives();
-    console.log(objectives);
-  }, [userInfo, userToken]);
+
   //--------- API Calls --------
 
   //Function to add objective
@@ -88,7 +86,9 @@ function AddObjectiveModal({
         setObjectiveDescription('');
         setObjectiveProgress('');
         setObjectiveGoalNumber('');
-        getObjectives();
+        forceRender(n => n + 1);
+        changeVisbility(false)
+
       } else {
         console.log(response.status, data.message);
       }
@@ -96,34 +96,7 @@ function AddObjectiveModal({
       console.log('Frontend error', error);
     }
   };
-  //Funcion to edit objective
-
-  //Function to get objectives
-  const getObjectives = async () => {
-    if (!userToken || !userInfo) return;
-    console.log('Show');
-    console.log('API', `${api}objectives?currMonth=${objectiveMonth}`);
-
-    try {
-      const response = await fetch(`${api}objectives?currMonth=${objectiveMonth}`, {
-        headers: { Authtoken: userToken, userid: userInfo._id },
-        method: 'GET',
-      });
-      const data = await response.json();
-      if (response.status == 200) {
-        console.log('Success getting objectives');
-        console.log(data.objectives);
-        setObjectives(data.objectives);
-        setUserObjectives(data.objectives);
-      } else {
-        console.log(response.status, '  ', data.message);
-      }
-    } catch (error) {
-      console.log('Client Error', error);
-    }
-  };
-
-  //Function to delete objective
+  
 
   return (
     <AlertDialog open={visbility}>
@@ -157,7 +130,7 @@ function AddObjectiveModal({
               placeholder="Objective Progress"></TextInput>
             <View className="absolute right-2 top-2">
               <Button
-                onPress={() => {}}
+                onPress={() => { }}
                 size="icon"
                 variant="default"
                 className="h-4 w-4 rounded-full bg-slate-500 text-white">

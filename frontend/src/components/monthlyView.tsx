@@ -18,6 +18,9 @@ import {
   AlertDialogTrigger,
 } from 'components/ui';
 import * as Progress from 'react-native-progress';
+import * as SecureStore from 'expo-secure-store';
+import { useNavigation } from '@react-navigation/native';
+
 
 function MonthlyView({ markedDates, api }: { markedDates: {}; api: string }) {
   console.log(api);
@@ -30,8 +33,26 @@ function MonthlyView({ markedDates, api }: { markedDates: {}; api: string }) {
   const [selected, setSelected] = useState(false);
   const [myVar, setmyVar] = useState(false);
   const [addMark, setAddMark] = useState(false);
+  const objectiveMonth = selectedDate.getMonth() + 1;
+
+  const [objectives, setObjectives] = useState([]);
+
   const [userObjectives, setUserObjectives] = useState([]);
   const calendarRef = useRef<any>(null);
+  const [, forceRender] = useState(0);
+  const [userToken, setUserToken] = useState<any>(null);
+  const [userInfo, setUserInfo] = useState<any>(null);
+  const navigator = useNavigation();
+  useEffect(() => {
+    const fetchData = async () => {
+      const token = await SecureStore.getItemAsync('token');
+      setUserToken(token ? token : '');
+      const user = await SecureStore.getItemAsync('userInfo');
+      setUserInfo(user ? JSON.parse(user) : null);
+    };
+    fetchData();
+    console.log(userInfo);
+  }, []);
   useEffect(() => {
     console.log(userObjectives);
   }, [userObjectives]);
@@ -86,16 +107,81 @@ function MonthlyView({ markedDates, api }: { markedDates: {}; api: string }) {
     );
   };
   //----------- API CALL ---------------
-  const editDates = async (OID) => {
+  const getObjectives = async () => {
+    if (!userToken || !userInfo) return;
+    console.log('Show');
+    console.log('API', `${api}objectives?currMonth=${objectiveMonth}`);
+
     try {
-    } catch (error) {}
+      const response = await fetch(`${api}objectives?currMonth=${objectiveMonth}`, {
+        headers: { Authtoken: userToken, userid: userInfo._id },
+        method: 'GET',
+      });
+      const data = await response.json();
+      if (response.status == 200) {
+        console.log('Success getting objectives');
+        console.log(data.objectives);
+        setObjectives(data.objectives);
+        setUserObjectives(data.objectives);
+      } else {
+        console.log(response.status, '  ', data.message);
+      }
+    } catch (error) {
+      console.log('Client Error', error);
+    }
   };
+  useEffect(()=>{
+    getObjectives()
+  }, [])
+//Funcion to edit objective
+  const editObjective = async (OID: Number) => {
+    const payload: any = {};
+
+    try {
+      if (!objectiveTitle) {
+        console.log('Missing objective title');
+      }
+      payload.objectiveTitle = objectiveTitle;
+      payload.objectiveMonth = objectiveMonth;
+      if (objectiveDescription) {
+        payload.objectiveDescription = objectiveDescription;
+      }
+      if (objectiveProgress) {
+        payload.objectiveProgress = objectiveProgress;
+      }
+      if (objectiveGoalNumber) {
+        payload.objectiveGoalNumber = objectiveGoalNumber;
+      }
+      const response = await fetch(api + "objectives", { headers: { Authtoken: userToken, userid: userInfo._id }, method: "PATCH", body: JSON.stringify(payload) })
+      const data = await response.json()
+      if (response.status == 200) {
+        console.log("Objective sucessfully edited"); forceRender(n => n + 1);
+      } else { console.log("Error editing objective: ", data.message) }
+
+    } catch (error) {
+      console.log("Client Error: " + error)
+    }
+  };
+
+  //Function to delete objective
+  const deleteObjectives = async (id: Number) => {
+    const response = await fetch(api + "objectives", { headers: { Authtoken: userToken, userid: userInfo._id }, method: "DELETE", body: JSON.stringify({ "objectiveID": id }) }
+    )
+    const data = await response.json()
+    if (response.status == 200) {
+      console.log("Sucess deleting objective")
+      forceRender(n => n + 1);
+
+    } else {
+      console.log("Server Error: " + data.message)
+    }
+  }
   return (
     <View className="flex">
       <View>
         {/*Modal for the DateTimePicker in Calendar Header */}
 
-        <Modal transparent={true} visible={myVar} onBlur={() => {}}>
+        <Modal transparent={true} visible={myVar} onBlur={() => { }}>
           <Pressable
             className="top-40 h-16 flex-1 items-center "
             onPress={() => {
@@ -208,6 +294,10 @@ function MonthlyView({ markedDates, api }: { markedDates: {}; api: string }) {
 
                             console.log('Finna set', objective.title);
                           } else {
+                            setObjectiveTitle("");
+                            setObjectiveDescription("");
+                            setObjectiveProgress("");
+                            setObjectiveGoalNumber("");
                           }
                         }}>
                         <AlertDialogTrigger asChild>
@@ -238,7 +328,7 @@ function MonthlyView({ markedDates, api }: { markedDates: {}; api: string }) {
                                 placeholder="Objective Progress"></TextInput>
                               <View className="absolute right-2 top-2">
                                 <Button
-                                  onPress={() => {}}
+                                  onPress={() => { }}
                                   size="icon"
                                   variant="default"
                                   className="h-4 w-4 rounded-full bg-slate-500 text-white">
@@ -254,7 +344,7 @@ function MonthlyView({ markedDates, api }: { markedDates: {}; api: string }) {
                                 placeholder="Objective Goal"></TextInput>
                               <View className="absolute right-2 top-2">
                                 <Button
-                                  onPress={() => {}}
+                                  onPress={() => { }}
                                   size="icon"
                                   variant="default"
                                   className="h-4 w-4 rounded-full bg-slate-500 text-white">
@@ -265,7 +355,7 @@ function MonthlyView({ markedDates, api }: { markedDates: {}; api: string }) {
                           </AlertDescription>
                           <AlertDialogFooter className="flex-row">
                             <AlertDialogCancel>Cancel</AlertDialogCancel>
-                            <AlertDialogAction>Submit Changes</AlertDialogAction>
+                            <AlertDialogAction onPress={()=>{editObjective(objective._id)}}>Submit Changes</AlertDialogAction>
                           </AlertDialogFooter>
                         </AlertDialogContent>
                       </AlertDialog>
@@ -286,7 +376,7 @@ function MonthlyView({ markedDates, api }: { markedDates: {}; api: string }) {
                           </AlertDescription>
                           <AlertDialogFooter className="flex-row">
                             <AlertDialogCancel>Cancel</AlertDialogCancel>
-                            <AlertDialogAction>Delete</AlertDialogAction>
+                            <AlertDialogAction onPress={()=>{deleteObjectives(objective._id)}}>Delete</AlertDialogAction>
                           </AlertDialogFooter>
                         </AlertDialogContent>
                       </AlertDialog>
