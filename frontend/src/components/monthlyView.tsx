@@ -132,7 +132,7 @@ function MonthlyView({ markedDates, api }: { markedDates: {}; api: string }) {
   };
   useEffect(()=>{
     getObjectives()
-  }, [])
+  }, [objectiveMonth, userToken, userInfo])
 //Funcion to edit objective
   const editObjective = async (OID: Number) => {
     const payload: any = {};
@@ -152,7 +152,7 @@ function MonthlyView({ markedDates, api }: { markedDates: {}; api: string }) {
       if (objectiveGoalNumber) {
         payload.objectiveGoalNumber = objectiveGoalNumber;
       }
-      const response = await fetch(api + "objectives", { headers: { Authtoken: userToken, userid: userInfo._id }, method: "PATCH", body: JSON.stringify(payload) })
+      const response = await fetch(api + 'objectives/' + OID , { headers: { Authtoken: userToken, userid: userInfo._id,'Content-Type': 'application/json' }, method: "PATCH", body: JSON.stringify(payload) })
       const data = await response.json()
       if (response.status == 200) {
         console.log("Objective sucessfully edited"); forceRender(n => n + 1);
@@ -165,7 +165,7 @@ function MonthlyView({ markedDates, api }: { markedDates: {}; api: string }) {
 
   //Function to delete objective
   const deleteObjectives = async (id: Number) => {
-    const response = await fetch(api + "objectives", { headers: { Authtoken: userToken, userid: userInfo._id }, method: "DELETE", body: JSON.stringify({ "objectiveID": id }) }
+    const response = await fetch(api + 'objectives/' + id, { headers: { Authtoken: userToken, userid: userInfo._id }, method: "DELETE", body: JSON.stringify({ "objectiveID": id }) }
     )
     const data = await response.json()
     if (response.status == 200) {

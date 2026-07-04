@@ -55,8 +55,8 @@ export const editObjective = async (req, res) => {
       objectiveGoalNumber,
       objectiveMonth,
     } = req.body;
-    const currObjective = await Objectives.findbyId(objectiveID);
-    const updatedObjective = await Objectives.findbyIdandUpdate(
+    const currObjective = await Objectives.findById(objectiveID);
+    const updatedObjective = await Objectives.findByIdAndUpdate(
       objectiveID,
       {
         title: objectiveTitle || currObjective.title,
@@ -79,7 +79,7 @@ export const editObjective = async (req, res) => {
 export const deleteObjective = async (req, res) => {
   try {
     const { objectiveID } = req.params;
-    await Objectives.findbyIdandDelete(objectiveID);
+    await Objectives.findByIdAndDelete(objectiveID);
     return res.status(200).json({ message: "Objective sucessfully deleted" });
   } catch (error) {
     return res.status(400).json({ message: error });

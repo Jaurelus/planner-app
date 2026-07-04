@@ -11,7 +11,7 @@ import {
 const router = express.Router();
 router.post("/", validateToken, addObjective);
 router.get("/", validateToken, getObjectives);
-router.patch("/", validateToken, editObjective);
-router.delete("/", validateToken, deleteObjective);
+router.patch("/:objectiveID", validateToken, editObjective);
+router.delete("/:objectiveID", validateToken, deleteObjective);
 
 export default router;
