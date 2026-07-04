@@ -19,7 +19,7 @@ function Personal({ route }: PersonalProps) {
 
       {
         <View className="w-full items-center">
-          <UserCard></UserCard>
+          <UserCard api={api}></UserCard>
         </View>
       }
       <View className="mt-12">
