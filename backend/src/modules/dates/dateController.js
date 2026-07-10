@@ -54,7 +54,8 @@ export const addNewDate = async (req, res) => {
 export const getDates = async (req, res) => {
   try {
     const { userid } = req.headers;
-    const { searchColor } = req.params;
+    // optional filter -> query string (?searchColor=...), params only works with a /:placeholder route
+    const { searchColor } = req.query;
     let userDates;
     if (searchColor) {
       userDates = await MarkedDate.find({
@@ -78,20 +79,62 @@ export const deleteDate = async (req, res) => {
   //
   try {
     const { dateID } = req.params;
-    await Objectives.findByIdAndDelete(dateID);
-    return res.status(200).json({ message: "Objective successfully added" });
+    await MarkedDate.findByIdAndDelete(dateID);
+    return res.status(200).json({ message: "Date successfully deleted" });
   } catch (error) {
     return res.status(400).json({ message: "Error" + error });
   }
 };
 
-const editDate = async (req, res) => {
+export const editDate = async (req, res) => {
   try {
     const { dateID } = req.params;
-
-    const updatedObjective = Objectives.findByIdAndUpdate(dateID, {});
+    const { dateName, dateRule, dateCategory } = req.body;
+    const date = await MarkedDate.findById(dateID);
+    const updatedDate = await MarkedDate.findByIdAndUpdate(
+      dateID,
+      {
+        name: dateName || date.name,
+        rule: dateRule || date.rule,
+        category: {
+          type: dateCategory?.type || date.category.type,
+          color: dateCategory?.color || date.category.color,
+        },
+      },
+      { new: true },
+    );
+    return res
+      .status(200)
+      .json({ message: "Date sucessfully edited", date: updatedDate });
   } catch (error) {
-    return res.status(400).json({ message: "Error editing this date" });
+    return res.status(400).json({ message: "Error editing this date" + error });
   }
   //
+};
+
+export const getCategories = async (req, res) => {
+  try {
+    // frontend sends ?color=... -> that lands in req.query, never req.params
+
+    const { color } = req.query;
+    const { userid } = req.headers;
+    let categories;
+    if (!color) {
+      categories = await MarkedDate.distinct("category", {
+        userID: userid,
+      });
+    } else {
+      categories = await MarkedDate.find(
+        { userID: userid, "category.color": color },
+        { category: 1 },
+      );
+    }
+
+    return res.status(200).json({
+      categories: categories,
+      message: "Categories successfully retrieved",
+    });
+  } catch (error) {
+    return res.status(400).json({ message: "Error" + error });
+  }
 };

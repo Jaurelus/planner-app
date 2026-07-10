@@ -6,7 +6,7 @@ const DateModel = mongoose.Schema({
   name: { type: String, required: true },
   rule: { type: String, default: "" },
   category: {
-    type: { type: String, default: "" },
+    type: { type: String, default: "Uncategorized" },
     color: { type: String, default: "" },
   },
 });
