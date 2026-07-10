@@ -1,6 +1,5 @@
 import { View, Text, Image } from 'react-native';
-import Navbar from '../components/ui/Navbar';
-import Button from 'components/ui/button';
+import Navbar from '../../components/ui/Navbar';
 import { useNavigation } from '@react-navigation/native';
 
 function HomePage({ navigation }) {
@@ -11,7 +10,7 @@ function HomePage({ navigation }) {
         <Image
           style={{ width: 200, height: 200 }}
           className="h-[200px] w-[200px]"
-          source={require('../../assets/transparent-logo.png')}></Image>
+          source={require('../../../assets/transparent-logo.png')}></Image>
         <Text>{new Date().toDateString()} Reminders</Text>
       </View>
       <View className="flex w-full">

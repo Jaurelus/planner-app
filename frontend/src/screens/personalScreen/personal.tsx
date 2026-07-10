@@ -1,6 +1,6 @@
-import SettingsCard from '@/components/settings';
-import SignoutCard from '@/components/signoutCard';
-import UserCard from '@/components/usercard';
+import SettingsCard from '@/screens/personalScreen/settings';
+import SignoutCard from '@/screens/personalScreen/signoutCard';
+import UserCard from '@/screens/personalScreen/usercard';
 import { useSafeAreaEnv } from 'nativewind';
 import { useEffect, useState } from 'react';
 import { View, Text, Platform } from 'react-native';
@@ -9,7 +9,7 @@ interface PersonalProps {
   route: any;
 }
 function Personal({ route }: PersonalProps) {
-    const { api, onChange } = route.params;
+  const { api, onChange } = route.params;
 
   //-------- App Build---------
 
@@ -26,7 +26,12 @@ function Personal({ route }: PersonalProps) {
         <SettingsCard></SettingsCard>
       </View>
       <View>
-        <SignoutCard api={api} onLogout={()=>{onChange(false)}}/>
+        <SignoutCard
+          api={api}
+          onLogout={() => {
+            onChange(false);
+          }}
+        />
       </View>
     </View>
   );

@@ -1,6 +1,6 @@
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui';
 import { useNavigation } from '@react-navigation/native';
-import Button from 'components/ui/button';
+import Button from '../../../components/ui/button';
 import { useRef, useState, useEffect } from 'react';
 import { View, Text, TextInput } from 'react-native';
 import { Check } from 'lucide-react-native';

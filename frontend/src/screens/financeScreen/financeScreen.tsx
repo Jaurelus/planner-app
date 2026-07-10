@@ -1,5 +1,5 @@
 import { View, Text } from 'react-native';
-import PlaidLogin from '../components/plaidlogin';
+import PlaidLogin from './plaidlogin';
 
 function FinanceScreen({ route }) {
   const { api } = route.params;

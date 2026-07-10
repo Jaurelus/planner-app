@@ -45,7 +45,7 @@ function LoginScreen({ route }: LoginProps) {
 
   return (
     <View className="flex flex-1 items-center justify-center">
-      <Card className="w-[80%] items-center">
+      <Card className="flex w-[80%] items-center">
         <CardHeader>
           <CardTitle> Log into your account</CardTitle>
         </CardHeader>
@@ -53,7 +53,7 @@ function LoginScreen({ route }: LoginProps) {
           <TextInput
             autoCapitalize="none"
             placeholder="Email"
-            className="rounded-lg border border-primary py-2 text-center"
+            className=" rounded-lg border border-primary py-2 text-center"
             value={enteredEmail}
             onChangeText={setEnteredEmail}
           />
