@@ -42,18 +42,6 @@ function UserCard({ api }: { api: string }) {
   }, [userInfo]);
   //console.log(user.user);
   const [nameFocused, setNameFocused] = useState(false);
-  const hardCodeUser = {
-    __v: 0,
-    _id: '6987c123a2d46cca15f341b2',
-    email: 'jayden12@gmail.com',
-    firstName: 'Jayden',
-    lastName: '',
-    isVerified: true,
-    password: '$2b$10$WF637oLqV3OpR/rnkjWRu.w4ypaV7EJS3uXOMW3L5dFe6rwDZ3UUi',
-    phoneNumber: '5614526777',
-    userGoals: [],
-    userTasks: [],
-  };
 
   //-------- API Calls --------
   const getUser = async () => {
@@ -119,6 +107,10 @@ function UserCard({ api }: { api: string }) {
                     value={editLastName}
                     placeholder="Last Name"
                     onChangeText={setEditLastName}></TextInput>
+                  <TextInput
+                    value={editNumber}
+                    placeholder="Phone Number"
+                    onChangeText={setEditNumber}></TextInput>
                 </View>
                 <AlertDialogFooter className="flex flex-row items-center justify-center gap-3 py-5">
                   <AlertDialogCancel>Cancel</AlertDialogCancel>
@@ -158,6 +150,9 @@ function UserCard({ api }: { api: string }) {
                 {APIUser.lastName || 'Last Name'}
               </Text>
               <Text className=" flex rounded-lg px-2 text-center">{APIUser.email}</Text>
+              <Text className=" flex rounded-lg px-2 text-center">
+                {APIUser.phoneNumber || 'Phone Number'}
+              </Text>
             </CardContent>
           )}
           {nameFocused && (

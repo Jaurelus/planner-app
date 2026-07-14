@@ -7,8 +7,6 @@ const UserModel = new mongoose.Schema({
   firstName: { type: String, default: "" },
   lastName: { type: String, default: "" },
 
-  isVerified: { type: Boolean, default: false },
-  verficationToken: { type: String },
   //userMarkedDates
 });
 

@@ -37,6 +37,7 @@ export default function App() {
       setUserToken(token ? token : '');
       const user = await SecureStore.getItemAsync('userInfo');
       setUserInfo(user ? JSON.parse(user) : null);
+      if (token) setUser(true);
     };
     fetchData();
   }, []);
@@ -69,12 +70,7 @@ export default function App() {
   };
 
   useEffect(() => {
-    setUserDates([]);
     getMarkedDates();
-    if (!userDates) {
-      return;
-    }
-    mergeDates();
   }, [refreshDates]);
   //--------- API CALLS -------------
 
@@ -118,9 +114,13 @@ export default function App() {
           return acc;
         }, {});
         setFormattedHolidays(reducedHolidays);
-      } else console.log(String(response.status));
+      } else {
+        console.log(String(response.status));
+        setFormattedHolidays({});
+      }
     } catch (error) {
       console.log(error);
+      setFormattedHolidays({});
     }
   };
 
