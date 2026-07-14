@@ -11,7 +11,7 @@ function ColorSelector({
 }: {
   api: string;
   currentCategory?: Record<string, any>;
-  setUpdatedCategory: React.Dispatch<React.SetStateAction<any>>;
+  setUpdatedCategory?: React.Dispatch<React.SetStateAction<any>>;
 }) {
   const [userToken, setUserToken] = useState('');
   const [userInfo, setUserInfo] = useState<any>(null);
@@ -20,9 +20,7 @@ function ColorSelector({
     currentCategory ? currentCategory.type : 'Category'
   );
   const [visible, setVisible] = useState(false);
-  useEffect(() => {
-    console.log('Category, ', currentCategory);
-  }, [currentCategory]);
+
   useEffect(() => {
     const fetchData = async () => {
       const token = await SecureStore.getItemAsync('token');
@@ -39,6 +37,7 @@ function ColorSelector({
 
   const getColors = async (color?) => {
     if (!userInfo || !userToken) return;
+    console.log('pre response');
     const response = await fetch(
       !color ? api + 'dates/categories' : api + `dates/categories?color=${color}`,
       {
@@ -75,7 +74,7 @@ function ColorSelector({
                   onPress={() => {
                     setSelectedValue(value.type);
                     setVisible(false);
-                    setUpdatedCategory(value.type);
+                    setUpdatedCategory?.(value.type);
                   }}>
                   <View className="flex flex-1 flex-row justify-between">
                     <Text>{value.type}</Text>
