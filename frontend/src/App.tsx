@@ -2,13 +2,13 @@ import { View, useColorScheme } from 'react-native';
 import './global.css';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import HomePage from '@/screens/home';
-import Personal from '@/screens/personal';
-import Daily from '@/screens/today';
-import CalendarScreen from '@/screens/calendarScreen';
-import LoginScreen from './screens/loginScreen';
-import RegisterScreen from './screens/registerScreen';
-import FinanceScreen from './screens/financeScreen';
+import HomePage from '@/screens/homeScreen/home';
+import Personal from '@/screens/personalScreen/personal';
+import Daily from '@/screens/todayScreen/today';
+import CalendarScreen from '@/screens/calendarScreen/calendarScreen';
+import LoginScreen from './screens/loginScreen/loginScreen';
+import RegisterScreen from './screens/registerScreen/registerScreen';
+import FinanceScreen from './screens/financeScreen/financeScreen';
 
 import { useState, useEffect } from 'react';
 import * as Device from 'expo-device';
@@ -24,6 +24,7 @@ export default function App() {
   const [userDates, setUserDates] = useState<[]>();
   const [formattedHolidays, setFormattedHolidays] = useState<Record<string, any>>();
   const [mergedDates, setmergedDates] = useState<{}>({});
+  const [refreshDates, setRefreshDates] = useState(false);
 
   //If system is is a simulator, then set the API URL to :
 
@@ -67,6 +68,14 @@ export default function App() {
     setmergedDates(merged);
   };
 
+  useEffect(() => {
+    setUserDates([]);
+    getMarkedDates();
+    if (!userDates) {
+      return;
+    }
+    mergeDates();
+  }, [refreshDates]);
   //--------- API CALLS -------------
 
   //Function to get all marked dates
@@ -164,19 +173,24 @@ export default function App() {
                   initialParams={{
                     api: API_URL,
                     dates: mergedDates,
+                    refreshDates: setRefreshDates,
                   }}
                 />
               )}
               <Stack.Screen
                 name="Personal"
                 component={Personal}
-                initialParams={{ api: API_URL, dates: mergedDates, onChange: setUser }}
+                initialParams={{ api: API_URL, onChange: setUser }}
               />
               {mergedDates && (
                 <Stack.Screen
                   name="Today"
                   component={Daily}
-                  initialParams={{ api: API_URL, dates: mergedDates }}
+                  initialParams={{
+                    api: API_URL,
+                    dates: mergedDates,
+                    refreshDates: setRefreshDates,
+                  }}
                 />
               )}
               {mergedDates && (

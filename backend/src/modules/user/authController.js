@@ -6,60 +6,7 @@ const apiKey = process.env.TWILIO_API_KEY;
 const sid = process.env.TWILIO_SID;
 const sKey = process.env.MY_SECRET_KEY;
 
-import twilio from "twilio";
-const client = twilio(sid, apiKey);
-
 /* This function takes an accounts email adress as a paramter and sends a html message to validate */
-export const sendVerification = async (req, res) => {
-  try {
-    const { userEmail, userPhoneNumber } = req.body;
-    const verficationCode = Math.random().toString().slice(3, 9);
-    if (!userPhoneNumber) {
-      //Send email
-      return res.status(200).json({ message: "Email sent" });
-    } else {
-      //Send to number
-      const vMessage = client.verify.v2
-        .services("VA3e65986353629354e3899002ab05605e")
-        .verifications.create({
-          to: "+15614526777",
-          channel: "sms",
-        });
-      return res.status(200).json({ message: "Message sent" });
-    }
-  } catch (error) {
-    return res.status(400).json({ message: error });
-  }
-};
-
-export const validateUser = async (req, res) => {
-  try {
-    const { uCode, email, number } = req.body;
-    const { id } = req.params;
-    if (number) {
-      const verStat = await client.verify.v2
-        .services("VA3e65986353629354e3899002ab05605e")
-        .verificationChecks.create({
-          code: uCode,
-          to: /*number.padStart(12, "+1")*/ "+15614526777",
-        });
-
-      if (verStat.status == "approved") {
-        const updatedUser = await User.findByIdAndUpdate(
-          id,
-          { isVerified: true },
-          { new: true },
-        );
-        //login
-        return res
-          .status(200)
-          .json({ message: "User verified", user: updatedUser });
-      } else return res.status(401).json({ message: "Incorrect code" });
-    }
-  } catch (error) {
-    return res.status(400).json({ message: "Error back " + error });
-  }
-};
 
 export const registerUser = async (req, res) => {
   try {
@@ -167,7 +114,7 @@ export const editUser = async (req, res) => {
 export const getUser = async (req, res) => {
   try {
     const { userid } = req.headers;
-    const user = User.findById(userid);
+    const user = await User.findById(userid);
     return res
       .status(200)
       .json({ message: "Success getting user", user: user });

@@ -3,8 +3,10 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '../../comp
 import { Text, View } from 'react-native';
 import { useState } from 'react';
 import ColorSelector from '@/components/colorSelector';
+import { Power, PowerOff } from 'lucide-react-native';
 function SettingsCard({ api }: { api: string }) {
   const [categoryChanger, setCategoryChanger] = useState(false);
+  const [notisON, setNotisOn] = useState(false);
   return (
     <Card className="w-[75%]">
       <CardHeader>
@@ -19,9 +21,19 @@ function SettingsCard({ api }: { api: string }) {
           <Text>Notifications</Text>
           <Button
             onPress={() => {
-              setCategoryChanger(true);
+              setNotisOn((prev) => !prev);
             }}>
-            ...
+            {notisON ? (
+              <View className="flex-row items-center gap-3 ">
+                <Text className="text-white">OFF</Text>
+                <PowerOff color={'white'} />
+              </View>
+            ) : (
+              <View className="flex-row items-center gap-3 ">
+                <Text className="text-white">ON</Text>
+                <Power color={'white'} />
+              </View>
+            )}
           </Button>
         </View>
       </CardContent>
