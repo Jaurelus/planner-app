@@ -4,7 +4,6 @@ import Button from '../../../components/ui/button';
 import { useRef, useState, useEffect } from 'react';
 import { View, Text, TextInput } from 'react-native';
 import { Check } from 'lucide-react-native';
-import VerificationModal from '@/components/verificationModal';
 
 interface RegisterProps {
   route: any;
@@ -27,7 +26,6 @@ function RegisterScreen({ route, userG, setUserG }: RegisterProps) {
   const [initialERender, setInitialERender] = useState(true);
   const [initialPWRender, setInitialPWRender] = useState(true);
   const [initialPWCRender, setInitialPWCRender] = useState(true);
-  const [showVerification, setShowVerification] = useState(false);
   const [user, setUser] = useState({});
   console.log(user, 'j');
   //Handle valid and invlaid input from email box
@@ -117,7 +115,6 @@ function RegisterScreen({ route, userG, setUserG }: RegisterProps) {
         setConfirmPW('');
         setPWCheck(false);
         setValidEmail(false);
-        setShowVerification(true);
       }
       if (response.status == 400) {
         console.log('Error', data.message);
@@ -131,11 +128,6 @@ function RegisterScreen({ route, userG, setUserG }: RegisterProps) {
 
   return (
     <View className=" flex flex-1 items-center justify-center">
-      <VerificationModal
-        isVisible={showVerification}
-        user={user}
-        onUserUpdate={setUser}
-        api={api}></VerificationModal>
       <Card className="w-[80%] items-center">
         <CardHeader>
           <CardTitle>Sign Up </CardTitle>

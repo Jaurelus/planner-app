@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Card, CardDescription } from '@/components/ui/card';
+import { Card, CardContent, CardDescription } from '@/components/ui/card';
 import Button from '@/../components/ui/button';
 import * as SecureStore from 'expo-secure-store';
 import { useNavigation } from '@react-navigation/native';
@@ -37,16 +37,16 @@ function SignoutCard({ api, onLogout }: { api: string; onLogout: () => void }) {
     navigator.navigate('Login');
   };
   return (
-    <Card>
-      <CardDescription>
+    <Card className="mb-4 flex w-[75%] p-1">
+      <CardContent>
         <Button
           variant="ghost"
           onPress={() => {
             logoutUser();
           }}>
-          <Text className="color-red-600">Sign Out</Text>
+          <Text style={{ color: '#ef4444' }}>Sign Out</Text>
         </Button>
-      </CardDescription>
+      </CardContent>
     </Card>
   );
 }

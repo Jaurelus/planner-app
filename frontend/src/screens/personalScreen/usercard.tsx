@@ -67,7 +67,7 @@ function UserCard({ api }: { api: string }) {
       console.log('user retrieved');
       setAPIUser(data.user);
     } else {
-      console.log('Server Error:', data.message);
+      console.log('Server Error getting user:', data.message);
     }
   };
   const editUser = async (userID: Number) => {
@@ -96,14 +96,14 @@ function UserCard({ api }: { api: string }) {
   };
   //-------- APP BUILD -----------
   return (
-    <Card className="relative w-[75%] p-0 pb-5">
+    <Card className="relative w-[75%] pb-3 ">
       {userInfo != null && (
         <View>
           <View className="absolute right-2 top-2">
             <AlertDialog>
               <AlertDialogTrigger asChild={true}>
-                <Button variant="outline" className="flex h-8 w-8 rounded-3xl" onPress={() => {}}>
-                  <SquarePen size={16} className="flex" color={'black'} />
+                <Button className=" h-24 w-24 rounded-lg p-1" onPress={() => {}}>
+                  <SquarePen size={20} className="flex" color={'white'} />
                 </Button>
               </AlertDialogTrigger>
               <AlertDialogContent className="flex !w-[90%] items-center justify-center gap-3 bg-white">
@@ -119,16 +119,14 @@ function UserCard({ api }: { api: string }) {
                     value={editLastName}
                     placeholder="Last Name"
                     onChangeText={setEditLastName}></TextInput>
-                  <TextInput
-                    value={editNumber}
-                    placeholder="Phone Number"
-                    onChangeText={setEditNumber}></TextInput>
                 </View>
                 <AlertDialogFooter className="flex flex-row items-center justify-center gap-3 py-5">
                   <AlertDialogCancel>Cancel</AlertDialogCancel>
                   <AlertDialogAction
-                    onPress={() => {
-                      editUser(userInfo._id);
+                    onPress={async () => {
+                      await editUser(userInfo._id);
+                      let tmpUsr = await getUser();
+                      await SecureStore.setItemAsync('userInfo', JSON.stringify(tmpUsr));
                     }}>
                     Confirm
                   </AlertDialogAction>
@@ -138,11 +136,12 @@ function UserCard({ api }: { api: string }) {
           </View>
           <CardHeader className=" ml-5 mr-5 mt-5 flex-col justify-between">
             <View className="mt-3 flex flex-row justify-between">
-              <Circle className=" " fill={'#754ABF'} size={64} color={'#754ABF'}>
-                <Text className="mt-6 text-center text-xl font-bold color-white">
+              <View className="flex h-10 w-10 items-center justify-center rounded-full bg-secondary">
+                <Text className="text-center text-xl font-bold color-white">
                   {userInfo.firstName ? userInfo.firstName.slice(0, 1) : 'U'}
                 </Text>
-              </Circle>
+              </View>
+
               <CardTitle className="mt-6 text-lg">{userInfo.firstName}</CardTitle>
             </View>
           </CardHeader>
@@ -159,15 +158,6 @@ function UserCard({ api }: { api: string }) {
                 {APIUser.lastName || 'Last Name'}
               </Text>
               <Text className=" flex rounded-lg px-2 text-center">{APIUser.email}</Text>
-              <Text className=" flex rounded-lg px-2 text-center">
-                {APIUser.phoneNumber || 'Phone Number'}
-              </Text>
-              {hardCodeUser.isVerified && (
-                <View className="mr-5 flex-row justify-center">
-                  <BadgeCheck fill={'green'} color={'white'}></BadgeCheck>
-                  <Text className="mt-1 text-center"> Account verified</Text>
-                </View>
-              )}
             </CardContent>
           )}
           {nameFocused && (

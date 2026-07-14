@@ -14,18 +14,14 @@ function Personal({ route }: PersonalProps) {
   //-------- App Build---------
 
   return (
-    <View className="flex items-center gap-5">
-      <Text>Personal</Text>
-
-      {
-        <View className="w-full items-center">
-          <UserCard api={api}></UserCard>
-        </View>
-      }
-      <View className="mt-12">
+    <View className="flex flex-1 items-center justify-between py-5">
+      <View className=" flex w-full items-center">
+        <UserCard api={api}></UserCard>
+      </View>
+      <View className="flex">
         <SettingsCard></SettingsCard>
       </View>
-      <View>
+      <View className="mb-5 flex">
         <SignoutCard
           api={api}
           onLogout={() => {
