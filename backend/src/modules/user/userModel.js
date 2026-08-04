@@ -6,6 +6,7 @@ const UserModel = new mongoose.Schema({
   password: { type: String, required: true },
   firstName: { type: String, default: "" },
   lastName: { type: String, default: "" },
+  pushToken: { type: String },
 
   //userMarkedDates
 });

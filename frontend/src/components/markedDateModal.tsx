@@ -123,10 +123,13 @@ function MarkedDateModal({
     <Modal transparent={true} visible={visible}>
       {!existingMarkedDate ? (
         <Card className="mb-auto ml-auto mr-auto mt-auto w-[75%] items-center justify-center">
-          <CardHeader>
-            <CardTitle>{'Add Marked Date?'}</CardTitle>
-            <Text className="text-center">{date.slice(0, 10)}</Text>
-          </CardHeader>
+          <View className="flex flex-1 bg-[#A77ED6]">
+            <CardHeader>
+              <CardTitle>{'Add Marked Date?'}</CardTitle>
+              <Text className="text-center">{date.slice(0, 10)}</Text>
+            </CardHeader>
+          </View>
+
           <CardContent className="w-full items-center gap-3 ">
             <TextInput
               className=" w-3/4 rounded-lg border border-primary p-1 text-center"

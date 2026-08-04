@@ -66,28 +66,21 @@ export const loginUser = async (req, res) => {
 
 //Function to update uesr info
 export const editUser = async (req, res) => {
-  const payload = {};
   try {
     const { id } = req.params;
 
     console.log(req.body);
-    const { userFirst, userLast, userPassword, phone } = req.body;
+    const { userFirst, userLast, userPassword, phone, userNotiToken } =
+      req.body;
     console.log(phone);
 
-    if (!userFirst && !userLast && !userPassword && !phone) {
+    if (!userFirst && !userLast && !userPassword && !phone && !userNotiToken) {
       return res.status(400).json({ message: "Nothing to update" });
     }
     console.log("Exit");
 
     if (userPassword) {
-      payload.password = bcrypt.hash(userPassword);
-    } else if (userFirst) {
-      payload.firstName = userFirst;
-    } else if (userLast) {
-      payload.lastName = userLast;
-    } else if (phone) {
-      payload.phoneNumber = phone;
-      console.log("Selected");
+      let newpassHash = bcrypt.hash(userPassword);
     }
 
     const currUser = await User.findById(id);
@@ -98,6 +91,8 @@ export const editUser = async (req, res) => {
         firstName: userFirst || currUser.firstName,
         lastName: userLast || currUser.lastName,
         phoneNumber: phone || currUser.phoneNumber,
+        pushToken: userNotiToken || currUser.pushToken,
+        password: newpassHash || currUser.password,
       },
       { new: true },
     );

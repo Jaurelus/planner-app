@@ -4,7 +4,8 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 import { use, useEffect, useRef, useState } from 'react';
 import Button from '@/components/ui/button';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '../../components/ui/card';
-import AddObjectiveModal from '../../components/addObjectiveModal';
+import AddModal from '@/components/AddModal';
+import EditModal from '@/components/EditModal';
 import { SquarePen, LucideCircleX, CircleQuestionMark } from 'lucide-react-native';
 import {
   AlertDescription,
@@ -21,6 +22,7 @@ import * as Progress from 'react-native-progress';
 import * as SecureStore from 'expo-secure-store';
 import { useNavigation } from '@react-navigation/native';
 import MarkedDateModal from '@/components/markedDateModal';
+import DeleteModal from '@/components/DeleteModal';
 
 function MonthlyView({
   markedDates,
@@ -54,6 +56,7 @@ function MonthlyView({
   const [longDate, setLongDate] = useState<Date>();
 
   const [modalVisible, setModalVisible] = useState(false);
+  const [deleteVisibility, setDeleteVisibility] = useState(false);
   const navigator = useNavigation();
   useEffect(() => {
     const fetchData = async () => {
@@ -75,6 +78,14 @@ function MonthlyView({
   const [objectiveDescription, setObjectiveDescription] = useState('');
   const [objectiveProgress, setObjectiveProgress] = useState('');
   const [objectiveGoalNumber, setObjectiveGoalNumber] = useState('');
+
+  // Shared form state for AddModal / EditModal. Keys match the backend payload.
+  const [form, setForm] = useState<Record<string, any>>({});
+  const handleChange = (key: string, value: any) =>
+    setForm((prev) => ({ ...prev, [key]: value }));
+  // Which objective the edit/delete modals are acting on
+  const [selectedObjective, setSelectedObjective] = useState<any>(null);
+  const [editVisibility, setEditVisibility] = useState(false);
   const colors = ['#D8EED2', '#FEE2C3', '#E1D9FB', 'D0E9FA'];
 
   let max = new Date();
@@ -150,34 +161,46 @@ function MonthlyView({
   useEffect(() => {
     getObjectives();
   }, [objectiveMonth, userToken, userInfo]);
-  //Funcion to edit objective
-  const editObjective = async (OID: Number) => {
-    const payload: any = {};
-
+  //Function to add objective (moved out of addObjectiveModal so this screen
+  //can refresh its own list after a successful save)
+  const addNewObjective = async () => {
+    if (!userToken || !userInfo) return;
     try {
-      if (!objectiveTitle) {
-        console.log('Missing objective title');
+      const payload = { ...form, objectiveMonth };
+      const response = await fetch(api + 'objectives', {
+        headers: { Authtoken: userToken, userid: userInfo._id, 'Content-Type': 'application/json' },
+        method: 'POST',
+        body: JSON.stringify(payload),
+      });
+      const data = await response.json();
+      if (response.status == 201) {
+        setForm({});
+        setVisibility(false);
+        getObjectives();
+      } else {
+        console.log('Error adding objective: ', data.message);
       }
-      payload.objectiveTitle = objectiveTitle;
-      payload.objectiveMonth = objectiveMonth;
-      if (objectiveDescription) {
-        payload.objectiveDescription = objectiveDescription;
-      }
-      if (objectiveProgress) {
-        payload.objectiveProgress = objectiveProgress;
-      }
-      if (objectiveGoalNumber) {
-        payload.objectiveGoalNumber = objectiveGoalNumber;
-      }
-      const response = await fetch(api + 'objectives/' + OID, {
+    } catch (error) {
+      console.log('Client Error: ' + error);
+    }
+  };
+
+  //Funcion to edit objective
+  const editObjective = async () => {
+    if (!userToken || !userInfo || !selectedObjective) return;
+    try {
+      const payload = { ...form, objectiveMonth };
+      const response = await fetch(api + 'objectives/' + selectedObjective._id, {
         headers: { Authtoken: userToken, userid: userInfo._id, 'Content-Type': 'application/json' },
         method: 'PATCH',
         body: JSON.stringify(payload),
       });
       const data = await response.json();
       if (response.status == 200) {
-        console.log('Objective sucessfully edited');
-        forceRender((n) => n + 1);
+        setForm({});
+        setEditVisibility(false);
+        setSelectedObjective(null);
+        getObjectives();
       } else {
         console.log('Error editing objective: ', data.message);
       }
@@ -187,16 +210,17 @@ function MonthlyView({
   };
 
   //Function to delete objective
-  const deleteObjectives = async (id: Number) => {
-    const response = await fetch(api + 'objectives/' + id, {
+  const deleteObjectives = async () => {
+    if (!selectedObjective) return;
+    const response = await fetch(api + 'objectives/' + selectedObjective._id, {
       headers: { Authtoken: userToken, userid: userInfo._id },
       method: 'DELETE',
-      body: JSON.stringify({ objectiveID: id }),
     });
     const data = await response.json();
     if (response.status == 200) {
-      console.log('Sucess deleting objective');
-      forceRender((n) => n + 1);
+      setDeleteVisibility(false);
+      setSelectedObjective(null);
+      getObjectives();
     } else {
       console.log('Server Error: ' + data.message);
     }
@@ -287,133 +311,53 @@ function MonthlyView({
             {userObjectives.map((objective, index) => {
               return (
                 <Card
-                  className="relative flex items-center justify-center"
                   key={objective._id}
                   style={{ backgroundColor: colors[index % colors.length] }}>
-                  <CardHeader>
-                    <CardTitle>{objective.title}</CardTitle>
+                  <CardHeader className="pb-1">
+                    <CardTitle className="text-base">{objective.title}</CardTitle>
                   </CardHeader>
-                  <View className="flex-row">
-                    <CardContent className="w-[70%] justify-center">
-                      <Text className="text-center">{objective.description}</Text>
-                    </CardContent>
-                    <CardFooter className="mt-2 justify-end">
-                      {/* Edit Objective */}
-                      <Progress.Circle
-                        className=" absolute -top-16 left-12"
-                        size={36}
-                        progress={objective.progress / objective.goalNumber}
-                        color="green"
-                        showsText={false}></Progress.Circle>
-
-                      <AlertDialog
-                        onOpenChange={(open) => {
-                          if (open) {
-                            setObjectiveTitle(objective.title);
-                            setObjectiveDescription(objective.description);
-                            setObjectiveProgress(String(objective.progress));
-                            setObjectiveGoalNumber(String(objective.goalNumber));
-
-                            console.log('Finna set', objective.title);
-                          } else {
-                            setObjectiveTitle('');
-                            setObjectiveDescription('');
-                            setObjectiveProgress('');
-                            setObjectiveGoalNumber('');
-                          }
+                  <CardContent className="py-1">
+                    <Text className="text-md text-center-[">{objective.description}</Text>
+                  </CardContent>
+                  <CardFooter className="flex-row items-center justify-between gap-2 pt-1">
+                    <Progress.Circle
+                      size={32}
+                      progress={objective.progress / objective.goalNumber}
+                      color="green"
+                      showsText={false}
+                    />
+                    <View className="flex-row gap-2">
+                      {/* Edit Objective -- opens the single hoisted EditModal */}
+                      <Button
+                        size="icon"
+                        className="rounded-full"
+                        variant="ghost"
+                        onPress={() => {
+                          setSelectedObjective(objective);
+                          setForm({
+                            objectiveTitle: objective.title,
+                            objectiveDescription: objective.description,
+                            objectiveProgress: String(objective.progress),
+                            objectiveGoalNumber: String(objective.goalNumber),
+                          });
+                          setEditVisibility(true);
                         }}>
-                        <AlertDialogTrigger asChild>
-                          <Button size="icon" className="rounded-full " variant="ghost">
-                            <SquarePen size={20} />
-                          </Button>
-                        </AlertDialogTrigger>
-                        <AlertDialogContent className="!w-[90%] bg-white px-2">
-                          <AlertDialogHeader>
-                            <AlertDialogTitle>Edit Objective</AlertDialogTitle>
-                          </AlertDialogHeader>
-                          <AlertDescription>
-                            <TextInput
-                              className=" mt-5 rounded-xl border border-primary  bg-white p-1 text-center"
-                              value={objectiveTitle || objective.title}
-                              onChangeText={setObjectiveTitle}></TextInput>
-                            <TextInput
-                              className=" mt-5 rounded-xl border border-primary  bg-white p-1 text-center"
-                              multiline={true}
-                              value={objectiveDescription || objective.description}
-                              onChangeText={setObjectiveDescription}></TextInput>
-                            {/*Progress Hint */}
-                            <View className="relative mt-5 ">
-                              <TextInput
-                                className="  rounded-xl border border-primary  bg-white p-1 text-center"
-                                value={objectiveProgress || String(objective.progress)}
-                                onChangeText={setObjectiveProgress}
-                                placeholder="Objective Progress"></TextInput>
-                              <View className="absolute right-2 top-2">
-                                <Button
-                                  onPress={() => {}}
-                                  size="icon"
-                                  variant="default"
-                                  className="h-4 w-4 rounded-full bg-slate-500 text-white">
-                                  <CircleQuestionMark color="white" />
-                                </Button>
-                              </View>
-                            </View>
-                            <View className="relative mt-5 ">
-                              <TextInput
-                                className="  rounded-xl border border-primary  bg-white p-1 text-center"
-                                value={objectiveGoalNumber || String(objective.goalNumber)}
-                                onChangeText={setObjectiveGoalNumber}
-                                placeholder="Objective Goal"></TextInput>
-                              <View className="absolute right-2 top-2">
-                                <Button
-                                  onPress={() => {}}
-                                  size="icon"
-                                  variant="default"
-                                  className="h-4 w-4 rounded-full bg-slate-500 text-white">
-                                  <CircleQuestionMark color="white" />
-                                </Button>
-                              </View>
-                            </View>
-                          </AlertDescription>
-                          <AlertDialogFooter className="flex-row">
-                            <AlertDialogCancel>Cancel</AlertDialogCancel>
-                            <AlertDialogAction
-                              onPress={() => {
-                                editObjective(objective._id);
-                              }}>
-                              Submit Changes
-                            </AlertDialogAction>
-                          </AlertDialogFooter>
-                        </AlertDialogContent>
-                      </AlertDialog>
+                        <SquarePen size={20} />
+                      </Button>
 
                       {/* Delete Objective */}
-                      <AlertDialog>
-                        <AlertDialogTrigger asChild>
-                          <Button size="icon" className="rounded-full " variant="ghost">
-                            <LucideCircleX size={20} color={'red'} />
-                          </Button>
-                        </AlertDialogTrigger>
-                        <AlertDialogContent className="!w-[90%] bg-white">
-                          <AlertDialogHeader>
-                            <AlertDialogTitle>Delete Objective?</AlertDialogTitle>
-                          </AlertDialogHeader>
-                          <AlertDescription>
-                            Are you sure that you want to delete this objective
-                          </AlertDescription>
-                          <AlertDialogFooter className="flex-row">
-                            <AlertDialogCancel>Cancel</AlertDialogCancel>
-                            <AlertDialogAction
-                              onPress={() => {
-                                deleteObjectives(objective._id);
-                              }}>
-                              Delete
-                            </AlertDialogAction>
-                          </AlertDialogFooter>
-                        </AlertDialogContent>
-                      </AlertDialog>
-                    </CardFooter>
-                  </View>
+                      <Button
+                        onPress={() => {
+                          setSelectedObjective(objective);
+                          setDeleteVisibility(true);
+                        }}
+                        size="icon"
+                        className="rounded-full"
+                        variant="ghost">
+                        <LucideCircleX size={20} color={'red'} />
+                      </Button>
+                    </View>
+                  </CardFooter>
                 </Card>
               );
             })}
@@ -421,18 +365,39 @@ function MonthlyView({
         )}
         <Button
           onPress={() => {
+            setForm({});
             setVisibility(true);
           }}>
           Add Objective
         </Button>
-        <View className="!w-[90%] px-4">
-          <AddObjectiveModal
-            setUserObjectives={setUserObjectives}
-            api={api}
-            date={selectedDate}
-            visbility={visbility}
-            changeVisbility={setVisibility}></AddObjectiveModal>
-        </View>
+
+        {/* One instance of each modal, outside the map -- rendering them inside
+            meant every card had its own copy sharing one visibility flag. */}
+        <AddModal
+          module="Objective"
+          visibility={visbility}
+          setVisibility={setVisibility}
+          values={form}
+          onChange={handleChange}
+          onClick={addNewObjective}
+        />
+        <EditModal
+          module="Objective"
+          visibility={editVisibility}
+          setVisibility={setEditVisibility}
+          values={form}
+          onChange={handleChange}
+          onClick={editObjective}
+          context={selectedObjective?.title}
+        />
+        <DeleteModal
+          module="Objective"
+          visibility={deleteVisibility}
+          setVisibility={setDeleteVisibility}
+          onClick={deleteObjectives}
+          context={selectedObjective?.title ?? ''}
+        />
+
         {longDate && (
           <MarkedDateModal
             date={longDate.toISOString()}

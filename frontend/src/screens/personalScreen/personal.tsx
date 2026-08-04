@@ -19,7 +19,7 @@ function Personal({ route }: PersonalProps) {
         <UserCard api={api}></UserCard>
       </View>
       <View className="flex">
-        <SettingsCard></SettingsCard>
+        <SettingsCard api={api}></SettingsCard>
       </View>
       <View className="mb-5 flex">
         <SignoutCard

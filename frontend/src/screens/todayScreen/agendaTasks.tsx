@@ -26,6 +26,7 @@ import {
   AlertDialogTrigger,
 } from 'components/ui';
 import { Select } from 'components/Select';
+import DeleteModal from '@/components/DeleteModal';
 
 interface AgendaTasksProps {
   api: string;
@@ -39,6 +40,12 @@ function AgendaTasks({ api, date }: AgendaTasksProps) {
   const [taskName, setTaskName] = useState('');
   const [taskDesc, setTaskDesc] = useState('');
   const [taskCat, setTaskCat] = useState('');
+  // Minutes before start to fire a push. Blank = no reminder.
+  const [taskRemind, setTaskRemind] = useState('');
+  const [uTaskRemind, setUTaskRemind] = useState('');
+  // Which task the delete modal is acting on
+  const [selectedTask, setSelectedTask] = useState<any>(null);
+  const [deleteVisible, setDeleteVisible] = useState(false);
 
   const [uTaskEnd, setUTaskEnd] = useState<Date | null>(null);
   const [uTaskStart, setUTaskStart] = useState<Date | null>(null);
@@ -222,6 +229,8 @@ function AgendaTasks({ api, date }: AgendaTasksProps) {
       uTaskStart: startHour,
       uTaskEnd: endHour,
       uTaskCat: taskCat,
+      // Backend converts this into an absolute remindTime
+      uTaskRemind: taskRemind,
     };
     try {
       const response = await fetch(API_URL, {
@@ -236,6 +245,7 @@ function AgendaTasks({ api, date }: AgendaTasksProps) {
         viewTasks();
 
         //Reset fields
+        setTaskRemind('');
         setTaskName('');
         setTaskDesc('');
       } else console.log(data.message);
@@ -270,6 +280,7 @@ function AgendaTasks({ api, date }: AgendaTasksProps) {
     if (uTaskStart) payload.uTaskStart = uTaskStart;
     if (uTaskEnd) payload.uTaskEnd = uTaskEnd;
     if (uTaskCat) payload.uTaskCat = uTaskCat;
+    if (uTaskRemind) payload.uTaskRemind = uTaskRemind;
 
     try {
       const response = await fetch(API_URL + '/' + taskID, {
@@ -402,6 +413,18 @@ function AgendaTasks({ api, date }: AgendaTasksProps) {
                             />
                           </View>
                         </View>
+                        {/* Push reminder: minutes before start */}
+                        <View className="w-80 gap-1">
+                          <Text className="ml-1 text-xs font-medium text-slate-500">
+                            Remind me (minutes before)
+                          </Text>
+                          <TextInput
+                            value={uTaskRemind}
+                            onChangeText={setUTaskRemind}
+                            keyboardType="numeric"
+                            placeholder="e.g. 15 — leave blank for none"
+                            className="rounded-xl border border-[#d1bcea] bg-white p-2 text-center"></TextInput>
+                        </View>
                         <Select
                           placeholder={PH || event.taskCategory}
                           options={[
@@ -451,7 +474,8 @@ function AgendaTasks({ api, date }: AgendaTasksProps) {
                         console.log('No event id');
                         return;
                       }
-                      deleteTask(event.id);
+                      setSelectedTask({ id: event.id, title: event.title });
+                      setDeleteVisible(true);
                     }}
                     className="flex flex-1"
                     textClassName="color-black"
@@ -510,6 +534,18 @@ function AgendaTasks({ api, date }: AgendaTasksProps) {
                 />
               </View>
             </View>
+            {/* Push reminder: minutes before start */}
+            <View className="w-80 gap-1">
+              <Text className="ml-1 text-xs font-medium text-slate-500">
+                Remind me (minutes before)
+              </Text>
+              <TextInput
+                value={taskRemind}
+                onChangeText={setTaskRemind}
+                keyboardType="numeric"
+                placeholder="e.g. 15 — leave blank for none"
+                className="rounded-xl border border-[#d1bcea] bg-white p-2 text-center"></TextInput>
+            </View>
             <Select
               placeholder={taskCat || 'Choose a classification for these tasks'}
               options={[
@@ -536,6 +572,20 @@ function AgendaTasks({ api, date }: AgendaTasksProps) {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {/* Single delete modal for every task on the timeline */}
+      <DeleteModal
+        module="Task"
+        visibility={deleteVisible}
+        setVisibility={setDeleteVisible}
+        onClick={async () => {
+          if (!selectedTask) return;
+          await deleteTask(selectedTask.id);
+          setDeleteVisible(false);
+          setSelectedTask(null);
+        }}
+        context={selectedTask?.title ?? ''}
+      />
     </View>
   );
 }

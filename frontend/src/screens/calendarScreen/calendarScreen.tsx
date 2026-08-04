@@ -101,7 +101,7 @@ function CalendarScreen({ route, navigation }) {
         )
       }
       {monthlyVisibility && (
-        <View className="mb-5">
+        <View className="mb-5 flex-1">
           <MonthlyView api={api} markedDates={dates} refreshDates={refreshDates}></MonthlyView>
         </View>
       )}

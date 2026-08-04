@@ -1,14 +1,32 @@
 import Reminder from "./remindersSchema.js";
 
+const DAY_MS = 24 * 60 * 60 * 1000;
+
 export const createReminder = async (req, res) => {
   try {
     const { userid } = req.headers;
     const { reminderDate, reminderDescription, reminderExpiration } = req.body;
+
+    if (!reminderDescription) {
+      return res.status(400).json({ message: "Missing reminder description" });
+    }
+    if (!reminderDate) {
+      return res.status(400).json({ message: "Missing reminder date" });
+    }
+
+    const date = new Date(reminderDate);
+    if (isNaN(date.getTime())) {
+      return res.status(400).json({ message: "Invalid reminder date" });
+    }
+
     const reminder = new Reminder({
       userID: userid,
-      date: reminderDate,
+      date,
       description: reminderDescription,
-      expiresAt: reminderExpiration,
+      // Default: clean itself up a day after it fires
+      expiresAt: reminderExpiration
+        ? new Date(reminderExpiration)
+        : new Date(date.getTime() + DAY_MS),
     });
     const newReminder = await reminder.save();
     return res.status(201).json({
@@ -22,7 +40,8 @@ export const createReminder = async (req, res) => {
 export const getReminders = async (req, res) => {
   try {
     const { userid } = req.headers;
-    const reminders = await Reminder.find({ userID: userid });
+    // Soonest first, so the home screen shows what's next at the top
+    const reminders = await Reminder.find({ userID: userid }).sort({ date: 1 });
     return res
       .status(200)
       .json({ message: "Success retrieving reminders", reminders: reminders });
@@ -34,9 +53,28 @@ export const editReminder = async (req, res) => {
   try {
     // ID from the URL path; only the editable fields belong in the body
     const { reminderID } = req.params;
-    const { reminderDescription } = req.body;
-    const reminder = await Reminder.findByIdAndUpdate(reminderID, {
-      description: reminderDescription,
+    const { reminderDescription, reminderDate } = req.body;
+
+    if (!reminderDescription && !reminderDate) {
+      return res.status(400).json({ message: "Nothing to change" });
+    }
+
+    const update = {};
+    if (reminderDescription) update.description = reminderDescription;
+    if (reminderDate) {
+      const date = new Date(reminderDate);
+      if (isNaN(date.getTime())) {
+        return res.status(400).json({ message: "Invalid reminder date" });
+      }
+      update.date = date;
+      update.expiresAt = new Date(date.getTime() + DAY_MS);
+      // Moved to a new time -> let it notify again
+      update.notifiedAt = null;
+    }
+
+    // { new: true } returns the updated doc; without it you get the stale one
+    const reminder = await Reminder.findByIdAndUpdate(reminderID, update, {
+      new: true,
     });
     return res
       .status(200)

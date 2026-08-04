@@ -19,6 +19,9 @@ import {
 import { TextInput } from 'react-native';
 import { CalendarContext } from 'react-native-calendars';
 import * as SecureStore from 'expo-secure-store';
+import AddModal from '@/components/AddModal';
+import EditModal from '@/components/EditModal';
+import DeleteModal from '@/components/DeleteModal';
 
 function Goals({ api, scrollDate }: { api: string; scrollDate: string }) {
   const API_URL = api + 'goals';
@@ -37,6 +40,15 @@ function Goals({ api, scrollDate }: { api: string; scrollDate: string }) {
   const [inputDate, setInputDate] = useState('');
   const [userToken, setUserToken] = useState('');
   const [userInfo, setUserInfo] = useState<any>(null);
+
+  // Shared form state for AddModal / EditModal
+  const [form, setForm] = useState<Record<string, any>>({});
+  const handleChange = (key: string, value: any) =>
+    setForm((prev) => ({ ...prev, [key]: value }));
+  const [selectedGoal, setSelectedGoal] = useState<any>(null);
+  const [addVisible, setAddVisible] = useState(false);
+  const [editVisible, setEditVisible] = useState(false);
+  const [deleteVisible, setDeleteVisible] = useState(false);
 
   const colors = ['#D8EED2', '#FEE2C3', '#E1D9FB', 'D0E9FA'];
 
@@ -94,12 +106,11 @@ function Goals({ api, scrollDate }: { api: string; scrollDate: string }) {
   //Add new goal
   const saveNewGoal = async () => {
     if (!userInfo) return;
-    console.log(scrollDate);
     try {
+      // Fall back to the week being viewed if no date was picked
       const payload = {
-        goalTitle: gTitle,
-        goalDescription: gDesc,
-        goalDate: new Date(scrollDate),
+        ...form,
+        goalDate: form.goalDate || new Date(scrollDate),
       };
       const response = await fetch(API_URL, {
         method: 'POST',
@@ -110,11 +121,9 @@ function Goals({ api, scrollDate }: { api: string; scrollDate: string }) {
       const data = await response.json();
 
       if (response.status == 201) {
-        setGTitle('');
-        setGDesc('');
-        console.log('Goal Saved');
+        setForm({});
+        setAddVisible(false);
         await showGoals();
-        console.log(data.goal);
       } else {
         console.log(data.message);
       }
@@ -182,33 +191,20 @@ function Goals({ api, scrollDate }: { api: string; scrollDate: string }) {
   }, [scrollDate, userInfo]);
 
   //Edit goals
-  const editGoals = async (GID) => {
-    if (!userInfo) return;
-
-    const payload: any = {};
-
-    //Either description or title
-    if (!gTitleEdit.trim() && !gDescEdit.trim()) {
-      console.log('Nothing to change');
-    }
-    //Title change
-    if (gTitleEdit.trim()) {
-      payload.goalTitle = gTitleEdit;
-    }
-    //Description change
-    if (gDescEdit.trim()) {
-      payload.goalDescription = gDescEdit;
-    }
+  const editGoals = async () => {
+    if (!userInfo || !selectedGoal) return;
 
     try {
-      const response = await fetch(API_URL + '/' + GID, {
+      const response = await fetch(API_URL + '/' + selectedGoal._id, {
         headers: { 'Content-Type': 'application/json', authtoken: userToken },
         method: 'PUT',
-        body: JSON.stringify(payload),
+        body: JSON.stringify(form),
       });
 
       if (response.status == 200) {
-        console.log('Goal info sucuessfully updated');
+        setForm({});
+        setEditVisible(false);
+        setSelectedGoal(null);
         showGoals();
       }
     } catch (error) {
@@ -216,15 +212,17 @@ function Goals({ api, scrollDate }: { api: string; scrollDate: string }) {
     }
   };
   //Delete goals
-  const deleteGoals = async (GID) => {
-    if (!userInfo) return;
+  const deleteGoals = async () => {
+    if (!userInfo || !selectedGoal) return;
 
     try {
-      const response = await fetch(API_URL + '/' + GID, {
+      const response = await fetch(API_URL + '/' + selectedGoal._id, {
         method: 'DELETE',
         headers: { authtoken: userToken },
       });
       if (response.status == 200) {
+        setDeleteVisible(false);
+        setSelectedGoal(null);
         showGoals();
       }
     } catch (error) {
@@ -280,78 +278,33 @@ function Goals({ api, scrollDate }: { api: string; scrollDate: string }) {
             {/*Button View*/}
 
             <View className="flex-row">
-              {/* Edit Goal */}
-              <AlertDialog>
-                <AlertDialogTrigger asChild>
-                  <Button>Create Goal</Button>
-                </AlertDialogTrigger>
-                <View className="">
-                  <AlertDialogContent className=" !w-[90%] rounded-3xl bg-white p-2 px-10">
-                    <AlertDialogHeader>
-                      <AlertDialogTitle className="mt-2 color-dark">Add New Goal</AlertDialogTitle>
-                    </AlertDialogHeader>
-                    <TextInput
-                      className="mb-5 mt-5 rounded-xl border border-primary  bg-white p-1 text-center"
-                      value={gTitleEdit}
-                      onChangeText={setGTitleEdit}
-                      placeholder="Goal Title"></TextInput>
-                    <TextInput
-                      value={gDescEdit}
-                      onChangeText={setGDescEdit}
-                      multiline
-                      scrollEnabled={false}
-                      className="w-100 mb-5 h-64 rounded-xl border border-primary bg-white p-2 text-center"
-                      placeholder="Goal Description"></TextInput>
-                    <AlertDialogFooter className="mt-5 flex-row justify-center text-white">
-                      <AlertDialogCancel variant="destructive" className="mr-5 border border-white">
-                        <Text className="text-white">Cancel</Text>
-                      </AlertDialogCancel>
-                      <AlertDialogAction
-                        variant="default"
-                        className="mt-2 border border-primary"
-                        onPress={() => {
-                          editGoals(goal._id);
-                        }}>
-                        <Text className="text-white">Confirm</Text>
-                      </AlertDialogAction>
-                    </AlertDialogFooter>
-                  </AlertDialogContent>
-                </View>
-              </AlertDialog>
+              {/* Edit Goal -- opens the single hoisted EditModal */}
               <Button
                 size="icon"
                 onPress={() => {
-                  editGoals(goal._id);
+                  setSelectedGoal(goal);
+                  setForm({
+                    goalTitle: goal.title,
+                    goalDescription: goal.description,
+                  });
+                  setEditVisible(true);
                 }}
                 className="rounded-full "
                 variant="ghost">
                 <SquarePen size={18} />
               </Button>
-              {/* Edit Goal */}
-              <AlertDialog>
-                <AlertDialogTrigger asChild>
-                  <Button size="icon" className="rounded-full " variant="ghost">
-                    <LucideCircleX size={20} color={'red'} />
-                  </Button>
-                </AlertDialogTrigger>
-                <AlertDialogContent className="!w-[90%] bg-white">
-                  <AlertDialogHeader>
-                    <AlertDialogTitle>Delete Objective?</AlertDialogTitle>
-                  </AlertDialogHeader>
-                  <AlertDescription>
-                    Are you sure that you want to delete this objective
-                  </AlertDescription>
-                  <AlertDialogFooter className="flex-row">
-                    <AlertDialogCancel>Cancel</AlertDialogCancel>
-                    <AlertDialogAction
-                      onPress={() => {
-                        deleteGoals(goal._id);
-                      }}>
-                      Delete
-                    </AlertDialogAction>
-                  </AlertDialogFooter>
-                </AlertDialogContent>
-              </AlertDialog>
+
+              {/* Delete Goal */}
+              <Button
+                size="icon"
+                className="rounded-full "
+                variant="ghost"
+                onPress={() => {
+                  setSelectedGoal(goal);
+                  setDeleteVisible(true);
+                }}>
+                <LucideCircleX size={20} color={'red'} />
+              </Button>
 
               {/*Checkbox View*/}
 
@@ -371,41 +324,39 @@ function Goals({ api, scrollDate }: { api: string; scrollDate: string }) {
 
       {/* Adding a new goal */}
 
-      <AlertDialog>
-        <AlertDialogTrigger asChild>
-          <Button>Create Goal</Button>
-        </AlertDialogTrigger>
-        <View className="">
-          <AlertDialogContent className=" !w-[90%] rounded-3xl bg-white p-2 px-10">
-            <AlertDialogHeader>
-              <AlertDialogTitle className="mt-2 color-dark">Add New Goal</AlertDialogTitle>
-            </AlertDialogHeader>
-            <TextInput
-              className="mb-5 mt-5 rounded-xl border border-primary  bg-white p-1 text-center"
-              value={gTitle}
-              onChangeText={setGTitle}
-              placeholder="Goal Title"></TextInput>
-            <TextInput
-              value={gDesc}
-              onChangeText={setGDesc}
-              multiline
-              scrollEnabled={false}
-              className="w-100 mb-5 h-64 rounded-xl border border-primary bg-white p-2 text-center"
-              placeholder="Goal Description"></TextInput>
-            <AlertDialogFooter className="mt-5 flex-row justify-center text-white">
-              <AlertDialogCancel variant="destructive" className="mr-5 border border-white">
-                <Text className="text-white">Cancel</Text>
-              </AlertDialogCancel>
-              <AlertDialogAction
-                variant="default"
-                className="mt-2 border border-primary"
-                onPress={saveNewGoal}>
-                <Text className="text-white">Confirm</Text>
-              </AlertDialogAction>
-            </AlertDialogFooter>
-          </AlertDialogContent>
-        </View>
-      </AlertDialog>
+      <Button
+        onPress={() => {
+          setForm({});
+          setAddVisible(true);
+        }}>
+        Create Goal
+      </Button>
+
+      {/* One instance of each modal, outside the map */}
+      <AddModal
+        module="Goal"
+        visibility={addVisible}
+        setVisibility={setAddVisible}
+        values={form}
+        onChange={handleChange}
+        onClick={saveNewGoal}
+      />
+      <EditModal
+        module="Goal"
+        visibility={editVisible}
+        setVisibility={setEditVisible}
+        values={form}
+        onChange={handleChange}
+        onClick={editGoals}
+        context={selectedGoal?.title}
+      />
+      <DeleteModal
+        module="Goal"
+        visibility={deleteVisible}
+        setVisibility={setDeleteVisible}
+        onClick={deleteGoals}
+        context={selectedGoal?.title ?? ''}
+      />
     </View>
   );
 }

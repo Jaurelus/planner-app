@@ -1,4 +1,5 @@
-import { View, useColorScheme } from 'react-native';
+import { View, useColorScheme, Platform } from 'react-native';
+import { useState, useEffect } from 'react';
 import './global.css';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
@@ -9,11 +10,10 @@ import CalendarScreen from '@/screens/calendarScreen/calendarScreen';
 import LoginScreen from './screens/loginScreen/loginScreen';
 import RegisterScreen from './screens/registerScreen/registerScreen';
 import FinanceScreen from './screens/financeScreen/financeScreen';
-
-import { useState, useEffect } from 'react';
 import * as Device from 'expo-device';
 import * as SecureStore from 'expo-secure-store';
-import Button from 'components/ui/button';
+import * as Notifications from 'expo-notifications';
+import Constants from 'expo-constants';
 
 export default function App() {
   const colorScheme = useColorScheme();
@@ -25,6 +25,7 @@ export default function App() {
   const [formattedHolidays, setFormattedHolidays] = useState<Record<string, any>>();
   const [mergedDates, setmergedDates] = useState<{}>({});
   const [refreshDates, setRefreshDates] = useState(false);
+  const [notiToken, setNotiToken] = useState('');
 
   //If system is is a simulator, then set the API URL to :
 
@@ -146,6 +147,73 @@ export default function App() {
       mergeDates();
     }
   }, [userDates, formattedHolidays]);
+
+  const getNotiToken = async () => {
+    if (Platform.OS === 'android') {
+      await Notifications.setNotificationChannelAsync('default', {
+        name: 'default',
+        importance: Notifications.AndroidImportance.MAX,
+        vibrationPattern: [0, 250, 250, 250],
+        lightColor: '#FF231F7C',
+      });
+    }
+
+    const { status: existingStatus } = await Notifications.getPermissionsAsync();
+    let finalStatus = existingStatus;
+    if (existingStatus !== 'granted') {
+      const { status } = await Notifications.requestPermissionsAsync();
+      finalStatus = status;
+    }
+    if (finalStatus !== 'granted') {
+      console.log('Permission not granted to get push token for push notification!');
+      return;
+    }
+    const projectId =
+      Constants?.expoConfig?.extra?.eas?.projectId ?? Constants?.easConfig?.projectId;
+    if (!projectId) {
+      console.log('Project ID not found');
+      return;
+    }
+    try {
+      const pushTokenString = (
+        await Notifications.getExpoPushTokenAsync({
+          projectId,
+        })
+      ).data;
+      console.log(pushTokenString);
+      setNotiToken(pushTokenString);
+      return pushTokenString;
+    } catch (e: unknown) {
+      console.log(`${e}`);
+    }
+  };
+
+  const addToken = async () => {
+    if (!userToken || !notiToken || !userInfo) return;
+    const response = await fetch(API_URL + 'user/' + userInfo._id, {
+      headers: { AuthToken: userToken, 'Content-Type': 'application/json' },
+      method: 'PATCH',
+      body: JSON.stringify({ userNotiToken: notiToken }),
+    });
+    const data = await response.json();
+    if (response.status == 200) {
+      console.log('Success saving token to server' + data);
+    } else {
+      console.log('Error saving token to server' + data);
+    }
+  };
+  // Ask the device for a push token once we know who the user is
+  useEffect(() => {
+    if (!userInfo) return;
+    getNotiToken();
+  }, [userInfo]);
+
+  useEffect(() => {
+    //Save the token to the user model in backend
+    if (!notiToken || !userInfo || !userToken) return;
+    addToken();
+  }, [notiToken, userInfo, userToken]);
+
   return (
     <View className="flex flex-1">
       <NavigationContainer>
@@ -165,7 +233,11 @@ export default function App() {
             </>
           ) : (
             <>
-              <Stack.Screen name="Home" component={HomePage} />
+              <Stack.Screen
+                name="Home"
+                component={HomePage}
+                initialParams={{ api: API_URL }}
+              />
               {mergedDates && (
                 <Stack.Screen
                   name="Goals"

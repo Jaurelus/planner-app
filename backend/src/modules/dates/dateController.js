@@ -129,7 +129,6 @@ export const getCategories = async (req, res) => {
         { category: 1 },
       );
     }
-
     return res.status(200).json({
       categories: categories,
       message: "Categories successfully retrieved",
