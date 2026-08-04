@@ -3,6 +3,7 @@ import { Modal, Text, TextInput, View, Pressable } from 'react-native';
 import { useState } from 'react';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from './ui';
+import RemindSelect from './RemindSelect';
 
 interface AddModalProps {
   module: string;
@@ -164,18 +165,10 @@ function AddModal({
                 />
               </View>
               {/* Minutes before start. Backend turns this into remindTime. */}
-              <View className="gap-1">
-                <Text className="ml-1 text-xs font-medium text-slate-500">
-                  Remind me (minutes before)
-                </Text>
-                <TextInput
-                  className="rounded-xl border border-[#d1bcea] bg-white p-1 text-center"
-                  placeholder="e.g. 15 — leave blank for none"
-                  keyboardType="numeric"
-                  value={values.uTaskRemind ?? ''}
-                  onChangeText={(t) => onChange('uTaskRemind', t)}
-                />
-              </View>
+              <RemindSelect
+                value={values.uTaskRemind ?? ''}
+                onChange={(v) => onChange('uTaskRemind', v)}
+              />
             </CardContent>
           )}
 

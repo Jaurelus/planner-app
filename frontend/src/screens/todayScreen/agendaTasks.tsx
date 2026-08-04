@@ -27,6 +27,7 @@ import {
 } from 'components/ui';
 import { Select } from 'components/Select';
 import DeleteModal from '@/components/DeleteModal';
+import RemindSelect from '@/components/RemindSelect';
 
 interface AgendaTasksProps {
   api: string;
@@ -280,7 +281,8 @@ function AgendaTasks({ api, date }: AgendaTasksProps) {
     if (uTaskStart) payload.uTaskStart = uTaskStart;
     if (uTaskEnd) payload.uTaskEnd = uTaskEnd;
     if (uTaskCat) payload.uTaskCat = uTaskCat;
-    if (uTaskRemind) payload.uTaskRemind = uTaskRemind;
+    // Always sent: '' means "clear the reminder", so it can't be omitted
+    payload.uTaskRemind = uTaskRemind;
 
     try {
       const response = await fetch(API_URL + '/' + taskID, {
@@ -354,6 +356,17 @@ function AgendaTasks({ api, date }: AgendaTasksProps) {
                         setuTaskName(event.title);
                         setUTaskStart(startDate);
                         setUTaskEnd(endDate);
+                        // Turn the stored remindTime back into "minutes before"
+                        const savedRemind = (event as any).remindTime;
+                        setUTaskRemind(
+                          savedRemind
+                            ? String(
+                                Math.round(
+                                  (startDate.getTime() - new Date(savedRemind).getTime()) / 60000
+                                )
+                              )
+                            : ''
+                        );
                       }
                       if (!open) {
                         setuTaskName('');
@@ -414,16 +427,8 @@ function AgendaTasks({ api, date }: AgendaTasksProps) {
                           </View>
                         </View>
                         {/* Push reminder: minutes before start */}
-                        <View className="w-80 gap-1">
-                          <Text className="ml-1 text-xs font-medium text-slate-500">
-                            Remind me (minutes before)
-                          </Text>
-                          <TextInput
-                            value={uTaskRemind}
-                            onChangeText={setUTaskRemind}
-                            keyboardType="numeric"
-                            placeholder="e.g. 15 — leave blank for none"
-                            className="rounded-xl border border-[#d1bcea] bg-white p-2 text-center"></TextInput>
+                        <View className="w-80">
+                          <RemindSelect value={uTaskRemind} onChange={setUTaskRemind} />
                         </View>
                         <Select
                           placeholder={PH || event.taskCategory}
@@ -535,16 +540,8 @@ function AgendaTasks({ api, date }: AgendaTasksProps) {
               </View>
             </View>
             {/* Push reminder: minutes before start */}
-            <View className="w-80 gap-1">
-              <Text className="ml-1 text-xs font-medium text-slate-500">
-                Remind me (minutes before)
-              </Text>
-              <TextInput
-                value={taskRemind}
-                onChangeText={setTaskRemind}
-                keyboardType="numeric"
-                placeholder="e.g. 15 — leave blank for none"
-                className="rounded-xl border border-[#d1bcea] bg-white p-2 text-center"></TextInput>
+            <View className="w-80">
+              <RemindSelect value={taskRemind} onChange={setTaskRemind} />
             </View>
             <Select
               placeholder={taskCat || 'Choose a classification for these tasks'}

@@ -7,6 +7,7 @@ const UserModel = new mongoose.Schema({
   firstName: { type: String, default: "" },
   lastName: { type: String, default: "" },
   pushToken: { type: String },
+  notificationsEnabled: { type: Boolean, default: true },
 
   //userMarkedDates
 });

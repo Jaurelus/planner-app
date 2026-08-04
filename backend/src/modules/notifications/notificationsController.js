@@ -20,8 +20,12 @@ export const operateReminderFlow = async () => {
   let completeTask = [];
   for (const task of dueTasks) {
     // findById returns null if the user was deleted -- guard with ?.
-    const notiToken = await User.findById(task.userID, { pushToken: 1 }).lean();
-    if (!notiToken?.pushToken) continue;
+    const notiToken = await User.findById(task.userID, {
+      pushToken: 1,
+      notificationsEnabled: 1,
+    }).lean();
+    if (!notiToken?.pushToken || notiToken.notificationsEnabled === false)
+      continue;
 
     completeTask.push({ ...task, pushToken: notiToken.pushToken });
   }
@@ -73,8 +77,11 @@ export const operateStandaloneReminders = async () => {
   const messages = [];
   const sentIDs = [];
   for (const reminder of due) {
-    const user = await User.findById(reminder.userID, { pushToken: 1 }).lean();
-    if (!user?.pushToken) continue;
+    const user = await User.findById(reminder.userID, {
+      pushToken: 1,
+      notificationsEnabled: 1,
+    }).lean();
+    if (!user?.pushToken || user.notificationsEnabled === false) continue;
     messages.push({
       to: user.pushToken,
       title: "Reminder",

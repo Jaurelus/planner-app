@@ -65,7 +65,7 @@ export const editTask = async (req, res) => {
       !uTaskStart &&
       !uTaskEnd &&
       !uTaskCat &&
-      !uTaskRemind
+      uTaskRemind === undefined
     ) {
       return res.status(400).json({ message: "Nothing to change" });
     }
@@ -74,9 +74,17 @@ export const editTask = async (req, res) => {
     const newStart = uTaskStart || currTask.timeStart;
     // Recompute remindTime if either the offset or the start time moved,
     // and clear notfiedAt so the rescheduled reminder can fire again.
-    const remindTime = uTaskRemind
-      ? new Date(new Date(newStart).getTime() - Number(uTaskRemind) * 60000)
-      : currTask.remindTime;
+    // undefined -> field wasn't sent, keep it. "" -> user unticked, clear it.
+    let remindTime;
+    if (uTaskRemind === undefined) {
+      remindTime = currTask.remindTime;
+    } else if (uTaskRemind) {
+      remindTime = new Date(
+        new Date(newStart).getTime() - Number(uTaskRemind) * 60000,
+      );
+    } else {
+      remindTime = null;
+    }
 
     const updatedTask = await Task.findByIdAndUpdate(
       id,

@@ -70,11 +70,24 @@ export const editUser = async (req, res) => {
     const { id } = req.params;
 
     console.log(req.body);
-    const { userFirst, userLast, userPassword, phone, userNotiToken } =
-      req.body;
+    const {
+      userFirst,
+      userLast,
+      userPassword,
+      phone,
+      userNotiToken,
+      userNotisEnabled,
+    } = req.body;
     console.log(phone);
 
-    if (!userFirst && !userLast && !userPassword && !phone && !userNotiToken) {
+    if (
+      !userFirst &&
+      !userLast &&
+      !userPassword &&
+      !phone &&
+      !userNotiToken &&
+      userNotisEnabled === undefined
+    ) {
       return res.status(400).json({ message: "Nothing to update" });
     }
     console.log("Exit");
@@ -92,6 +105,11 @@ export const editUser = async (req, res) => {
         lastName: userLast || currUser.lastName,
         phoneNumber: phone || currUser.phoneNumber,
         pushToken: userNotiToken || currUser.pushToken,
+        // Boolean, so `||` would swallow a deliberate false
+        notificationsEnabled:
+          userNotisEnabled === undefined
+            ? currUser.notificationsEnabled
+            : userNotisEnabled,
         password: newpassHash || currUser.password,
       },
       { new: true },
