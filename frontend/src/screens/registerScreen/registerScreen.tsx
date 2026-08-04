@@ -1,10 +1,10 @@
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui';
 import { useNavigation } from '@react-navigation/native';
-import Button from 'components/ui/button';
+import Button from '../../../components/ui/button';
 import { useRef, useState, useEffect } from 'react';
-import { View, Text, TextInput } from 'react-native';
+import { View, Text, TextInput, Image } from 'react-native';
 import { Check } from 'lucide-react-native';
-import VerificationModal from '@/components/verificationModal';
+import { useToast } from '@/components/Toast';
 
 interface RegisterProps {
   route: any;
@@ -14,6 +14,7 @@ interface RegisterProps {
 
 function RegisterScreen({ route, userG, setUserG }: RegisterProps) {
   const { api } = route.params;
+  const showError = useToast();
   const [email, setEmail] = useState('');
   const [PW, setPW] = useState('');
   const [confirmpW, setConfirmPW] = useState('');
@@ -27,7 +28,6 @@ function RegisterScreen({ route, userG, setUserG }: RegisterProps) {
   const [initialERender, setInitialERender] = useState(true);
   const [initialPWRender, setInitialPWRender] = useState(true);
   const [initialPWCRender, setInitialPWCRender] = useState(true);
-  const [showVerification, setShowVerification] = useState(false);
   const [user, setUser] = useState({});
   console.log(user, 'j');
   //Handle valid and invlaid input from email box
@@ -55,7 +55,7 @@ function RegisterScreen({ route, userG, setUserG }: RegisterProps) {
       if (password.length > 7) {
         tmp1 = true;
       } else {
-        tmp2 = false;
+        tmp1 = false;
       }
       if (/[0-9]/.test(password)) {
         tmp2 = true;
@@ -112,18 +112,20 @@ function RegisterScreen({ route, userG, setUserG }: RegisterProps) {
       if (response.status == 201) {
         console.log('User Added');
         setUser(data.user);
+        // Hand the credentials to Login so the user just taps Log In
+        naviagtor.navigate('Login', { prefillEmail: email, prefillPW: PW });
         setPW('');
         setEmail('');
         setConfirmPW('');
         setPWCheck(false);
         setValidEmail(false);
-        setShowVerification(true);
-      }
-      if (response.status == 400) {
+      } else {
         console.log('Error', data.message);
-      } else console.log(response.status);
+        showError(data.message || 'Could not create your account');
+      }
     } catch (error) {
       console.log('Error1', error);
+      showError('Network error — please try again');
     }
   };
 
@@ -131,11 +133,12 @@ function RegisterScreen({ route, userG, setUserG }: RegisterProps) {
 
   return (
     <View className=" flex flex-1 items-center justify-center">
-      <VerificationModal
-        isVisible={showVerification}
-        user={user}
-        onUserUpdate={setUser}
-        api={api}></VerificationModal>
+      <Image
+        style={{ width: 220, height: 58 }}
+        resizeMode="contain"
+        className="mb-8"
+        source={require('../../../assets/dayflow-logotype.png')}
+      />
       <Card className="w-[80%] items-center">
         <CardHeader>
           <CardTitle>Sign Up </CardTitle>
@@ -161,6 +164,7 @@ function RegisterScreen({ route, userG, setUserG }: RegisterProps) {
             <TextInput
               //secureTextEntry
               autoCapitalize="none"
+              secureTextEntry
               onBlur={() => {
                 handlePWInput(PW);
               }}
@@ -196,6 +200,7 @@ function RegisterScreen({ route, userG, setUserG }: RegisterProps) {
                 handleConfirmInput(confirmpW, PW);
               }}
               autoCapitalize="none"
+              secureTextEntry
               value={confirmpW}
               onChangeText={setConfirmPW}
               className="rounded-lg border border-primary py-2 text-center"

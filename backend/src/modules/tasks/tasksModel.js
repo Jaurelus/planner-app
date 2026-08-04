@@ -7,6 +7,8 @@ const TaskSchema = new mongoose.Schema({
   timeStart: { type: Date, required: true },
   timeEnd: { type: Date, required: true },
   taskCategory: { type: String },
+  remindTime: { type: Date },
+  notfiedAt: { type: Date, default: null },
 });
 
 const Task = mongoose.model("Task", TaskSchema);

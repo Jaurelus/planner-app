@@ -3,16 +3,17 @@ import { useState, useEffect } from 'react';
 import { CalendarList, Calendar, CalendarContext, DateData } from 'react-native-calendars';
 import { useColorScheme } from 'react-native';
 import { CalendarContextProps } from 'react-native-calendars/src/expandableCalendar/Context';
-import MarkedDateModal from './markedDateModal';
+import MarkedDateModal from '../../components/markedDateModal';
 
 interface ScrollViewProps {
   onChange: (value: number) => void;
   setDate: (value: Date) => void;
   markedDates: {};
   api: string;
+  refreshDates: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-function ScrollView({ onChange, setDate, markedDates, api }: ScrollViewProps) {
+function ScrollView({ onChange, setDate, markedDates, api, refreshDates }: ScrollViewProps) {
   const colorScheme = useColorScheme();
   const isDark = colorScheme === 'dark';
 
@@ -73,7 +74,9 @@ function ScrollView({ onChange, setDate, markedDates, api }: ScrollViewProps) {
             date={longDate.toISOString()}
             api={api}
             visible={modalVisible}
-            setVisible={setModalVisible}></MarkedDateModal>
+            setVisible={setModalVisible}
+            markedDates={markedDates}
+            refreshDates={refreshDates}></MarkedDateModal>
         )}
       </View>
     </View>

@@ -5,3 +5,4 @@ export * from './alert';
 export * from './alertdialog';
 export * from './button';
 export * from './input-otp';
+export * from './skeleton';

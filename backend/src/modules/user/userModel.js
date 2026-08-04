@@ -6,9 +6,9 @@ const UserModel = new mongoose.Schema({
   password: { type: String, required: true },
   firstName: { type: String, default: "" },
   lastName: { type: String, default: "" },
+  pushToken: { type: String },
+  notificationsEnabled: { type: Boolean, default: true },
 
-  isVerified: { type: Boolean, default: false },
-  verficationToken: { type: String },
   //userMarkedDates
 });
 

@@ -4,19 +4,20 @@
     "slug": "my-expo-app",
     "version": "1.0.0",
     "web": {
-      "favicon": "./assets/favicon.png"
+      "favicon": "./assets/dayflow-icon.png"
     },
     "experiments": {
       "tsconfigPaths": true
     },
     "plugins": [
-      "expo-secure-store"
+      "expo-secure-store",
+      "expo-notifications"
     ],
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
+    "icon": "./assets/dayflow-icon.png",
     "userInterfaceStyle": "light",
     "splash": {
-      "image": "./assets/splash.png",
+      "image": "./assets/dayflow-logotype.png",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
@@ -29,9 +30,15 @@
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
+        "foregroundImage": "./assets/dayflow-icon.png",
+        "backgroundColor": "#8B62C4"
       }
-    }
+    },
+    "extra": {
+      "eas": {
+        "projectId": "82b5b772-9c0a-4791-b546-7e0d8a006d18"
+      }
+    },
+    "owner": "jaurelus12"
   }
 }

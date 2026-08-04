@@ -1,13 +1,13 @@
-import WeeklyView from '@/components/weeklyView';
-import MonthlyView from '@/components/monthlyView';
+import WeeklyView from '@/screens/calendarScreen/weeklyView';
+import MonthlyView from './monthlyView';
 import { View, Text } from 'react-native';
-import ScrollView from '@/components/scrollview';
+import ScrollView from '@/screens/calendarScreen/scrollview';
 import { useEffect, useState } from 'react';
-import Button from '@/components/ui/button';
+import Button from '@/../components/ui/button';
 import { Eye } from 'lucide-react-native';
 
 function CalendarScreen({ route, navigation }) {
-  const { api, dates } = route.params;
+  const { api, dates, refreshDates } = route.params;
   const [scrollVisibility, setScrollVisiblity] = useState(true);
   const [weeklyVisibility, setWeeklyVisbility] = useState(false);
   const [monthlyVisibility, setMonthlyVisibility] = useState(false);
@@ -79,17 +79,30 @@ function CalendarScreen({ route, navigation }) {
             onChange={setViewVar}
             markedDates={dates}
             api={api}
+            refreshDates={refreshDates}
           />
         </View>
       )}
-      {weeklyVisibility && (
-        <View className="top-0 mt-0">
-          <WeeklyView api={api} scrollDate={date} markedDates={dates}></WeeklyView>
-        </View>
-      )}
+      {
+        //Make the inital weekly view date the Monday of the week
+        weeklyVisibility && (
+          <View className="top-0 mt-0">
+            <WeeklyView
+              api={api}
+              scrollDate={(() => {
+                let tmpTdy = new Date(date);
+                let frmMonday = tmpTdy.getDay() - 1;
+                tmpTdy.setDate(tmpTdy.getDate() - frmMonday);
+                return tmpTdy;
+              })()}
+              markedDates={dates}
+              refreshDates={refreshDates}></WeeklyView>
+          </View>
+        )
+      }
       {monthlyVisibility && (
-        <View className="">
-          <MonthlyView api={api} markedDates={dates}></MonthlyView>
+        <View className="mb-5 flex-1">
+          <MonthlyView api={api} markedDates={dates} refreshDates={refreshDates}></MonthlyView>
         </View>
       )}
     </View>

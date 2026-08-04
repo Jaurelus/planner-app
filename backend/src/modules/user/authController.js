@@ -6,60 +6,7 @@ const apiKey = process.env.TWILIO_API_KEY;
 const sid = process.env.TWILIO_SID;
 const sKey = process.env.MY_SECRET_KEY;
 
-import twilio from "twilio";
-const client = twilio(sid, apiKey);
-
 /* This function takes an accounts email adress as a paramter and sends a html message to validate */
-export const sendVerification = async (req, res) => {
-  try {
-    const { userEmail, userPhoneNumber } = req.body;
-    const verficationCode = Math.random().toString().slice(3, 9);
-    if (!userPhoneNumber) {
-      //Send email
-      return res.status(200).json({ message: "Email sent" });
-    } else {
-      //Send to number
-      const vMessage = client.verify.v2
-        .services("VA3e65986353629354e3899002ab05605e")
-        .verifications.create({
-          to: "+15614526777",
-          channel: "sms",
-        });
-      return res.status(200).json({ message: "Message sent" });
-    }
-  } catch (error) {
-    return res.status(400).json({ message: error });
-  }
-};
-
-export const validateUser = async (req, res) => {
-  try {
-    const { uCode, email, number } = req.body;
-    const { id } = req.params;
-    if (number) {
-      const verStat = await client.verify.v2
-        .services("VA3e65986353629354e3899002ab05605e")
-        .verificationChecks.create({
-          code: uCode,
-          to: /*number.padStart(12, "+1")*/ "+15614526777",
-        });
-
-      if (verStat.status == "approved") {
-        const updatedUser = await User.findByIdAndUpdate(
-          id,
-          { isVerified: true },
-          { new: true },
-        );
-        //login
-        return res
-          .status(200)
-          .json({ message: "User verified", user: updatedUser });
-      } else return res.status(401).json({ message: "Incorrect code" });
-    }
-  } catch (error) {
-    return res.status(400).json({ message: "Error back " + error });
-  }
-};
 
 export const registerUser = async (req, res) => {
   try {
@@ -77,9 +24,11 @@ export const registerUser = async (req, res) => {
     });
     //Await and save user into mongoose
     const savedUser = await currUser.save();
+    // Strip the hash before it leaves the server
+    const { password, ...safeUser } = savedUser.toObject();
     return res
       .status(201)
-      .json({ message: "User successfully added", user: savedUser });
+      .json({ message: "User successfully added", user: safeUser });
     //return
   } catch (error) {
     return res.status(400).json({ message: "Try catch failed" + error });
@@ -103,10 +52,15 @@ export const loginUser = async (req, res) => {
         const id = intendedU._id;
         //login user
 
-        let token = jwt.sign({ email: tbdUEmail }, sKey, { expiresIn: "7d" });
+        // id travels in the signed token -- that's what the middleware trusts
+        let token = jwt.sign({ id, email: tbdUEmail }, sKey, {
+          expiresIn: "7d",
+        });
+        // Strip the hash before it leaves the server
+        const { password, ...safeUser } = intendedU.toObject();
         return res.status(200).json({
           message: "User sucessfully logged in",
-          user: intendedU,
+          user: safeUser,
           token: token,
         });
       } else
@@ -114,33 +68,45 @@ export const loginUser = async (req, res) => {
     }
   } catch (error) {
     console.log(error);
+    // Without this the request hangs forever on the client
+    return res.status(500).json({ message: "Login failed" });
   }
 };
 
 //Function to update uesr info
 export const editUser = async (req, res) => {
-  const payload = {};
   try {
-    const { id } = req.params;
+    // Only ever edit your own account, whatever id the URL asks for
+    const id = req.userID;
 
     console.log(req.body);
-    const { userFirst, userLast, userPassword, phone } = req.body;
+    const {
+      userFirst,
+      userLast,
+      userPassword,
+      phone,
+      userNotiToken,
+      userNotisEnabled,
+    } = req.body;
     console.log(phone);
 
-    if (!userFirst && !userLast && !userPassword && !phone) {
+    if (
+      !userFirst &&
+      !userLast &&
+      !userPassword &&
+      !phone &&
+      !userNotiToken &&
+      userNotisEnabled === undefined
+    ) {
       return res.status(400).json({ message: "Nothing to update" });
     }
     console.log("Exit");
 
+    // Declared outside the if -- a `let` inside the block was out of scope
+    // below, which made every call to this endpoint throw a ReferenceError.
+    let newpassHash;
     if (userPassword) {
-      payload.password = bcrypt.hash(userPassword);
-    } else if (userFirst) {
-      payload.firstName = userFirst;
-    } else if (userLast) {
-      payload.lastName = userLast;
-    } else if (phone) {
-      payload.phoneNumber = phone;
-      console.log("Selected");
+      newpassHash = await bcrypt.hash(userPassword, 10);
     }
 
     const currUser = await User.findById(id);
@@ -151,14 +117,22 @@ export const editUser = async (req, res) => {
         firstName: userFirst || currUser.firstName,
         lastName: userLast || currUser.lastName,
         phoneNumber: phone || currUser.phoneNumber,
+        pushToken: userNotiToken || currUser.pushToken,
+        // Boolean, so `||` would swallow a deliberate false
+        notificationsEnabled:
+          userNotisEnabled === undefined
+            ? currUser.notificationsEnabled
+            : userNotisEnabled,
+        password: newpassHash || currUser.password,
       },
       { new: true },
     );
-    console.log("Update", updatedUser);
     if (!currUser) return res.status(400).json("User not found");
+    // Strip the hash before it leaves the server
+    const { password, ...safeUser } = updatedUser.toObject();
     return res
       .status(200)
-      .json({ message: "User info succesfully updated.", user: updatedUser });
+      .json({ message: "User info succesfully updated.", user: safeUser });
   } catch (error) {
     return res.status(400).json({ message: "Problem" });
   }
@@ -166,8 +140,8 @@ export const editUser = async (req, res) => {
 
 export const getUser = async (req, res) => {
   try {
-    const { userid } = req.headers;
-    const user = User.findById(userid);
+    const userid = req.userID;
+    const user = await User.findById(userid);
     return res
       .status(200)
       .json({ message: "Success getting user", user: user });

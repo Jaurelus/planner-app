@@ -1,14 +1,18 @@
-import AgendaTasks from '@/components/agendaTasks';
+import AgendaTasks from '@/screens/todayScreen/agendaTasks';
 import { View, Text } from 'react-native';
-import { Agenda, CalendarProvider, ExpandableCalendar } from 'react-native-calendars';
+import { Agenda, CalendarProvider, ExpandableCalendar, DateData } from 'react-native-calendars';
 import { useColorScheme } from 'react-native';
 import { useState } from 'react';
 import { todayString } from 'react-native-calendars/src/expandableCalendar/commons';
+import MarkedDateModal from '@/components/markedDateModal';
 
 function Daily({ route, navigation }) {
-  const { api, dates } = route.params;
+  const { api, dates, refreshDates } = route.params;
   const colorScheme = useColorScheme();
   const today = new Date();
+  const [longDate, setLongDate] = useState<Date>();
+
+  const [modalVisible, setModalVisible] = useState(false);
   const todayStr =
     today.getFullYear() +
     '-' +
@@ -32,6 +36,11 @@ function Daily({ route, navigation }) {
     textMonthFontWeight: 'bold',
     textDayHeaderFontWeight: '600',
   };
+  const handleLongPress = (day: DateData) => {
+    setModalVisible(true);
+    let tmpDate = new Date(day.dateString);
+    setLongDate(tmpDate);
+  };
 
   return (
     <CalendarProvider date={todayStr} onDateChanged={(date) => setSelectedDate(date)}>
@@ -50,10 +59,19 @@ function Daily({ route, navigation }) {
             console.log(day.dateString);
           }}
           onDayLongPress={(day) => {
-            //Add the date to marked dates
+            handleLongPress(day);
           }}
         />
         <AgendaTasks api={api} date={selectedDate || todayStr}></AgendaTasks>
+        {longDate && (
+          <MarkedDateModal
+            date={longDate.toISOString()}
+            api={api}
+            visible={modalVisible}
+            setVisible={setModalVisible}
+            markedDates={dates}
+            refreshDates={refreshDates}></MarkedDateModal>
+        )}
       </View>
     </CalendarProvider>
   );

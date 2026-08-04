@@ -1,6 +1,6 @@
 import { View, Text } from 'react-native';
 import { useState, useEffect } from 'react';
-import { styles } from '../Styles';
+import { styles } from '../../Styles';
 import Button from 'components/ui/button';
 
 import * as SecureStore from 'expo-secure-store';

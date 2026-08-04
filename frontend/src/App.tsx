@@ -1,18 +1,20 @@
-import { View, useColorScheme } from 'react-native';
+import { View, useColorScheme, Platform } from 'react-native';
+import { useState, useEffect } from 'react';
 import './global.css';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import HomePage from '@/screens/home';
-import Personal from '@/screens/personal';
-import Daily from '@/screens/today';
-import CalendarScreen from '@/screens/calendarScreen';
-import LoginScreen from './screens/loginScreen';
-import RegisterScreen from './screens/registerScreen';
-import FinanceScreen from './screens/financeScreen';
-
-import { useState, useEffect } from 'react';
+import HomePage from '@/screens/homeScreen/home';
+import ToastProvider from '@/components/Toast';
+import Personal from '@/screens/personalScreen/personal';
+import Daily from '@/screens/todayScreen/today';
+import CalendarScreen from '@/screens/calendarScreen/calendarScreen';
+import LoginScreen from './screens/loginScreen/loginScreen';
+import RegisterScreen from './screens/registerScreen/registerScreen';
+import FinanceScreen from './screens/financeScreen/financeScreen';
 import * as Device from 'expo-device';
 import * as SecureStore from 'expo-secure-store';
+import * as Notifications from 'expo-notifications';
+import Constants from 'expo-constants';
 
 export default function App() {
   const colorScheme = useColorScheme();
@@ -20,63 +22,63 @@ export default function App() {
   const [user, setUser] = useState(false);
   const [userToken, setUserToken] = useState('');
   const [userInfo, setUserInfo] = useState<any>(null);
-  const [userDates, setUserDates] = useState<any>(null);
-  const [formattedHolidays, setFormattedHolidays] = useState({});
-  const [formattedUserDates, setFormattedUserDates] = useState({});
-
-  useEffect(() => {
-    console.log(userDates, 'App User dates');
-  }, [userDates]);
+  const [userDates, setUserDates] = useState<[]>();
+  const [formattedHolidays, setFormattedHolidays] = useState<Record<string, any>>();
+  const [mergedDates, setmergedDates] = useState<{}>({});
+  const [refreshDates, setRefreshDates] = useState(false);
+  const [notiToken, setNotiToken] = useState('');
 
   //If system is is a simulator, then set the API URL to :
 
   const API_URL = Device.isDevice
     ? 'http://192.168.12.175:3000/api/'
     : 'http://localhost:3000/api/';
-
+  useEffect(() => {
+    const fetchData = async () => {
+      const token = await SecureStore.getItemAsync('token');
+      setUserToken(token ? token : '');
+      const user = await SecureStore.getItemAsync('userInfo');
+      setUserInfo(user ? JSON.parse(user) : null);
+      if (token) setUser(true);
+    };
+    fetchData();
+  }, []);
   const Stack = createNativeStackNavigator();
 
   //Function to merge  marked dates and holidays
-  const mergeDates = (object1: any, object2: any) => {
-    if (!object1 && !object2) return;
-    console.log('-------Keys-----\n', Object.keys(object1));
-    let dateKeys = Object.keys(object1);
-    let dateKey = 0;
+  const mergeDates = () => {
+    if (!formattedHolidays || !userDates) return;
+    const merged = { ...formattedHolidays };
+    userDates?.forEach((date) => {
+      let key = date.date;
+      key = key.slice(0, 10);
+      if (Object.keys(formattedHolidays).includes(key)) {
+        //dots
+        merged[key].dots.push(date.category);
+        merged[key].events.push(date);
 
-    dateKeys.forEach((obj) => {
-      //If date from 2 in 1 add it into dots
-      if (Object.keys(object2).includes(obj)) {
-        console.log(obj, 'obj IF');
-
-        object2[obj].dots = [object1[obj].dots, ...object2[obj].dots];
-        console.log(object2[obj].dots);
+        console.log('Info for this date');
+        console.log(formattedHolidays[key]);
+        console.log(formattedHolidays);
       } else {
-        let line = { [obj]: object1[obj] };
-        if (Object.keys(object2).includes(obj)) {
-          return;
-        }
-
-        console.log(line, 'line');
-        Object.assign(object2, line);
-        //console.log(object2);
+        console.log('date', date);
+        merged[key] = {
+          dots: [date.category],
+          events: [date],
+        };
       }
-
-      dateKey += 1;
-
-      return object2;
     });
-    console.log(object2);
-    console.log(Object.keys(object2));
-    setFormattedUserDates(object2);
-    return object2;
+    setmergedDates(merged);
   };
 
+  useEffect(() => {
+    getMarkedDates();
+  }, [refreshDates]);
   //--------- API CALLS -------------
 
   //Function to get all marked dates
   const getMarkedDates = async () => {
     if (!userToken || !userInfo._id) return;
-    console.log('getting dates');
     try {
       const response = await fetch(API_URL + 'dates', {
         method: 'GET',
@@ -84,21 +86,8 @@ export default function App() {
       });
       const data = await response.json();
       if (response.status == 200) {
-        console.log('Success!!');
-        console.log(data);
-        let formattedDates;
-        if (data.userDates.length >= 0) {
-          formattedDates = data.userDates.reduce((acc, currVal) => {
-            acc[currVal.date.slice(0, 10)] = {
-              dots: [{ key: currVal.name, color: currVal.category.color || currVal.color }],
-              ...currVal,
-            };
-
-            return acc;
-          }, {});
-        }
-
-        setUserDates(formattedDates);
+        console.log('Success getting user dates');
+        setUserDates(data.userDates);
       } else {
         console.log('error retrieving marked dates', data.message);
       }
@@ -108,8 +97,6 @@ export default function App() {
   };
   //Function to get all holidays
   const getHolidays = async () => {
-    console.log('Top');
-
     try {
       const response = await fetch(API_URL + 'holidays');
       const data = await response.json();
@@ -124,14 +111,18 @@ export default function App() {
                 selectedColor: currHoliday.color || 'red',
               },
             ],
-            ...currHoliday,
+            events: [currHoliday],
           };
           return acc;
         }, {});
         setFormattedHolidays(reducedHolidays);
-      } else console.log(String(response.status), data.message);
+      } else {
+        console.log(String(response.status));
+        setFormattedHolidays({});
+      }
     } catch (error) {
       console.log(error);
+      setFormattedHolidays({});
     }
   };
 
@@ -145,68 +136,146 @@ export default function App() {
     };
     fetchData();
     getHolidays();
-    console.log('Holidays\n\n ', formattedHolidays);
   }, []);
   useEffect(() => {
     getMarkedDates();
   }, [userToken, userInfo]);
   useEffect(() => {
-    getHolidays();
-  }, []);
-  useEffect(() => {
     if (userDates != null && formattedHolidays != null) {
-      mergeDates(userDates, formattedHolidays);
+      mergeDates();
     }
   }, [userDates, formattedHolidays]);
+
+  const getNotiToken = async () => {
+    if (Platform.OS === 'android') {
+      await Notifications.setNotificationChannelAsync('default', {
+        name: 'default',
+        importance: Notifications.AndroidImportance.MAX,
+        vibrationPattern: [0, 250, 250, 250],
+        lightColor: '#FF231F7C',
+      });
+    }
+
+    const { status: existingStatus } = await Notifications.getPermissionsAsync();
+    let finalStatus = existingStatus;
+    if (existingStatus !== 'granted') {
+      const { status } = await Notifications.requestPermissionsAsync();
+      finalStatus = status;
+    }
+    if (finalStatus !== 'granted') {
+      console.log('Permission not granted to get push token for push notification!');
+      return;
+    }
+    const projectId =
+      Constants?.expoConfig?.extra?.eas?.projectId ?? Constants?.easConfig?.projectId;
+    if (!projectId) {
+      console.log('Project ID not found');
+      return;
+    }
+    try {
+      const pushTokenString = (
+        await Notifications.getExpoPushTokenAsync({
+          projectId,
+        })
+      ).data;
+      console.log(pushTokenString);
+      setNotiToken(pushTokenString);
+      return pushTokenString;
+    } catch (e: unknown) {
+      console.log(`${e}`);
+    }
+  };
+
+  const addToken = async () => {
+    if (!userToken || !notiToken || !userInfo) return;
+    const response = await fetch(API_URL + 'user/' + userInfo._id, {
+      headers: { AuthToken: userToken, 'Content-Type': 'application/json' },
+      method: 'PATCH',
+      body: JSON.stringify({ userNotiToken: notiToken }),
+    });
+    const data = await response.json();
+    if (response.status == 200) {
+      console.log('Success saving token to server' + data);
+    } else {
+      console.log('Error saving token to server' + data);
+    }
+  };
+  // Ask the device for a push token once we know who the user is
+  useEffect(() => {
+    if (!userInfo) return;
+    getNotiToken();
+  }, [userInfo]);
+
+  useEffect(() => {
+    //Save the token to the user model in backend
+    if (!notiToken || !userInfo || !userToken) return;
+    addToken();
+  }, [notiToken, userInfo, userToken]);
+
   return (
+    <ToastProvider>
     <View className="flex flex-1">
       <NavigationContainer>
         <Stack.Navigator>
-          {!user? (
+          {!user ? (
             <>
-            <Stack.Screen
-              name="Login"
-              component={LoginScreen}
-              initialParams={{ api: API_URL, onChange: setUser }}
-            />
-             <Stack.Screen
-            name="Register"
-            component={RegisterScreen}
-            initialParams={{ api: API_URL }}
-          />
+              <Stack.Screen
+                name="Login"
+                component={LoginScreen}
+                initialParams={{ api: API_URL, onChange: setUser }}
+              />
+              <Stack.Screen
+                name="Register"
+                component={RegisterScreen}
+                initialParams={{ api: API_URL }}
+              />
             </>
-          ): (<>
-          <Stack.Screen name="Home" component={HomePage} />
-          {formattedUserDates && (
-            <Stack.Screen
-              name="Goals"
-              component={CalendarScreen}
-              initialParams={{
-                api: API_URL,
-                dates: formattedUserDates,
-              }}
-            />
+          ) : (
+            <>
+              <Stack.Screen
+                name="Home"
+                component={HomePage}
+                initialParams={{ api: API_URL }}
+              />
+              {mergedDates && (
+                <Stack.Screen
+                  name="Goals"
+                  component={CalendarScreen}
+                  initialParams={{
+                    api: API_URL,
+                    dates: mergedDates,
+                    refreshDates: setRefreshDates,
+                  }}
+                />
+              )}
+              <Stack.Screen
+                name="Personal"
+                component={Personal}
+                initialParams={{ api: API_URL, onChange: setUser }}
+              />
+              {mergedDates && (
+                <Stack.Screen
+                  name="Today"
+                  component={Daily}
+                  initialParams={{
+                    api: API_URL,
+                    dates: mergedDates,
+                    refreshDates: setRefreshDates,
+                  }}
+                />
+              )}
+              {mergedDates && (
+                <Stack.Screen
+                  name="Finance"
+                  component={FinanceScreen}
+                  initialParams={{ api: API_URL, dates: mergedDates }}
+                />
+              )}
+            </>
           )}
-          <Stack.Screen name="Personal" component={Personal} initialParams={{ api: API_URL, dates: formattedUserDates, onChange: setUser }}/>
-          {formattedUserDates && (
-            <Stack.Screen
-              name="Today"
-              component={Daily}
-              initialParams={{ api: API_URL, dates: formattedUserDates }}
-            />
-          )}
-          {formattedUserDates && (
-            <Stack.Screen
-              name="Finance"
-              component={FinanceScreen}
-              initialParams={{ api: API_URL, dates: formattedUserDates }}
-            />
-          )}</>)}
-          
-
-         
         </Stack.Navigator>
       </NavigationContainer>
     </View>
+    </ToastProvider>
   );
 }

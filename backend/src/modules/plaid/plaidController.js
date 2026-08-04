@@ -18,7 +18,7 @@ const configuration = new Configuration({
 const plaidClient = new PlaidApi(configuration);
 
 export const createLinkToken = async (req, res) => {
-  const { userid } = req.headers;
+  const userid = req.userID;
   const user = await User.findOne({ _id: userid });
   const request = {
     user: {

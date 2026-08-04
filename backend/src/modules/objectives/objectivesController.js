@@ -1,7 +1,7 @@
 import Objectives from "./objectivesModel.js";
 export const addObjective = async (req, res) => {
   try {
-    const { userid } = req.headers;
+    const userid = req.userID;
     const {
       objectiveTitle,
       objectiveDescription,
@@ -29,7 +29,7 @@ export const addObjective = async (req, res) => {
 
 export const getObjectives = async (req, res) => {
   try {
-    const { userid } = req.headers;
+    const userid = req.userID;
     const { currMonth } = req.query;
     console.log(userid, currMonth);
     const userObj = await Objectives.find({ userID: userid, month: currMonth });
@@ -55,8 +55,14 @@ export const editObjective = async (req, res) => {
       objectiveGoalNumber,
       objectiveMonth,
     } = req.body;
-    const currObjective = await Objectives.findbyId(objectiveID);
-    const updatedObjective = await Objectives.findbyIdandUpdate(
+    // Scoped to the owner so you can't edit someone else's objective
+    const currObjective = await Objectives.findOne({
+      _id: objectiveID,
+      userID: req.userID,
+    });
+    if (!currObjective)
+      return res.status(404).json({ message: "Objective not found" });
+    const updatedObjective = await Objectives.findByIdAndUpdate(
       objectiveID,
       {
         title: objectiveTitle || currObjective.title,
@@ -79,7 +85,12 @@ export const editObjective = async (req, res) => {
 export const deleteObjective = async (req, res) => {
   try {
     const { objectiveID } = req.params;
-    await Objectives.findbyIdandDelete(objectiveID);
+    const deleted = await Objectives.findOneAndDelete({
+      _id: objectiveID,
+      userID: req.userID,
+    });
+    if (!deleted)
+      return res.status(404).json({ message: "Objective not found" });
     return res.status(200).json({ message: "Objective sucessfully deleted" });
   } catch (error) {
     return res.status(400).json({ message: error });

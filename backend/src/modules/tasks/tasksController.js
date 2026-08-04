@@ -4,9 +4,16 @@ import Task from "./tasksModel.js";
 export const addTask = async (req, res) => {
   try {
     //Destructure req
-    const { userid } = req.headers;
+    const userid = req.userID;
 
-    const { uTaskName, uTaskDesc, uTaskStart, uTaskEnd, uTaskCat } = req.body;
+    const {
+      uTaskName,
+      uTaskDesc,
+      uTaskStart,
+      uTaskEnd,
+      uTaskCat,
+      uTaskRemind,
+    } = req.body;
     if (!uTaskName) {
       return res.status(400).json({ message: "Missing task name" });
     } else if (!uTaskStart) {
@@ -14,6 +21,11 @@ export const addTask = async (req, res) => {
     } else if (!uTaskEnd) {
       return res.status(400).json({ message: "Missing task end time" });
     } else {
+      // uTaskRemind is "minutes before start". Absent -> no reminder.
+      const remindTime = uTaskRemind
+        ? new Date(new Date(uTaskStart).getTime() - Number(uTaskRemind) * 60000)
+        : null;
+
       const NewTask = new Task({
         userID: userid,
         taskName: uTaskName,
@@ -21,6 +33,7 @@ export const addTask = async (req, res) => {
         timeStart: uTaskStart,
         timeEnd: uTaskEnd,
         taskCategory: uTaskCat || "",
+        remindTime,
       });
 
       const savedTask = await NewTask.save();
@@ -37,20 +50,54 @@ export const addTask = async (req, res) => {
 export const editTask = async (req, res) => {
   try {
     const { id } = req.params;
-    const { uTaskName, uTaskDesc, uTaskStart, uTaskEnd, uTaskCat } = req.body;
+    const {
+      uTaskName,
+      uTaskDesc,
+      uTaskStart,
+      uTaskEnd,
+      uTaskCat,
+      uTaskRemind,
+    } = req.body;
     //Backend verification checks
-    if (!uTaskName && !uTaskDesc && !uTaskStart && !uTaskEnd && !uTaskCat) {
+    if (
+      !uTaskName &&
+      !uTaskDesc &&
+      !uTaskStart &&
+      !uTaskEnd &&
+      !uTaskCat &&
+      uTaskRemind === undefined
+    ) {
       return res.status(400).json({ message: "Nothing to change" });
     }
-    const currTask = await Task.findById(id);
+    // Scoped to the owner so you can't edit someone else's task
+    const currTask = await Task.findOne({ _id: id, userID: req.userID });
+    if (!currTask) return res.status(404).json({ message: "Task not found" });
+
+    const newStart = uTaskStart || currTask.timeStart;
+    // Recompute remindTime if either the offset or the start time moved,
+    // and clear notfiedAt so the rescheduled reminder can fire again.
+    // undefined -> field wasn't sent, keep it. "" -> user unticked, clear it.
+    let remindTime;
+    if (uTaskRemind === undefined) {
+      remindTime = currTask.remindTime;
+    } else if (uTaskRemind) {
+      remindTime = new Date(
+        new Date(newStart).getTime() - Number(uTaskRemind) * 60000,
+      );
+    } else {
+      remindTime = null;
+    }
+
     const updatedTask = await Task.findByIdAndUpdate(
       id,
       {
         taskName: uTaskName || currTask.taskName,
         taskDescription: uTaskDesc || currTask.taskDescription,
-        timeStart: uTaskStart || currTask.timeStart,
+        timeStart: newStart,
         timeEnd: uTaskEnd || currTask.timeEnd,
         taskCategory: uTaskCat || currTask.taskCategory,
+        remindTime,
+        notfiedAt: uTaskRemind || uTaskStart ? null : currTask.notfiedAt,
       },
       { new: true },
     );
@@ -65,7 +112,8 @@ export const editTask = async (req, res) => {
 export const deleteTask = async (req, res) => {
   try {
     const { id } = req.params;
-    await Task.findByIdAndDelete(id);
+    const deleted = await Task.findOneAndDelete({ _id: id, userID: req.userID });
+    if (!deleted) return res.status(404).json({ message: "Task not found" });
     return res.status(200).json({ message: "Task successfully deleted" });
   } catch (error) {
     return res.status(400).json({ message: "Error deleting task" });
@@ -75,7 +123,7 @@ export const deleteTask = async (req, res) => {
 
 export const viewAllTasks = async (req, res) => {
   try {
-    const { userid } = req.headers;
+    const userid = req.userID;
     const { date } = req.query;
     const testDate = new Date(date);
     console.log(testDate);
