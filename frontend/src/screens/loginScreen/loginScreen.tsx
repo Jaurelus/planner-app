@@ -1,6 +1,6 @@
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui';
 import { useNavigation } from '@react-navigation/native';
-import { View, Text, TextInput } from 'react-native';
+import { View, Text, TextInput, Image } from 'react-native';
 import { useEffect, useState } from 'react';
 
 import Button from 'components/ui/button';
@@ -57,6 +57,12 @@ function LoginScreen({ route }: LoginProps) {
 
   return (
     <View className="flex flex-1 items-center justify-center">
+      <Image
+        style={{ width: 220, height: 58 }}
+        resizeMode="contain"
+        className="mb-8"
+        source={require('../../../assets/dayflow-logotype.png')}
+      />
       <Card className="flex w-[80%] items-center">
         <CardHeader>
           <CardTitle> Log into your account</CardTitle>

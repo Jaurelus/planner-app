@@ -2,7 +2,7 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/componen
 import { useNavigation } from '@react-navigation/native';
 import Button from '../../../components/ui/button';
 import { useRef, useState, useEffect } from 'react';
-import { View, Text, TextInput } from 'react-native';
+import { View, Text, TextInput, Image } from 'react-native';
 import { Check } from 'lucide-react-native';
 import { useToast } from '@/components/Toast';
 
@@ -133,6 +133,12 @@ function RegisterScreen({ route, userG, setUserG }: RegisterProps) {
 
   return (
     <View className=" flex flex-1 items-center justify-center">
+      <Image
+        style={{ width: 220, height: 58 }}
+        resizeMode="contain"
+        className="mb-8"
+        source={require('../../../assets/dayflow-logotype.png')}
+      />
       <Card className="w-[80%] items-center">
         <CardHeader>
           <CardTitle>Sign Up </CardTitle>

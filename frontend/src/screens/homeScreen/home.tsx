@@ -148,12 +148,13 @@ function HomePage({ route }: any) {
   return (
     <View className="flex flex-1">
       <View className="flex flex-1">
-        <View className="items-center">
+        <View className="items-center pt-6">
+          {/* Wordmark -- wide aspect, so contain rather than a square box */}
           <Image
-            style={{ width: 200, height: 200 }}
-            className="h-[200px] w-[200px]"
-            source={require('../../../assets/transparent-logo.png')}></Image>
-          <Text className="text-lg font-semibold">{new Date().toDateString()}</Text>
+            style={{ width: 220, height: 58 }}
+            resizeMode="contain"
+            source={require('../../../assets/dayflow-logotype.png')}></Image>
+          <Text className="mt-4 text-lg font-semibold">{new Date().toDateString()}</Text>
           <Text className="mt-1 text-slate-500">Reminders</Text>
         </View>
 

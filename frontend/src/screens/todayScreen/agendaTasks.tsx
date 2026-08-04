@@ -497,7 +497,14 @@ function AgendaTasks({ api, date }: AgendaTasksProps) {
 
       {/* Positioned by a wrapper View, not the Button itself -- and given an
           explicit zIndex/elevation so the Timeline can't paint over it. */}
-      <View className="absolute bottom-6 right-6" style={{ zIndex: 50, elevation: 5 }}>
+      <View
+        style={{
+          position: 'absolute',
+          bottom: 28,
+          right: 24,
+          zIndex: 50,
+          elevation: 5,
+        }}>
         <AlertDialog>
           <AlertDialogTrigger asChild>
             <Button className="rounded-full border p-2" size="lg">
