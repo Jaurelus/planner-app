@@ -21,7 +21,7 @@ function SignoutCard({ api, onLogout }: { api: string; onLogout: () => void }) {
   }, []);
   const logoutUser = async () => {
     console.log('Log out function');
-    const response = await fetch(api + 'api/user/logout', {
+    const response = await fetch(api + 'user/logout', {
       headers: { AuthToken: userToken },
       method: 'POST',
     });

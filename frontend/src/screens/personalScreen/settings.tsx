@@ -54,9 +54,10 @@ function SettingsCard({ api }: { api: string }) {
         <CardTitle>Settings</CardTitle>
       </CardHeader>
       <CardContent className="mt-2 flex w-full gap-2">
-        <View className="flex w-full flex-row items-center justify-between py-2">
+        <View className="flex w-full py-2">
           <Text className="font-medium">Categories</Text>
-          <ColorSelector api={api}></ColorSelector>
+          <Text className="mb-1 text-xs text-slate-500">Tap one to change its colour</Text>
+          <ColorSelector api={api} manage></ColorSelector>
         </View>
         <View className="h-[1px] w-full bg-[#d1bcea]" />
         <View className="flex flex-row items-center justify-between py-2">

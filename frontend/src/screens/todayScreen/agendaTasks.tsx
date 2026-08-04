@@ -28,6 +28,7 @@ import {
 import { Select } from 'components/Select';
 import DeleteModal from '@/components/DeleteModal';
 import RemindSelect from '@/components/RemindSelect';
+import { useToast } from '@/components/Toast';
 
 interface AgendaTasksProps {
   api: string;
@@ -35,6 +36,7 @@ interface AgendaTasksProps {
 }
 function AgendaTasks({ api, date }: AgendaTasksProps) {
   const API_URL = api + 'tasks';
+  const showError = useToast();
   const [selectedDate, setSelectedDate] = useState('');
   const [startHour, setStartHour] = useState<Date>(new Date(date + 'T12:00:00'));
   const [endHour, setEndHour] = useState<Date>(new Date(date + 'T12:00:00'));
@@ -251,7 +253,7 @@ function AgendaTasks({ api, date }: AgendaTasksProps) {
         setTaskDesc('');
       } else console.log(data.message);
     } catch (error) {
-      console.log('Error', error);
+      showError('Could not create that task');
     }
   };
 
@@ -269,7 +271,7 @@ function AgendaTasks({ api, date }: AgendaTasksProps) {
         console.log('Task deleted');
       } else console.log(response.status);
     } catch (error) {
-      console.log('Error: ', error);
+      showError('Could not delete that task');
     }
   };
 
@@ -493,12 +495,15 @@ function AgendaTasks({ api, date }: AgendaTasksProps) {
           );
         }}></Timeline>
 
-      <AlertDialog>
-        <AlertDialogTrigger asChild>
-          <Button className=" absolute bottom-10 right-10 rounded-full border p-2" size="lg">
-            <CopyPlus color={'white'} />
-          </Button>
-        </AlertDialogTrigger>
+      {/* Positioned by a wrapper View, not the Button itself -- and given an
+          explicit zIndex/elevation so the Timeline can't paint over it. */}
+      <View className="absolute bottom-6 right-6" style={{ zIndex: 50, elevation: 5 }}>
+        <AlertDialog>
+          <AlertDialogTrigger asChild>
+            <Button className="rounded-full border p-2" size="lg">
+              <CopyPlus color={'white'} />
+            </Button>
+          </AlertDialogTrigger>
         <AlertDialogContent className="!w-[90%] gap-3 bg-white">
           <AlertDialogHeader>
             <AlertDialogTitle className="mt-2 color-dark">Add New Task</AlertDialogTitle>
@@ -563,12 +568,13 @@ function AgendaTasks({ api, date }: AgendaTasksProps) {
               valueKey="choiceNum"></Select>
           </View>
 
-          <AlertDialogFooter className="mb-5 mt-5 flex flex-row items-center justify-center gap-3">
-            <AlertDialogCancel variant="destructive">Cancel</AlertDialogCancel>
-            <AlertDialogAction onPress={createTask}>Confirm</AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+            <AlertDialogFooter className="mb-5 mt-5 flex flex-row items-center justify-center gap-3">
+              <AlertDialogCancel variant="destructive">Cancel</AlertDialogCancel>
+              <AlertDialogAction onPress={createTask}>Confirm</AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
+      </View>
 
       {/* Single delete modal for every task on the timeline */}
       <DeleteModal

@@ -1,4 +1,4 @@
-import { View, useColorScheme, Text, Modal, Pressable, TextInput } from 'react-native';
+import { View, useColorScheme, Text, Modal, Pressable, TextInput, ScrollView } from 'react-native';
 import { Calendar, CalendarList, DateData } from 'react-native-calendars';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { use, useEffect, useRef, useState } from 'react';
@@ -23,6 +23,7 @@ import * as SecureStore from 'expo-secure-store';
 import { useNavigation } from '@react-navigation/native';
 import MarkedDateModal from '@/components/markedDateModal';
 import DeleteModal from '@/components/DeleteModal';
+import { useToast } from '@/components/Toast';
 
 function MonthlyView({
   markedDates,
@@ -34,11 +35,12 @@ function MonthlyView({
   refreshDates: React.Dispatch<React.SetStateAction<boolean>>;
 }) {
   console.log(api);
+  const showError = useToast();
   const colorScheme = useColorScheme();
   const isDark = colorScheme === 'dark';
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   const [currLongPressDate, setCurrLongPressDate] = useState<Date>(new Date());
-  const [empty, setEmpty] = useState(false);
+  // Derived, not stored -- setEmpty was never called so the hint never showed
   const [visbility, setVisibility] = useState(false);
   const [selected, setSelected] = useState(false);
   const [myVar, setmyVar] = useState(false);
@@ -48,6 +50,7 @@ function MonthlyView({
   const [objectives, setObjectives] = useState([]);
 
   const [userObjectives, setUserObjectives] = useState([]);
+  const empty = userObjectives.length === 0;
   const calendarRef = useRef<any>(null);
   const [, forceRender] = useState(0);
   const [userToken, setUserToken] = useState<any>(null);
@@ -155,7 +158,7 @@ function MonthlyView({
         console.log(response.status, '  ', data.message);
       }
     } catch (error) {
-      console.log('Client Error', error);
+      showError('Network error loading objectives');
     }
   };
   useEffect(() => {
@@ -178,7 +181,7 @@ function MonthlyView({
         setVisibility(false);
         getObjectives();
       } else {
-        console.log('Error adding objective: ', data.message);
+        showError(data.message || 'Could not add that objective');
       }
     } catch (error) {
       console.log('Client Error: ' + error);
@@ -202,7 +205,7 @@ function MonthlyView({
         setSelectedObjective(null);
         getObjectives();
       } else {
-        console.log('Error editing objective: ', data.message);
+        showError(data.message || 'Could not save that objective');
       }
     } catch (error) {
       console.log('Client Error: ' + error);
@@ -222,11 +225,12 @@ function MonthlyView({
       setSelectedObjective(null);
       getObjectives();
     } else {
-      console.log('Server Error: ' + data.message);
+      showError('Could not delete that objective');
     }
   };
   return (
-    <View className="flex">
+    // flex-1 (not flex) -- the ScrollView below needs a bounded height to scroll
+    <View className="flex-1">
       <View>
         {/*Modal for the DateTimePicker in Calendar Header */}
 
@@ -296,7 +300,7 @@ function MonthlyView({
             );
           }}></Calendar>
       </View>
-      <View className="justify-center gap-3 px-4">
+      <ScrollView className="flex-1" contentContainerClassName="gap-3 px-4 pb-32">
         <Text className="mt-3 text-center"> Monthly Overview</Text>
         {empty ? (
           <Card className="">
@@ -407,7 +411,7 @@ function MonthlyView({
             markedDates={markedDates}
             refreshDates={refreshDates}></MarkedDateModal>
         )}
-      </View>
+      </ScrollView>
     </View>
   );
 }

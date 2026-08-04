@@ -22,9 +22,11 @@ import * as SecureStore from 'expo-secure-store';
 import AddModal from '@/components/AddModal';
 import EditModal from '@/components/EditModal';
 import DeleteModal from '@/components/DeleteModal';
+import { useToast } from '@/components/Toast';
 
 function Goals({ api, scrollDate }: { api: string; scrollDate: string }) {
   const API_URL = api + 'goals';
+  const showError = useToast();
   const [goals, setGoals] = useState([]);
   const [alertDT, setAlertDT] = useState('Mark Goal Complete?');
   const [alertDD, setAlertDD] = useState(
@@ -125,10 +127,10 @@ function Goals({ api, scrollDate }: { api: string; scrollDate: string }) {
         setAddVisible(false);
         await showGoals();
       } else {
-        console.log(data.message);
+        showError(data.message || 'Could not save that goal');
       }
     } catch (error) {
-      console.log(error);
+      showError('Network error saving goal');
     }
   };
 
@@ -208,7 +210,7 @@ function Goals({ api, scrollDate }: { api: string; scrollDate: string }) {
         showGoals();
       }
     } catch (error) {
-      console.log('Error: ', error);
+      showError('Could not save that goal');
     }
   };
   //Delete goals
@@ -226,7 +228,7 @@ function Goals({ api, scrollDate }: { api: string; scrollDate: string }) {
         showGoals();
       }
     } catch (error) {
-      console.log('error:', error);
+      showError('Could not delete that goal');
     }
   };
 

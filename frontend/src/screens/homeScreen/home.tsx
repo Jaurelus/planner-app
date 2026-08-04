@@ -6,11 +6,13 @@ import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/ca
 import { BellPlus, LucideCircleX, SquarePen } from 'lucide-react-native';
 import * as SecureStore from 'expo-secure-store';
 import AddModal from '@/components/AddModal';
+import { useToast } from '@/components/Toast';
 import EditModal from '@/components/EditModal';
 import DeleteModal from '@/components/DeleteModal';
 
 function HomePage({ route }: any) {
   const api = route?.params?.api;
+  const showError = useToast();
 
   const [userToken, setUserToken] = useState('');
   const [userInfo, setUserInfo] = useState<any>(null);
@@ -51,10 +53,10 @@ function HomePage({ route }: any) {
       if (response.status == 200) {
         setReminders(data.reminders ?? []);
       } else {
-        console.log('Server Error getting reminders: ' + data.message);
+        showError('Could not load your reminders');
       }
     } catch (error) {
-      console.log('Client error getting reminders', error);
+      showError('Network error loading reminders');
     }
   };
 
@@ -80,10 +82,10 @@ function HomePage({ route }: any) {
         setAddVisible(false);
         getReminders();
       } else {
-        console.log('Server Error adding reminder: ' + data.message);
+        showError(data.message || 'Could not add that reminder');
       }
     } catch (error) {
-      console.log('Client error adding reminder', error);
+      showError('Network error adding reminder');
     }
   };
 
@@ -106,10 +108,10 @@ function HomePage({ route }: any) {
         setSelected(null);
         getReminders();
       } else {
-        console.log('Server Error editing reminder: ' + data.message);
+        showError(data.message || 'Could not save that reminder');
       }
     } catch (error) {
-      console.log('Client error editing reminder', error);
+      showError('Network error saving reminder');
     }
   };
 
@@ -126,7 +128,7 @@ function HomePage({ route }: any) {
         getReminders();
       }
     } catch (error) {
-      console.log('Client error deleting reminder', error);
+      showError('Could not delete that reminder');
     }
   };
 

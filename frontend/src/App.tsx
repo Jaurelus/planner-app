@@ -4,6 +4,7 @@ import './global.css';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import HomePage from '@/screens/homeScreen/home';
+import ToastProvider from '@/components/Toast';
 import Personal from '@/screens/personalScreen/personal';
 import Daily from '@/screens/todayScreen/today';
 import CalendarScreen from '@/screens/calendarScreen/calendarScreen';
@@ -140,9 +141,6 @@ export default function App() {
     getMarkedDates();
   }, [userToken, userInfo]);
   useEffect(() => {
-    getHolidays();
-  }, []);
-  useEffect(() => {
     if (userDates != null && formattedHolidays != null) {
       mergeDates();
     }
@@ -215,6 +213,7 @@ export default function App() {
   }, [notiToken, userInfo, userToken]);
 
   return (
+    <ToastProvider>
     <View className="flex flex-1">
       <NavigationContainer>
         <Stack.Navigator>
@@ -277,5 +276,6 @@ export default function App() {
         </Stack.Navigator>
       </NavigationContainer>
     </View>
+    </ToastProvider>
   );
 }
