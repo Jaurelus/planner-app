@@ -4,7 +4,7 @@ const DAY_MS = 24 * 60 * 60 * 1000;
 
 export const createReminder = async (req, res) => {
   try {
-    const { userid } = req.headers;
+    const userid = req.userID;
     const { reminderDate, reminderDescription, reminderExpiration } = req.body;
 
     if (!reminderDescription) {
@@ -39,7 +39,7 @@ export const createReminder = async (req, res) => {
 };
 export const getReminders = async (req, res) => {
   try {
-    const { userid } = req.headers;
+    const userid = req.userID;
     // Soonest first, so the home screen shows what's next at the top
     const reminders = await Reminder.find({ userID: userid }).sort({ date: 1 });
     return res
@@ -73,9 +73,14 @@ export const editReminder = async (req, res) => {
     }
 
     // { new: true } returns the updated doc; without it you get the stale one
-    const reminder = await Reminder.findByIdAndUpdate(reminderID, update, {
-      new: true,
-    });
+    // Scoped to the owner so you can't edit someone else's reminder
+    const reminder = await Reminder.findOneAndUpdate(
+      { _id: reminderID, userID: req.userID },
+      update,
+      { new: true },
+    );
+    if (!reminder)
+      return res.status(404).json({ message: "Reminder not found" });
     return res
       .status(200)
       .json({ message: "Reminder successfully edited", reminder: reminder });
@@ -87,7 +92,11 @@ export const deleteReminder = async (req, res) => {
   try {
     // DELETE requests shouldn't carry a body — some proxies strip it; use the path param
     const { reminderID } = req.params;
-    await Reminder.findByIdAndDelete(reminderID);
+    const deleted = await Reminder.findOneAndDelete({
+      _id: reminderID,
+      userID: req.userID,
+    });
+    if (!deleted) return res.status(404).json({ message: "Reminder not found" });
     return res.status(200).json({ message: "Reminder successfully deleted" });
   } catch (error) {
     return res.status(400).json({ message: error });

@@ -3,7 +3,7 @@ import Goal from "./goalsModel.js";
 //Create a goal (Post)
 export const createGoal = async (req, res) => {
   try {
-    const { userid } = req.headers;
+    const userid = req.userID;
 
     const { goalTitle, goalDescription, goalDate } = req.body;
 
@@ -34,9 +34,11 @@ export const editGoal = async (req, res) => {
     //Destructure request
     const { goalTitle, goalDescription, goalCompletion } = req.body;
     const { id } = req.params;
+    const userid = req.userID;
 
-    //Find current goal
-    const currGoal = await Goal.findById(id);
+    //Find current goal -- scoped to the owner so you can't edit someone else's
+    const currGoal = await Goal.findOne({ _id: id, userID: userid });
+    if (!currGoal) return res.status(404).json({ message: "Goal not found" });
 
     //At least one thing needed for update
     if (!goalTitle && !goalDescription && goalCompletion === undefined) {
@@ -65,7 +67,8 @@ export const editGoal = async (req, res) => {
 export const deleteGoal = async (req, res) => {
   try {
     const { id } = req.params;
-    await Goal.findByIdAndDelete(id);
+    const deleted = await Goal.findOneAndDelete({ _id: id, userID: req.userID });
+    if (!deleted) return res.status(404).json({ message: "Goal not found" });
     return res.status(200).json({ message: "Goal deleted" });
   } catch (error) {
     return res.status(400).json({ message: "Error deleting this goal" });
@@ -75,7 +78,7 @@ export const deleteGoal = async (req, res) => {
 //Get all goals
 export const getGoals = async (req, res) => {
   try {
-    const { userid } = req.headers;
+    const userid = req.userID;
     const { startDate, endDate } = req.query;
     let jsObjectStart = new Date(startDate);
     jsObjectStart.setUTCHours(0, 0, 0);

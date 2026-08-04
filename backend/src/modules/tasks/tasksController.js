@@ -4,7 +4,7 @@ import Task from "./tasksModel.js";
 export const addTask = async (req, res) => {
   try {
     //Destructure req
-    const { userid } = req.headers;
+    const userid = req.userID;
 
     const {
       uTaskName,
@@ -69,7 +69,9 @@ export const editTask = async (req, res) => {
     ) {
       return res.status(400).json({ message: "Nothing to change" });
     }
-    const currTask = await Task.findById(id);
+    // Scoped to the owner so you can't edit someone else's task
+    const currTask = await Task.findOne({ _id: id, userID: req.userID });
+    if (!currTask) return res.status(404).json({ message: "Task not found" });
 
     const newStart = uTaskStart || currTask.timeStart;
     // Recompute remindTime if either the offset or the start time moved,
@@ -110,7 +112,8 @@ export const editTask = async (req, res) => {
 export const deleteTask = async (req, res) => {
   try {
     const { id } = req.params;
-    await Task.findByIdAndDelete(id);
+    const deleted = await Task.findOneAndDelete({ _id: id, userID: req.userID });
+    if (!deleted) return res.status(404).json({ message: "Task not found" });
     return res.status(200).json({ message: "Task successfully deleted" });
   } catch (error) {
     return res.status(400).json({ message: "Error deleting task" });
@@ -120,7 +123,7 @@ export const deleteTask = async (req, res) => {
 
 export const viewAllTasks = async (req, res) => {
   try {
-    const { userid } = req.headers;
+    const userid = req.userID;
     const { date } = req.query;
     const testDate = new Date(date);
     console.log(testDate);
