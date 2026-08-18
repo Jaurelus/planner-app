@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, ScrollView, Pressable } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, Pressable, ActivityIndicator } from 'react-native';
 import { useState, useEffect, useContext } from 'react';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '../../components/ui/card';
 import Button from '../../components/ui/button';
@@ -28,6 +28,8 @@ function Goals({ api, scrollDate }: { api: string; scrollDate: string }) {
   const API_URL = api + 'goals';
   const showError = useToast();
   const [goals, setGoals] = useState([]);
+  // Starts true so the first paint is a spinner, not an empty list
+  const [loading, setLoading] = useState(true);
   const [alertDT, setAlertDT] = useState('Mark Goal Complete?');
   const [alertDD, setAlertDD] = useState(
     'By pressing confirm, you are agreeing that you completed this goal'
@@ -167,14 +169,14 @@ function Goals({ api, scrollDate }: { api: string; scrollDate: string }) {
         method: 'GET',
       });
       if (response.status == 200) {
-        console.log('--------Showing zgoals------');
         const data = await response.json();
-
-        console.log(data.goals);
         setGoals(data.goals);
       }
     } catch (error) {
-      console.log(error);
+      showError('Network error loading goals');
+    } finally {
+      // finally, so a failed request stops the spinner too
+      setLoading(false);
     }
   };
 
@@ -260,7 +262,14 @@ function Goals({ api, scrollDate }: { api: string; scrollDate: string }) {
     <View className=" mb-10 gap-3 px-5 py-5">
       {/* Goal display (cards) */}
 
-      {goals.map((goal, index) => (
+      {loading && (
+        <View className="items-center py-10">
+          <ActivityIndicator color="#754ABF" />
+        </View>
+      )}
+
+      {!loading &&
+        goals.map((goal, index) => (
         //
         <Card
           key={goal._id}

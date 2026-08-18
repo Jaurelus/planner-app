@@ -12,6 +12,7 @@ function SignoutCard({ api, onLogout }: { api: string; onLogout: () => void }) {
   useEffect(() => {
     const fetchData = async () => {
       const token = await SecureStore.getItemAsync('token');
+      //Check if token is active and do below code if so
       setUserToken(token ? token : '');
       const user = await SecureStore.getItemAsync('userInfo');
       setUserInfo(user ? JSON.parse(user) : null);

@@ -1,7 +1,9 @@
 import mongoose, { Schema } from "mongoose";
 
 const UserModel = new mongoose.Schema({
-  email: { type: String, required: true },
+  // unique -> Mongo rejects a second account on the same address.
+  // lowercase/trim so "Jay@x.com" and "jay@x.com " can't both exist.
+  email: { type: String, required: true, unique: true, lowercase: true, trim: true },
   phoneNumber: { type: String },
   password: { type: String, required: true },
   firstName: { type: String, default: "" },

@@ -44,6 +44,12 @@ function ColorSelector({
     if (manage) getPalette();
   }, [userInfo, userToken]);
 
+  // The picker outlives a single open when it sits inside a persistent modal,
+  // so follow the category the parent hands us instead of only the first one
+  useEffect(() => {
+    setSelectedValue(currentCategory?.type ?? 'Category');
+  }, [currentCategory?.type]);
+
   //-------- API Calls --------
 
   const getColors = async (color?: string) => {
@@ -121,9 +127,7 @@ function ColorSelector({
                   <Circle key={i} size={14} fill={value.color} stroke={value.color} />
                 ))}
                 {userCategories.length > 5 && (
-                  <Text className="ml-1 text-xs text-slate-500">
-                    +{userCategories.length - 5}
-                  </Text>
+                  <Text className="ml-1 text-xs text-slate-500">+{userCategories.length - 5}</Text>
                 )}
               </View>
               <Text className="text-xs text-slate-500">
@@ -213,7 +217,8 @@ function ColorSelector({
                   onPress={() => {
                     setSelectedValue(value.type);
                     setVisible(false);
-                    setUpdatedCategory?.(value.type);
+                    // Whole object: dateController reads .type and .color off it
+                    setUpdatedCategory?.(value);
                   }}>
                   <View className="flex flex-1 flex-row justify-between">
                     <Text>{value.type}</Text>

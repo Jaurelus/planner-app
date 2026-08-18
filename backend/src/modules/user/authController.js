@@ -31,6 +31,12 @@ export const registerUser = async (req, res) => {
       .json({ message: "User successfully added", user: safeUser });
     //return
   } catch (error) {
+    // 11000 = Mongo duplicate key, i.e. that email is already registered
+    if (error.code === 11000) {
+      return res
+        .status(409)
+        .json({ message: "An account with that email already exists" });
+    }
     return res.status(400).json({ message: "Try catch failed" + error });
   }
 };

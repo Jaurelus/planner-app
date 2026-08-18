@@ -15,6 +15,7 @@ import reminderRoutes from "./modules/reminders/remindersRoutes.js";
 // Bare import: running the module body is what registers the cron schedule
 import "./modules/notifications/notificationsController.js";
 import "./modules/notifications/notificationsController.js";
+import { validateToken } from "./middleware.js";
 
 var hd = new Holidays("US");
 const app = express();
@@ -23,6 +24,13 @@ const PORT = process.env.PORT || 3000;
 //Middleware (Every request passes through )
 app.use(cors());
 app.use(express.json());
+
+// Render probes this after deploy. Reporting the live DB state means a broken
+// Mongo connection fails the deploy instead of going "live" but broken.
+app.get("/health", (req, res) => {
+  const dbUp = mongoose.connection.readyState === 1;
+  return res.status(dbUp ? 200 : 503).json({ ok: dbUp });
+});
 
 app.get("/api/holidays", (req, res) => {
   try {
@@ -46,7 +54,7 @@ app.use("/api/dates", dateRoutes);
 app.use("/api/objectives", objectRoutes);
 app.use("/api/plaid", plaidRoutes);
 app.use("/api/reminders", reminderRoutes);
-
+app.use("/api/validate", validateToken, (req, res) => res.sendStatus(200));
 mongoose
   .connect(process.env.MONGO_URI)
   .then(() => console.log("Connected to MongoDB"))

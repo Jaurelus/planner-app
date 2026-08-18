@@ -1,10 +1,11 @@
 import { View, useColorScheme, Platform } from 'react-native';
 import { useState, useEffect } from 'react';
 import './global.css';
-import { NavigationContainer } from '@react-navigation/native';
+import { NavigationContainer, useNavigation } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import HomePage from '@/screens/homeScreen/home';
 import ToastProvider from '@/components/Toast';
+import ErrorBoundary from '@/components/ErrorBoundary';
 import Personal from '@/screens/personalScreen/personal';
 import Daily from '@/screens/todayScreen/today';
 import CalendarScreen from '@/screens/calendarScreen/calendarScreen';
@@ -31,15 +32,18 @@ export default function App() {
   //If system is is a simulator, then set the API URL to :
 
   const API_URL = Device.isDevice
-    ? 'http://192.168.12.175:3000/api/'
+    ? 'http://192.168.12.153:3000/api/'
     : 'http://localhost:3000/api/';
   useEffect(() => {
     const fetchData = async () => {
       const token = await SecureStore.getItemAsync('token');
+      await validateToken(token);
       setUserToken(token ? token : '');
       const user = await SecureStore.getItemAsync('userInfo');
       setUserInfo(user ? JSON.parse(user) : null);
       if (token) setUser(true);
+      console.log(API_URL);
+      console.log(token, user);
     };
     fetchData();
   }, []);
@@ -200,6 +204,34 @@ export default function App() {
       console.log('Error saving token to server' + data);
     }
   };
+
+  const logoutUser = async () => {
+    console.log('Log out function');
+    const response = await fetch(API_URL + 'user/logout', {
+      headers: { AuthToken: userToken },
+      method: 'POST',
+    });
+    //Destroy token
+    await SecureStore.deleteItemAsync('token');
+    await SecureStore.deleteItemAsync('userInfo');
+    setUserInfo(null);
+    setUserToken('');
+    setUser(false);
+    console.log('User Info cleared');
+    console.log('Redirect');
+    //Navigate to login screen
+  };
+
+  const validateToken = async (token) => {
+    const response = await fetch(API_URL + 'validate', {
+      headers: { AuthToken: token, 'Content-Type': 'application/json' },
+    });
+    if (response.status == 200) {
+      return;
+    } else {
+      await logoutUser();
+    }
+  };
   // Ask the device for a push token once we know who the user is
   useEffect(() => {
     if (!userInfo) return;
@@ -213,69 +245,67 @@ export default function App() {
   }, [notiToken, userInfo, userToken]);
 
   return (
-    <ToastProvider>
-    <View className="flex flex-1">
-      <NavigationContainer>
-        <Stack.Navigator>
-          {!user ? (
-            <>
-              <Stack.Screen
-                name="Login"
-                component={LoginScreen}
-                initialParams={{ api: API_URL, onChange: setUser }}
-              />
-              <Stack.Screen
-                name="Register"
-                component={RegisterScreen}
-                initialParams={{ api: API_URL }}
-              />
-            </>
-          ) : (
-            <>
-              <Stack.Screen
-                name="Home"
-                component={HomePage}
-                initialParams={{ api: API_URL }}
-              />
-              {mergedDates && (
-                <Stack.Screen
-                  name="Goals"
-                  component={CalendarScreen}
-                  initialParams={{
-                    api: API_URL,
-                    dates: mergedDates,
-                    refreshDates: setRefreshDates,
-                  }}
-                />
+    <ErrorBoundary>
+      <ToastProvider>
+        <View className="flex flex-1">
+          <NavigationContainer>
+            <Stack.Navigator>
+              {!user ? (
+                <>
+                  <Stack.Screen
+                    name="Login"
+                    component={LoginScreen}
+                    initialParams={{ api: API_URL, onChange: setUser }}
+                  />
+                  <Stack.Screen
+                    name="Register"
+                    component={RegisterScreen}
+                    initialParams={{ api: API_URL }}
+                  />
+                </>
+              ) : (
+                <>
+                  <Stack.Screen name="Home" component={HomePage} initialParams={{ api: API_URL }} />
+                  {mergedDates && (
+                    <Stack.Screen
+                      name="Goals"
+                      component={CalendarScreen}
+                      initialParams={{
+                        api: API_URL,
+                        dates: mergedDates,
+                        refreshDates: setRefreshDates,
+                      }}
+                    />
+                  )}
+                  <Stack.Screen
+                    name="Personal"
+                    component={Personal}
+                    initialParams={{ api: API_URL, onChange: setUserInfo }}
+                  />
+                  {mergedDates && (
+                    <Stack.Screen
+                      name="Today"
+                      component={Daily}
+                      initialParams={{
+                        api: API_URL,
+                        dates: mergedDates,
+                        refreshDates: setRefreshDates,
+                      }}
+                    />
+                  )}
+                  {mergedDates && (
+                    <Stack.Screen
+                      name="Finance"
+                      component={FinanceScreen}
+                      initialParams={{ api: API_URL, dates: mergedDates }}
+                    />
+                  )}
+                </>
               )}
-              <Stack.Screen
-                name="Personal"
-                component={Personal}
-                initialParams={{ api: API_URL, onChange: setUser }}
-              />
-              {mergedDates && (
-                <Stack.Screen
-                  name="Today"
-                  component={Daily}
-                  initialParams={{
-                    api: API_URL,
-                    dates: mergedDates,
-                    refreshDates: setRefreshDates,
-                  }}
-                />
-              )}
-              {mergedDates && (
-                <Stack.Screen
-                  name="Finance"
-                  component={FinanceScreen}
-                  initialParams={{ api: API_URL, dates: mergedDates }}
-                />
-              )}
-            </>
-          )}
-        </Stack.Navigator>
-      </NavigationContainer>
-    </View>
-    </ToastProvider>
+            </Stack.Navigator>
+          </NavigationContainer>
+        </View>
+      </ToastProvider>
+    </ErrorBoundary>
   );
 }
