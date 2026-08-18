@@ -59,7 +59,7 @@ function ScrollView({ onChange, setDate, markedDates, api, refreshDates }: Scrol
         markingType="multi-dot"
         markedDates={markedDates}
         className=""
-        enableSwipeMonths={true}
+        enableSwipeMonths={false}
         theme={calendarTheme}
         onDayPress={(day) => {
           console.log(day);

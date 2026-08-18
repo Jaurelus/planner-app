@@ -1,4 +1,4 @@
-import { View, Text, Image, ScrollView } from 'react-native';
+import { View, Text, Image, ScrollView, ActivityIndicator } from 'react-native';
 import { useEffect, useState } from 'react';
 import Navbar from '../../components/ui/Navbar';
 import Button from 'components/ui/button';
@@ -17,6 +17,8 @@ function HomePage({ route }: any) {
   const [userToken, setUserToken] = useState('');
   const [userInfo, setUserInfo] = useState<any>(null);
   const [reminders, setReminders] = useState<any[]>([]);
+  // Starts true so the first paint is a spinner, not an empty state
+  const [loading, setLoading] = useState(true);
 
   const [addVisible, setAddVisible] = useState(false);
   const [editVisible, setEditVisible] = useState(false);
@@ -57,6 +59,9 @@ function HomePage({ route }: any) {
       }
     } catch (error) {
       showError('Network error loading reminders');
+    } finally {
+      // finally, so a failed request stops the spinner too
+      setLoading(false);
     }
   };
 
@@ -159,7 +164,11 @@ function HomePage({ route }: any) {
         </View>
 
         <ScrollView contentContainerClassName="gap-3 px-5 pb-6 pt-3">
-          {reminders.length === 0 ? (
+          {loading ? (
+            <View className="items-center py-10">
+              <ActivityIndicator color="#754ABF" />
+            </View>
+          ) : reminders.length === 0 ? (
             <Card className="bg-[#E1D9FB]">
               <CardContent className="py-4">
                 <Text className="text-center text-sm">

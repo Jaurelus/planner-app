@@ -22,11 +22,12 @@ function DeleteModal({ module, visibility, setVisibility, onClick, context }: De
           <CardHeader className="-mx-[1] -mt-[22px] flex flex-row justify-between rounded-t-2xl  bg-[#d1bcea] pb-2 pt-4">
             <View className="-mx-4 flex  ">
               <CardTitle className="">Delete {module}</CardTitle>
-              <Text className="color-primary">This is permanent and cannot be undone</Text>
+              {/* #754ABF is only 3.5:1 on this lavender header; this is 8.3:1 */}
+              <Text className="text-[#3C0275]">This is permanent and cannot be undone</Text>
             </View>
             <Button
               className="-mr-6 -mt-5 "
-              textClassName="color-primary"
+              textClassName="text-[#3C0275]"
               variant="ghost"
               onPress={() => {
                 setVisibility(false);

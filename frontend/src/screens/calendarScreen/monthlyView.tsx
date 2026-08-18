@@ -1,4 +1,13 @@
-import { View, useColorScheme, Text, Modal, Pressable, TextInput, ScrollView } from 'react-native';
+import {
+  View,
+  useColorScheme,
+  Text,
+  Modal,
+  Pressable,
+  TextInput,
+  ScrollView,
+  ActivityIndicator,
+} from 'react-native';
 import { Calendar, CalendarList, DateData } from 'react-native-calendars';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { use, useEffect, useRef, useState } from 'react';
@@ -51,6 +60,8 @@ function MonthlyView({
 
   const [userObjectives, setUserObjectives] = useState([]);
   const empty = userObjectives.length === 0;
+  // Starts true so the first paint is a spinner, not the "no objectives" hint
+  const [loading, setLoading] = useState(true);
   const calendarRef = useRef<any>(null);
   const [, forceRender] = useState(0);
   const [userToken, setUserToken] = useState<any>(null);
@@ -159,6 +170,9 @@ function MonthlyView({
       }
     } catch (error) {
       showError('Network error loading objectives');
+    } finally {
+      // finally, so a failed request stops the spinner too
+      setLoading(false);
     }
   };
   useEffect(() => {
@@ -302,7 +316,11 @@ function MonthlyView({
       </View>
       <ScrollView className="flex-1" contentContainerClassName="gap-3 px-4 pb-32">
         <Text className="mt-3 text-center"> Monthly Overview</Text>
-        {empty ? (
+        {loading ? (
+          <View className="items-center py-10">
+            <ActivityIndicator color="#754ABF" />
+          </View>
+        ) : empty ? (
           <Card className="">
             {/*If no monthly goals  */}
 

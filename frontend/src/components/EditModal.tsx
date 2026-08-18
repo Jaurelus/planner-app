@@ -4,6 +4,9 @@ import { useState } from 'react';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from './ui';
 import RemindSelect from './RemindSelect';
+import ColorSelector from './colorSelector';
+import { Select } from 'components/Select';
+import { TASK_CATEGORIES } from './AddModal';
 
 interface EditModalProps {
   module: string;
@@ -15,6 +18,8 @@ interface EditModalProps {
   onChange: (key: string, value: any) => void;
   // Optional line under the title, e.g. the name of the item being edited
   context?: string;
+  // Only the Date module needs this -- ColorSelector loads categories itself
+  api?: string;
 }
 function EditModal({
   module,
@@ -24,6 +29,7 @@ function EditModal({
   values,
   onChange,
   context,
+  api,
 }: EditModalProps) {
   // Which date picker is open. UI-only, so it stays local.
   const [openPicker, setOpenPicker] = useState<string | null>(null);
@@ -46,7 +52,7 @@ function EditModal({
     withTime?: boolean;
   }) => (
     <View className="gap-1">
-      <Text className="ml-1 text-xs font-medium text-slate-500">{label}</Text>
+      <Text className="ml-1 text-xs font-medium text-slate-600">{label}</Text>
       <Pressable onPress={() => setOpenPicker(openPicker === field ? null : field)}>
         <View className="rounded-xl border border-[#d1bcea] bg-white p-2">
           <Text className="text-center">{showDate(values[field], withTime)}</Text>
@@ -72,11 +78,12 @@ function EditModal({
           <CardHeader className="-mx-[1] -mt-[22px] flex flex-row justify-between rounded-t-2xl  bg-[#d1bcea] pb-2 pt-4">
             <View className="-mx-4 flex  ">
               <CardTitle className="">Edit {module}</CardTitle>
-              {context ? <Text className="color-primary">{context}</Text> : null}
+              {/* #754ABF is only 3.5:1 on this lavender header; this is 8.3:1 */}
+              {context ? <Text className="text-[#3C0275]">{context}</Text> : null}
             </View>
             <Button
               className="-mr-6 -mt-5 "
-              textClassName="color-primary"
+              textClassName="text-[#3C0275]"
               variant="ghost"
               onPress={() => {
                 setOpenPicker(null);
@@ -90,7 +97,7 @@ function EditModal({
           {module == 'Objective' && (
             <CardContent className="mt-2 gap-5">
               <View className="gap-1">
-                <Text className="ml-1 text-xs font-medium text-slate-500">Title</Text>
+                <Text className="ml-1 text-xs font-medium text-slate-600">Title</Text>
                 <TextInput
                   className="rounded-xl border border-[#d1bcea] bg-white p-1 text-center"
                   placeholder="Objective Title"
@@ -99,7 +106,7 @@ function EditModal({
                 />
               </View>
               <View className="gap-1">
-                <Text className="ml-1 text-xs font-medium text-slate-500">Description</Text>
+                <Text className="ml-1 text-xs font-medium text-slate-600">Description</Text>
                 <TextInput
                   className="rounded-xl border border-[#d1bcea] bg-white p-1 text-center"
                   placeholder="Objective Description"
@@ -109,7 +116,7 @@ function EditModal({
                 />
               </View>
               <View className="gap-1">
-                <Text className="ml-1 text-xs font-medium text-slate-500">Current Progress</Text>
+                <Text className="ml-1 text-xs font-medium text-slate-600">Current Progress</Text>
                 <TextInput
                   className="rounded-xl border border-[#d1bcea] bg-white p-1 text-center"
                   placeholder="Current Progress"
@@ -119,7 +126,7 @@ function EditModal({
                 />
               </View>
               <View className="gap-1">
-                <Text className="ml-1 text-xs font-medium text-slate-500">Goal Number</Text>
+                <Text className="ml-1 text-xs font-medium text-slate-600">Goal Number</Text>
                 <TextInput
                   className="rounded-xl border border-[#d1bcea] bg-white p-1 text-center"
                   placeholder="Goal Number"
@@ -135,7 +142,7 @@ function EditModal({
           {module == 'Task' && (
             <CardContent className="mt-2 gap-5">
               <View className="gap-1">
-                <Text className="ml-1 text-xs font-medium text-slate-500">Task Name</Text>
+                <Text className="ml-1 text-xs font-medium text-slate-600">Task Name</Text>
                 <TextInput
                   className="rounded-xl border border-[#d1bcea] bg-white p-1 text-center"
                   placeholder="Task Name"
@@ -144,7 +151,7 @@ function EditModal({
                 />
               </View>
               <View className="gap-1">
-                <Text className="ml-1 text-xs font-medium text-slate-500">Description</Text>
+                <Text className="ml-1 text-xs font-medium text-slate-600">Description</Text>
                 <TextInput
                   className="rounded-xl border border-[#d1bcea] bg-white p-1 text-center"
                   placeholder="Task Description"
@@ -156,12 +163,16 @@ function EditModal({
               <DateField field="uTaskStart" label="Starts" withTime />
               <DateField field="uTaskEnd" label="Ends" withTime />
               <View className="gap-1">
-                <Text className="ml-1 text-xs font-medium text-slate-500">Category</Text>
-                <TextInput
-                  className="rounded-xl border border-[#d1bcea] bg-white p-1 text-center"
-                  placeholder="Category"
-                  value={values.uTaskCat ?? ''}
-                  onChangeText={(t) => onChange('uTaskCat', t)}
+                <Text className="ml-1 text-xs font-medium text-slate-600">Category</Text>
+                {/* Same fixed list AddModal writes, so the values stay in sync */}
+                <Select
+                  placeholder={values.uTaskCat || 'Choose a classification for this task'}
+                  options={TASK_CATEGORIES}
+                  onSelect={(choice) =>
+                    onChange('uTaskCat', TASK_CATEGORIES[Number(choice) - 1].option)
+                  }
+                  labelKey="option"
+                  valueKey="choiceNum"
                 />
               </View>
               <RemindSelect
@@ -175,7 +186,7 @@ function EditModal({
           {module == 'Goal' && (
             <CardContent className="mt-2 gap-5">
               <View className="gap-1">
-                <Text className="ml-1 text-xs font-medium text-slate-500">Title</Text>
+                <Text className="ml-1 text-xs font-medium text-slate-600">Title</Text>
                 <TextInput
                   className="rounded-xl border border-[#d1bcea] bg-white p-1 text-center"
                   placeholder="Goal Title"
@@ -184,7 +195,7 @@ function EditModal({
                 />
               </View>
               <View className="gap-1">
-                <Text className="ml-1 text-xs font-medium text-slate-500">Description</Text>
+                <Text className="ml-1 text-xs font-medium text-slate-600">Description</Text>
                 <TextInput
                   className="rounded-xl border border-[#d1bcea] bg-white p-1 text-center"
                   placeholder="Goal Description"
@@ -200,7 +211,7 @@ function EditModal({
           {module == 'Date' && (
             <CardContent className="mt-2 gap-5">
               <View className="gap-1">
-                <Text className="ml-1 text-xs font-medium text-slate-500">Name</Text>
+                <Text className="ml-1 text-xs font-medium text-slate-600">Name</Text>
                 <TextInput
                   className="rounded-xl border border-[#d1bcea] bg-white p-1 text-center"
                   placeholder="Name"
@@ -209,7 +220,7 @@ function EditModal({
                 />
               </View>
               <View className="gap-1">
-                <Text className="ml-1 text-xs font-medium text-slate-500">Note / Rule</Text>
+                <Text className="ml-1 text-xs font-medium text-slate-600">Note / Rule</Text>
                 <TextInput
                   className="rounded-xl border border-[#d1bcea] bg-white p-1 text-center"
                   placeholder="Note / Rule"
@@ -218,6 +229,16 @@ function EditModal({
                   onChangeText={(t) => onChange('dateRule', t)}
                 />
               </View>
+              {api && (
+                <View className="z-50 gap-1">
+                  <Text className="ml-1 text-xs font-medium text-slate-600">Category</Text>
+                  <ColorSelector
+                    api={api}
+                    currentCategory={values.dateCategory}
+                    setUpdatedCategory={(category) => onChange('dateCategory', category)}
+                  />
+                </View>
+              )}
             </CardContent>
           )}
 
@@ -225,7 +246,7 @@ function EditModal({
           {module == 'Reminder' && (
             <CardContent className="mt-2 gap-5">
               <View className="gap-1">
-                <Text className="ml-1 text-xs font-medium text-slate-500">Reminder</Text>
+                <Text className="ml-1 text-xs font-medium text-slate-600">Reminder</Text>
                 <TextInput
                   className="rounded-xl border border-[#d1bcea] bg-white p-1 text-center"
                   placeholder="What should I remind you about?"

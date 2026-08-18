@@ -4,6 +4,20 @@ import { useState } from 'react';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from './ui';
 import RemindSelect from './RemindSelect';
+import { Select } from 'components/Select';
+
+// Exported so EditModal offers exactly the same nine classifications
+export const TASK_CATEGORIES = [
+  { choiceNum: 1, option: 'Physical' },
+  { choiceNum: 2, option: 'Mental(School)' },
+  { choiceNum: 3, option: 'Intellecutal(Personal)' },
+  { choiceNum: 4, option: 'Creative' },
+  { choiceNum: 5, option: 'Social' },
+  { choiceNum: 6, option: 'Daily Living/Chore' },
+  { choiceNum: 7, option: 'Recreation/Hobby' },
+  { choiceNum: 8, option: 'Work/Occupation' },
+  { choiceNum: 9, option: 'Misc' },
+];
 
 interface AddModalProps {
   module: string;
@@ -45,7 +59,7 @@ function AddModal({
     withTime?: boolean;
   }) => (
     <View className="gap-1">
-      <Text className="ml-1 text-xs font-medium text-slate-500">{label}</Text>
+      <Text className="ml-1 text-xs font-medium text-slate-600">{label}</Text>
       <Pressable onPress={() => setOpenPicker(openPicker === field ? null : field)}>
         <View className="rounded-xl border border-[#d1bcea] bg-white p-2">
           <Text className="text-center">{showDate(values[field], withTime)}</Text>
@@ -76,7 +90,7 @@ function AddModal({
             </View>
             <Button
               className="-mr-6 -mt-5 "
-              textClassName="color-primary"
+              textClassName="text-[#3C0275]"
               variant="ghost"
               onPress={() => {
                 setOpenPicker(null);
@@ -90,7 +104,7 @@ function AddModal({
           {module == 'Objective' && (
             <CardContent className="mt-2 gap-5">
               <View className="gap-1">
-                <Text className="ml-1 text-xs font-medium text-slate-500">Title</Text>
+                <Text className="ml-1 text-xs font-medium text-slate-600">Title</Text>
                 <TextInput
                   className="rounded-xl border border-[#d1bcea] bg-white p-1 text-center"
                   placeholder="Objective Title"
@@ -99,7 +113,7 @@ function AddModal({
                 />
               </View>
               <View className="gap-1">
-                <Text className="ml-1 text-xs font-medium text-slate-500">Description</Text>
+                <Text className="ml-1 text-xs font-medium text-slate-600">Description</Text>
                 <TextInput
                   className="rounded-xl border border-[#d1bcea] bg-white p-1 text-center"
                   placeholder="Objective Description"
@@ -109,7 +123,7 @@ function AddModal({
                 />
               </View>
               <View className="gap-1">
-                <Text className="ml-1 text-xs font-medium text-slate-500">Current Progress</Text>
+                <Text className="ml-1 text-xs font-medium text-slate-600">Current Progress</Text>
                 <TextInput
                   className="rounded-xl border border-[#d1bcea] bg-white p-1 text-center"
                   placeholder="Current Progress"
@@ -119,7 +133,7 @@ function AddModal({
                 />
               </View>
               <View className="gap-1">
-                <Text className="ml-1 text-xs font-medium text-slate-500">Goal Number</Text>
+                <Text className="ml-1 text-xs font-medium text-slate-600">Goal Number</Text>
                 <TextInput
                   className="rounded-xl border border-[#d1bcea] bg-white p-1 text-center"
                   placeholder="Goal Number"
@@ -135,7 +149,7 @@ function AddModal({
           {module == 'Task' && (
             <CardContent className="mt-2 gap-5">
               <View className="gap-1">
-                <Text className="ml-1 text-xs font-medium text-slate-500">Task Name</Text>
+                <Text className="ml-1 text-xs font-medium text-slate-600">Task Name</Text>
                 <TextInput
                   className="rounded-xl border border-[#d1bcea] bg-white p-1 text-center"
                   placeholder="Task Name"
@@ -144,7 +158,7 @@ function AddModal({
                 />
               </View>
               <View className="gap-1">
-                <Text className="ml-1 text-xs font-medium text-slate-500">Description</Text>
+                <Text className="ml-1 text-xs font-medium text-slate-600">Description</Text>
                 <TextInput
                   className="rounded-xl border border-[#d1bcea] bg-white p-1 text-center"
                   placeholder="Task Description"
@@ -156,12 +170,16 @@ function AddModal({
               <DateField field="uTaskStart" label="Starts" withTime />
               <DateField field="uTaskEnd" label="Ends" withTime />
               <View className="gap-1">
-                <Text className="ml-1 text-xs font-medium text-slate-500">Category</Text>
-                <TextInput
-                  className="rounded-xl border border-[#d1bcea] bg-white p-1 text-center"
-                  placeholder="Category"
-                  value={values.uTaskCat ?? ''}
-                  onChangeText={(t) => onChange('uTaskCat', t)}
+                <Text className="ml-1 text-xs font-medium text-slate-600">Category</Text>
+                {/* Fixed list, so the values match what the edit dialog writes */}
+                <Select
+                  placeholder={values.uTaskCat || 'Choose a classification for this task'}
+                  options={TASK_CATEGORIES}
+                  onSelect={(choice) =>
+                    onChange('uTaskCat', TASK_CATEGORIES[Number(choice) - 1].option)
+                  }
+                  labelKey="option"
+                  valueKey="choiceNum"
                 />
               </View>
               {/* Minutes before start. Backend turns this into remindTime. */}
@@ -176,7 +194,7 @@ function AddModal({
           {module == 'Reminder' && (
             <CardContent className="mt-2 gap-5">
               <View className="gap-1">
-                <Text className="ml-1 text-xs font-medium text-slate-500">Reminder</Text>
+                <Text className="ml-1 text-xs font-medium text-slate-600">Reminder</Text>
                 <TextInput
                   className="rounded-xl border border-[#d1bcea] bg-white p-1 text-center"
                   placeholder="What should I remind you about?"
@@ -193,7 +211,7 @@ function AddModal({
           {module == 'Goal' && (
             <CardContent className="mt-2 gap-5">
               <View className="gap-1">
-                <Text className="ml-1 text-xs font-medium text-slate-500">Title</Text>
+                <Text className="ml-1 text-xs font-medium text-slate-600">Title</Text>
                 <TextInput
                   className="rounded-xl border border-[#d1bcea] bg-white p-1 text-center"
                   placeholder="Goal Title"
@@ -202,7 +220,7 @@ function AddModal({
                 />
               </View>
               <View className="gap-1">
-                <Text className="ml-1 text-xs font-medium text-slate-500">Description</Text>
+                <Text className="ml-1 text-xs font-medium text-slate-600">Description</Text>
                 <TextInput
                   className="rounded-xl border border-[#d1bcea] bg-white p-1 text-center"
                   placeholder="Goal Description"
@@ -219,7 +237,7 @@ function AddModal({
           {module == 'Date' && (
             <CardContent className="mt-2 gap-5">
               <View className="gap-1">
-                <Text className="ml-1 text-xs font-medium text-slate-500">Name</Text>
+                <Text className="ml-1 text-xs font-medium text-slate-600">Name</Text>
                 <TextInput
                   className="rounded-xl border border-[#d1bcea] bg-white p-1 text-center"
                   placeholder="Name"
@@ -228,7 +246,7 @@ function AddModal({
                 />
               </View>
               <View className="gap-1">
-                <Text className="ml-1 text-xs font-medium text-slate-500">Type</Text>
+                <Text className="ml-1 text-xs font-medium text-slate-600">Type</Text>
                 <TextInput
                   className="rounded-xl border border-[#d1bcea] bg-white p-1 text-center"
                   placeholder="Type (Ex: Birthdays)"
@@ -238,7 +256,7 @@ function AddModal({
               </View>
               <DateField field="newDateDate" label="Date" />
               <View className="gap-1">
-                <Text className="ml-1 text-xs font-medium text-slate-500">Note / Rule</Text>
+                <Text className="ml-1 text-xs font-medium text-slate-600">Note / Rule</Text>
                 <TextInput
                   className="rounded-xl border border-[#d1bcea] bg-white p-1 text-center"
                   placeholder="Note / Rule"

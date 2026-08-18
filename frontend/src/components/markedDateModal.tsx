@@ -1,12 +1,11 @@
-import { Modal, TextInput, Text, View, Pressable } from 'react-native';
+import { Modal, Text, View, Pressable } from 'react-native';
 import { useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from './ui';
 import Button from 'components/ui/button';
 import { useState } from 'react';
-import { AlertDialog, AlertDialogHeader, AlertDialogTrigger } from 'components/ui';
 import * as SecureStore from 'expo-secure-store';
-import ColorSelector from './colorSelector';
-import { Select } from 'components/Select';
+import AddModal from './AddModal';
+import EditModal from './EditModal';
 import { Circle } from 'lucide-react-native';
 
 interface MarkedDateModalProps {
@@ -27,22 +26,25 @@ function MarkedDateModal({
 }: MarkedDateModalProps) {
   const [userToken, setUserToken] = useState('');
   const [userInfo, setUserInfo] = useState<any>(null);
-  const [dateName, setDateName] = useState('');
   const [contextDate, setContextDate] = useState('');
   const [existingMarkedDate, setExistingMarkedDate] = useState<boolean>();
-  const [dateType, setDateType] = useState('');
-  const [dateRule, setDateRule] = useState('');
-  const [editType, setEditType] = useState('');
-  const [editRule, setEditRule] = useState('');
-  const [editCategory, setEditCategory] = useState<Record<string, any>>({});
-  const [selectedEditID, setSelectedEditID] = useState(null);
+  const [selectedEditID, setSelectedEditID] = useState<number | null>(null);
+  // Set when the user taps "Add New Date" on a day that already has one
+  const [addingAnother, setAddingAnother] = useState(false);
+
+  // Shared form state for AddModal / EditModal. Keys match the backend payload.
+  const [form, setForm] = useState<Record<string, any>>({});
+  const handleChange = (key: string, value: any) => setForm((prev) => ({ ...prev, [key]: value }));
+
+  const dayKey = date.slice(0, 10);
 
   useEffect(() => {
-    setExistingMarkedDate(Object.keys(markedDates).includes(date.slice(0, 10)));
+    const exists = Object.keys(markedDates).includes(dayKey);
+    setExistingMarkedDate(exists);
     setSelectedEditID(null);
-    console.log(markedDates['2026-07-04']?.events[0]?.name);
-
-    console.log('KEYS', Object.keys(markedDates));
+    setAddingAnother(false);
+    // A fresh day goes straight to the add form, so pre-fill the day tapped
+    setForm(exists ? {} : { newDateDate: new Date(date) });
   }, [date, markedDates]);
   useEffect(() => {
     setContextDate(date.toString());
@@ -57,41 +59,49 @@ function MarkedDateModal({
     };
     fetchData();
   }, []);
+
+  // Both modals only ever call this with false (their X button), so it closes
+  // the whole flow. Typed as a state setter so it drops straight into their props.
+  const closeAll: React.Dispatch<React.SetStateAction<boolean>> = () => {
+    setSelectedEditID(null);
+    setAddingAnother(false);
+    setForm({});
+    setVisible(false);
+  };
+
+  // Which of the three views is showing
+  const showAdd = visible && (!existingMarkedDate || addingAnother);
+  const showEdit = visible && !showAdd && selectedEditID !== null;
+  const showList = visible && !showAdd && !showEdit;
+
   //-------- API CALL --------------
   //Function to add marked dates
   const markDate = async () => {
     if (!userInfo || !userToken) return;
-    const payload: any = {};
+    // dateController does newDateType.toLowerCase(), so a blank type 500s there
+    if (!form.newDateName || !form.newDateType) {
+      console.log('A name and a type are both required to mark a date');
+      return;
+    }
+    const payload: any = {
+      newDateDate: form.newDateDate ?? new Date(contextDate),
+      newDateName: form.newDateName,
+      newDateType: form.newDateType,
+    };
+    if (form.newDateRule) payload.newDateRule = form.newDateRule;
 
     try {
-      if (date) {
-        payload.newDateDate = new Date(contextDate);
-      }
-      if (dateName) {
-        payload.newDateName = dateName;
-      }
-      if (dateType) {
-        payload.newDateType = dateType;
-      }
-      if (dateRule) {
-        payload.newDateRule = dateRule;
-      }
-      console.log('Pre fetch');
-      console.log(payload);
       const response = await fetch(api + 'dates', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Authtoken: userToken, userid: userInfo._id },
         body: JSON.stringify(payload),
       });
-      console.log('post fetch');
-      console.log(response.status);
 
       const data = await response.json();
-      console.log(data.message);
       if (response.status == 201) {
         console.log('Date sucessfully marked');
         refreshDates(true);
-        setVisible(false);
+        closeAll(false);
       } else {
         console.log('Server side error marking date' + data.message);
       }
@@ -99,9 +109,13 @@ function MarkedDateModal({
       console.log('Client-side eror ', error);
     }
   };
-  const editDate = async (dateID) => {
+  const editDate = async (dateID: string) => {
     if (!userInfo || !userToken) return;
-    const payload = { dateName: editType, dateRule: editRule, dateCategory: editCategory };
+    const payload = {
+      dateName: form.dateName,
+      dateRule: form.dateRule,
+      dateCategory: form.dateCategory,
+    };
     // ID travels in the URL path (same style as tasks/objectives) -> backend reads req.params.dateID
     const response = await fetch(`${api}dates/${dateID}`, {
       method: 'PATCH',
@@ -112,7 +126,7 @@ function MarkedDateModal({
     if (response.status == 200) {
       console.log('Date sucessfully edited');
       refreshDates(true);
-      setVisible(false);
+      closeAll(false);
     } else {
       console.log('Server side error editing date' + data.message);
     }
@@ -120,131 +134,88 @@ function MarkedDateModal({
 
   //----------- APP BUILD --------------
   return (
-    <Modal transparent={true} visible={visible}>
-      {!existingMarkedDate ? (
-        <Card className="mb-auto ml-auto mr-auto mt-auto w-[75%] items-center justify-center">
-          <View className="flex flex-1 bg-[#A77ED6]">
-            <CardHeader>
-              <CardTitle>{'Add Marked Date?'}</CardTitle>
-              <Text className="text-center">{date.slice(0, 10)}</Text>
+    <>
+      {/* Same add/edit modals every other module uses */}
+      <AddModal
+        module="Date"
+        visibility={showAdd}
+        setVisibility={closeAll}
+        values={form}
+        onChange={handleChange}
+        onClick={markDate}
+      />
+      <EditModal
+        module="Date"
+        api={api}
+        visibility={showEdit}
+        setVisibility={closeAll}
+        values={form}
+        onChange={handleChange}
+        onClick={async () => {
+          await editDate(markedDates[dayKey].events[selectedEditID!]._id);
+        }}
+        context={dayKey}
+      />
+
+      {/* Day already has marks: pick which one to edit first */}
+      <Modal transparent={true} visible={showList}>
+        <View className="flex flex-1 items-center justify-center bg-black/50">
+          <Card className="w-5/6">
+            <CardHeader className="-mx-[1] -mt-[22px] flex flex-row justify-between rounded-t-2xl bg-[#d1bcea] pb-2 pt-4">
+              <View className="-mx-4 flex">
+                <CardTitle>Marked Dates</CardTitle>
+                <Text className="text-[#3C0275]">{dayKey}</Text>
+              </View>
+              <Button
+                className="-mr-6 -mt-5"
+                textClassName="text-[#3C0275]"
+                variant="ghost"
+                onPress={() => closeAll(false)}>
+                X
+              </Button>
             </CardHeader>
-          </View>
-
-          <CardContent className="w-full items-center gap-3 ">
-            <TextInput
-              className=" w-3/4 rounded-lg border border-primary p-1 text-center"
-              placeholder="Name"
-              value={dateName}
-              onChangeText={setDateName}></TextInput>
-            <TextInput
-              className="w-3/4 rounded-lg border border-primary p-1 text-center"
-              placeholder="Type (Ex: Birthdays)"
-              value={dateType}
-              onChangeText={setDateType}></TextInput>
-            <ColorSelector
-              currentCategory={editCategory}
-              setUpdatedCategory={setEditCategory}
-              api={api}></ColorSelector>
-          </CardContent>
-          <CardFooter className="gap-3">
-            <Button
-              onPress={() => {
-                markDate();
-              }}>
-              Add Date
-            </Button>
-            <Button
-              onPress={() => {
-                setVisible(false);
-              }}>
-              Close
-            </Button>
-          </CardFooter>
-        </Card>
-      ) : (
-        <Card className="mb-auto ml-auto mr-auto mt-auto flex w-[75%] items-center justify-center">
-          <CardHeader>
-            <CardTitle>{'Edit Marked Date?'}</CardTitle>
-            <Text className="text-center">{date.slice(0, 10)}</Text>
-          </CardHeader>
-          {/*2 diff card contents (1 for multidot)*/}
-          {selectedEditID == null ? (
-            <>
-              <CardContent className="mx-3 w-full gap-3">
-                {markedDates[date.slice(0, 10)].events.map((event, i) => (
-                  <Pressable
-                    key={i}
-                    onPress={() => {
-                      setSelectedEditID(i);
-                      setEditType(markedDates[date.slice(0, 10)].events[i].name);
-                      setEditRule(markedDates[date.slice(0, 10)].events[i].rule);
-                      setEditCategory(markedDates[date.slice(0, 10)].events[i].category);
-                    }}>
-                    <Card className=" w-full bg-white">
-                      <CardHeader className="flex items-center justify-center">
-                        <CardTitle>{event.name || 'Hola'}</CardTitle>
-                      </CardHeader>
-                      <View className="ml-3 flex w-full flex-row gap-3">
-                        <Circle
-                          fill={markedDates[date.slice(0, 10)].dots[i].color}
-                          stroke={markedDates[date.slice(0, 10)].dots[i].color}
-                        />
-
-                        <CardDescription className="flex w-[75%] break-words">
-                          {event.rule || 'No worko'}
-                        </CardDescription>
-                      </View>
-                    </Card>
-                  </Pressable>
-                ))}
-              </CardContent>
-              <CardFooter className="gap-3">
-                <Button
+            <CardContent className="mt-2 gap-3">
+              {markedDates[dayKey]?.events.map((event: any, i: number) => (
+                <Pressable
+                  key={i}
                   onPress={() => {
-                    setVisible(false);
+                    setForm({
+                      dateName: markedDates[dayKey].events[i].name,
+                      dateRule: markedDates[dayKey].events[i].rule,
+                      dateCategory: markedDates[dayKey].events[i].category,
+                    });
+                    setSelectedEditID(i);
                   }}>
-                  Close
-                </Button>
-                <Button
-                  onPress={() => {
-                    setExistingMarkedDate(false);
-                  }}>
-                  Add New Date
-                </Button>
-              </CardFooter>
-            </>
-          ) : (
-            <>
-              <CardContent className="flex">
-                <TextInput value={editType} onChangeText={setEditType}></TextInput>
-                <TextInput value={editRule} onChangeText={setEditRule} multiline={true}></TextInput>
-                <View>
-                  <ColorSelector
-                    currentCategory={editCategory}
-                    setUpdatedCategory={setEditCategory}
-                    api={api}></ColorSelector>
-                </View>
-              </CardContent>
-              <CardFooter className="gap-3">
-                <Button
-                  onPress={() => {
-                    setSelectedEditID(null);
-                    setVisible(false);
-                  }}>
-                  Close
-                </Button>
-                <Button
-                  onPress={async () => {
-                    await editDate(markedDates[date.slice(0, 10)].events[selectedEditID]._id);
-                  }}>
-                  Edit Date
-                </Button>
-              </CardFooter>
-            </>
-          )}
-        </Card>
-      )}
-    </Modal>
+                  <Card className="w-full bg-white">
+                    <CardHeader className="flex items-center justify-center">
+                      <CardTitle>{event.name}</CardTitle>
+                    </CardHeader>
+                    <View className="ml-3 flex w-full flex-row items-center gap-3">
+                      <Circle
+                        fill={markedDates[dayKey].dots[i].color}
+                        stroke={markedDates[dayKey].dots[i].color}
+                      />
+                      <CardDescription className="flex w-[75%] break-words">
+                        {event.rule}
+                      </CardDescription>
+                    </View>
+                  </Card>
+                </Pressable>
+              ))}
+            </CardContent>
+            <CardFooter className="justify-end gap-3">
+              <Button
+                onPress={() => {
+                  setForm({ newDateDate: new Date(contextDate) });
+                  setAddingAnother(true);
+                }}>
+                Add New Date
+              </Button>
+            </CardFooter>
+          </Card>
+        </View>
+      </Modal>
+    </>
   );
 }
 export default MarkedDateModal;
