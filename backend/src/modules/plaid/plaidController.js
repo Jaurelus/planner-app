@@ -6,7 +6,7 @@ import { link } from "node:fs";
 dotenv.config();
 
 const configuration = new Configuration({
-  basePath: PlaidEnvironments.sandbox,
+  basePath: PlaidEnvironments.production,
   baseOptions: {
     headers: {
       "PLAID-CLIENT-ID": process.env.PLAID_CLIENT_ID,
@@ -23,7 +23,7 @@ export const createLinkToken = async (req, res) => {
   const request = {
     user: {
       client_user_id: userid,
-      phone_number: "415-555-0010", //Change to this for production : user.phoneNumber.padStart(12, "+1"),
+      //Change to this for production : user.phoneNumber.padStart(12, "+1"),
     },
     client_name: "DayFlow",
     language: "en",

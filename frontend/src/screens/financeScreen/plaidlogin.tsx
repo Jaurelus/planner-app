@@ -11,7 +11,7 @@ import {
   LinkExit,
   LinkSuccess,
 } from 'react-native-plaid-link-sdk';
-import { forEach } from 'eslint.config';
+import { PlaidEmbeddedSearchView } from 'react-native-plaid-link-sdk';
 
 function PlaidLogin({ api }: { api: string }) {
   const [userToken, setUserToken] = useState<any>(null);
@@ -80,6 +80,7 @@ function PlaidLogin({ api }: { api: string }) {
       console.log('h');
       if (response.status == 201) {
         setLinkToken(data.token);
+        console.log('link token good');
       } else {
         console.log(response.status, 'Server side error getting link token, ', data.message);
       }
@@ -108,12 +109,31 @@ function PlaidLogin({ api }: { api: string }) {
         console.log(data);
         setexchangeToken(data.accessToken);
         setItemID(data.itemID);
+        updateUser(data.accessToken);
         console.log('Item ID: ', data.itemID);
       } else {
         console.log(response);
       }
     } catch (error) {
       console.log('Client error, ', error);
+    }
+  };
+
+  const updateUser = async (token) => {
+    if (!userInfo._id) return;
+    const response = await fetch(`${api}plaid/exchangeToken/${userInfo._id}`, {
+      headers: {
+        Authtoken: userToken,
+        Userid: userInfo._id,
+        'Content-Type': 'application/json',
+      },
+      method: 'PATCH',
+      body: JSON.stringify({ userPlaidToken: token }),
+    });
+    if (response.status == 201) {
+      console.log('Success updating exchange token');
+    } else {
+      console.log('error updating exhcnage token');
     }
   };
 
@@ -174,8 +194,7 @@ function PlaidLogin({ api }: { api: string }) {
   }, [exchangeToken]);
 
   return (
-    <View>
-      <Text>Plaid</Text>
+    <View className="w-full">
       {linkToken && (
         <EmbeddedLinkView
           token={linkToken}
