@@ -29,11 +29,11 @@ export default function App() {
   const [refreshDates, setRefreshDates] = useState(false);
   const [notiToken, setNotiToken] = useState('');
 
-  //If system is is a simulator, then set the API URL to :
-
-  const API_URL = Device.isDevice
-    ? 'http://192.168.12.153:3000/api/'
-    : 'http://localhost:3000/api/';
+  // Set EXPO_PUBLIC_API_URL in frontend/.env to your deployed backend.
+  // Falls back to LAN/localhost for local dev when unset.
+  const API_URL =
+    process.env.EXPO_PUBLIC_API_URL ||
+    (Device.isDevice ? 'http://192.168.12.153:3000/api/' : 'http://localhost:3000/api/');
   useEffect(() => {
     const fetchData = async () => {
       const token = await SecureStore.getItemAsync('token');

@@ -5,7 +5,7 @@ function FinanceScreen() {
 
   return (
     <View>
-      <Text>Coming Soon</Text>
+      <Text>Hi</Text>
     </View>
   );
 }

@@ -93,6 +93,7 @@ export const editUser = async (req, res) => {
       phone,
       userNotiToken,
       userNotisEnabled,
+      userPlaidToken,
     } = req.body;
     console.log(phone);
 
@@ -102,7 +103,8 @@ export const editUser = async (req, res) => {
       !userPassword &&
       !phone &&
       !userNotiToken &&
-      userNotisEnabled === undefined
+      userNotisEnabled === undefined &&
+      !userPlaidToken
     ) {
       return res.status(400).json({ message: "Nothing to update" });
     }
@@ -124,6 +126,7 @@ export const editUser = async (req, res) => {
         lastName: userLast || currUser.lastName,
         phoneNumber: phone || currUser.phoneNumber,
         pushToken: userNotiToken || currUser.pushToken,
+        plaidToken: userPlaidToken || currUser.plaidToken,
         // Boolean, so `||` would swallow a deliberate false
         notificationsEnabled:
           userNotisEnabled === undefined

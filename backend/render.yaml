@@ -1,0 +1,25 @@
+services:
+  - type: web
+    name: planner-app-backend
+    runtime: node
+    plan: free
+    region: oregon
+    rootDir: backend
+    buildCommand: npm install
+    startCommand: npm start
+    healthCheckPath: /health
+    envVars:
+      - key: MONGO_URI
+        sync: false
+      - key: MY_SECRET_KEY
+        sync: false
+      - key: TWILIO_API_KEY
+        sync: false
+      - key: TWILIO_SID
+        sync: false
+      - key: SEND_GRID_API_KEY
+        sync: false
+      - key: PLAID_CLIENT_ID
+        sync: false
+      - key: PLAID_SS
+        sync: false
