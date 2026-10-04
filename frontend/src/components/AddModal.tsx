@@ -1,5 +1,5 @@
 import Button from 'components/ui/button';
-import { Modal, Text, TextInput, View, Pressable } from 'react-native';
+import { Modal, Text, TextInput, View, Pressable, Keyboard } from 'react-native';
 import { useState } from 'react';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from './ui';
@@ -80,7 +80,7 @@ function AddModal({
 
   return (
     <Modal transparent={true} visible={visibility}>
-      <View className="flex flex-1 items-center justify-center bg-black/50">
+      <Pressable className="flex flex-1 items-center justify-center bg-black/50" onPress={Keyboard.dismiss}>
         <Card className="w-5/6">
           <CardHeader className="-mx-[1] -mt-[22px] flex flex-row justify-between rounded-t-2xl  bg-[#d1bcea] pb-2 pt-4">
             <View className="-mx-4 flex  ">
@@ -277,7 +277,7 @@ function AddModal({
             </Button>
           </CardFooter>
         </Card>
-      </View>
+      </Pressable>
     </Modal>
   );
 }

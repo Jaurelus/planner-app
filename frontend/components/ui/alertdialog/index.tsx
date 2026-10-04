@@ -10,6 +10,7 @@ import {
   Platform,
   StyleSheet,
   LayoutChangeEvent,
+  Keyboard,
 } from 'react-native';
 import { cn } from '../../../lib/utils';
 
@@ -195,7 +196,7 @@ export const AlertDialogContent: React.FC<AlertDialogContentProps> = ({
       </Animated.View>
 
       {/* Content wrapper with flexbox centering */}
-      <View className="flex-1 justify-center items-center p-4">
+      <Pressable className="flex-1 justify-center items-center p-4" onPress={Keyboard.dismiss}>
         {/* Dialog content with animation */}
         <Animated.View
           ref={contentRef}
@@ -224,7 +225,7 @@ export const AlertDialogContent: React.FC<AlertDialogContentProps> = ({
         >
           <View className="gap-4 w-full">{children}</View>
         </Animated.View>
-      </View>
+      </Pressable>
     </Modal>
   );
 };
