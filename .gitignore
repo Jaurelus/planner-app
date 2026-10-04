@@ -1,2 +1,4 @@
 **/.env
 **/node_modules
+frontend/.expo/xcodebuild.log
+frontend/.expo/xcodebuild-error.log

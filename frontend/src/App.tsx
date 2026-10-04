@@ -1,4 +1,4 @@
-import { View, useColorScheme, Platform } from 'react-native';
+import { View, useColorScheme, Platform, Pressable, Keyboard } from 'react-native';
 import { useState, useEffect } from 'react';
 import './global.css';
 import { NavigationContainer, useNavigation } from '@react-navigation/native';
@@ -247,7 +247,7 @@ export default function App() {
   return (
     <ErrorBoundary>
       <ToastProvider>
-        <View className="flex flex-1">
+        <Pressable className="flex flex-1" onPress={Keyboard.dismiss}>
           <NavigationContainer>
             <Stack.Navigator>
               {!user ? (
@@ -304,7 +304,7 @@ export default function App() {
               )}
             </Stack.Navigator>
           </NavigationContainer>
-        </View>
+        </Pressable>
       </ToastProvider>
     </ErrorBoundary>
   );
